@@ -14,6 +14,14 @@ import Schedule from './pages/Schedule';
 import News from './pages/News';
 import NotFound from './pages/NotFound';
 import ArticleDetail from './pages/ArticleDetail';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import Terms from './pages/Terms';
+import Sitemap from './pages/Sitemap';
+
+// Dashboard
+import Dashboard from './pages/dashboard/Dashboard';
+import Profile from './pages/dashboard/Profile';
+import Documents from './pages/dashboard/Documents';
 
 function App() {
   return (
@@ -38,6 +46,16 @@ function App() {
           {/* Additional Routes */}
           <Route path="/schedule" element={<Schedule />} />
           <Route path="/news" element={<News />} />
+
+          {/* Dashboard Routes */}
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard/profile" element={<Profile />} />
+          <Route path="/dashboard/documents" element={<Documents />} />
+
+          {/* Legal Pages */}
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/sitemap" element={<Sitemap />} />
 
           {/* 404 handler - must be last */}
           <Route path="*" element={<NotFound />} />

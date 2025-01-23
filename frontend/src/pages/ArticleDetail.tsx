@@ -2,6 +2,7 @@ import { useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { CalendarDays, Clock, User } from 'lucide-react';
+import { LucideIcon } from 'lucide-react';
 
 // Dummy data - nanti akan diganti dengan data dari API/backend
 const article = {
@@ -62,7 +63,7 @@ const article = {
 };
 
 // Komponen untuk menampilkan metadata artikel
-function ArticleMeta({ icon: Icon, label, value }: { icon: any, label: string, value: string }) {
+function ArticleMeta({ icon: Icon, label, value }: { icon: LucideIcon, label: string, value: string }) {
   return (
     <div className="flex items-center gap-2 text-muted-foreground">
       <Icon className="h-4 w-4" />
