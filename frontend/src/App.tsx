@@ -8,7 +8,8 @@ import Services from './pages/Services';
 import Ministries from './pages/Ministries';
 import Media from './pages/Media';
 import Offerings from './pages/Offerings';
-// import Announcements from './pages/Announcements';
+import Announcements from './pages/Announcements';
+import ArchiveWarta from './pages/ArchiveWarta';
 import Schedule from './pages/Schedule';
 import News from './pages/News';
 import NotFound from './pages/NotFound';
@@ -31,10 +32,8 @@ function App() {
           <Route path="/articles/:slug" element={<ArticleDetail />} />
 
           {/* Warta & Announcements */}
-          {/* Temporarily disabled */}
-          {/* <Route path="/announcements" element={<Announcements />} /> */}
-          <Route path="/announcements" element={<div>Coming Soon</div>} />
-          <Route path="/arsip-warta" element={<Navigate to="/announcements" replace />} />
+          <Route path="/announcements" element={<Announcements />} />
+          <Route path="/arsip-warta" element={<ArchiveWarta />} />
           
           {/* Additional Routes */}
           <Route path="/schedule" element={<Schedule />} />
