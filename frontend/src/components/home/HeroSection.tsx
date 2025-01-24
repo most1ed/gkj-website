@@ -1,50 +1,56 @@
 import { Button } from '@/components/ui/Button';
+import { AnimatedWrapper } from '@/components/ui/AnimatedWrapper';
 
 export function HeroSection() {
   return (
-    <div className="relative min-h-screen flex items-center justify-center">
-      {/* Background Image */}
-      <div className="absolute inset-0 overflow-hidden">
-        <img 
-          src="https://images.unsplash.com/photo-1438232992991-995b7058bbb3?w=1600&auto=format&fit=crop"
-          alt="Church Background"
+    <section className="relative h-screen flex items-center justify-center overflow-hidden">
+      <AnimatedWrapper
+        animation="scale"
+        duration={1.5}
+        className="absolute inset-0 z-0"
+      >
+        <img
+          src="/images/church.jpg"
+          alt="GKJ Grogol"
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-background/80 to-background" />
+        <div className="absolute inset-0 bg-black/50" />
+      </AnimatedWrapper>
+
+      <div className="relative z-10 text-center text-white px-4">
+        <AnimatedWrapper animation="slide" direction="down" delay={0.5}>
+          <h1 className="text-4xl md:text-6xl font-bold mb-4">
+            GKJ Grogol Jakarta
+          </h1>
+        </AnimatedWrapper>
+
+        <AnimatedWrapper animation="slide" direction="up" delay={0.7}>
+          <p className="text-lg md:text-xl mb-8 max-w-2xl mx-auto">
+            "Menjadi Gereja yang hidup dan berbuah dalam kasih Kristus"
+          </p>
+        </AnimatedWrapper>
+
+        <AnimatedWrapper animation="fade" delay={0.9}>
+          <Button
+            size="lg"
+            variant="outline"
+            className="bg-white/10 backdrop-blur-sm hover:bg-white/20"
+          >
+            Jadwal Ibadah
+          </Button>
+        </AnimatedWrapper>
       </div>
 
-      {/* Content */}
-      <div className="relative container mx-auto px-4 text-center">
-        <h1 className="text-4xl md:text-6xl font-bold mb-6">
-          Selamat Datang di GKJ Grogol Jakarta
-        </h1>
-        <p className="text-xl md:text-2xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-          Bersama kami, bertumbuh dalam iman dan melayani sesama di dalam kasih Kristus.
-        </p>
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Button size="lg" variant="default">
-            Tonton Ibadah Online
-          </Button>
-          <Button size="lg" variant="outline">
-            Lihat Jadwal Ibadah
-          </Button>
+      <AnimatedWrapper
+        animation="slide"
+        direction="down"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white"
+        once={false}
+      >
+        <div className="w-6 h-10 border-2 border-white rounded-full flex items-start justify-center p-1">
+          <div className="w-1 h-2 bg-white rounded-full animate-bounce" />
         </div>
-      </div>
-
-      {/* Scroll Indicator */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-        <svg
-          className="w-6 h-6 text-foreground"
-          fill="none"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="2"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-        </svg>
-      </div>
-    </div>
+      </AnimatedWrapper>
+    </section>
   );
 }

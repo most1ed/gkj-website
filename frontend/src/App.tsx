@@ -17,6 +17,7 @@ import ArticleDetail from './pages/ArticleDetail';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Terms from './pages/Terms';
 import Sitemap from './pages/Sitemap';
+import Bible from './pages/Bible';
 
 // Dashboard
 import Dashboard from './pages/dashboard/Dashboard';
@@ -35,6 +36,7 @@ function App() {
           <Route path="/ministries" element={<Ministries />} />
           <Route path="/media" element={<Media />} />
           <Route path="/offerings" element={<Offerings />} />
+          <Route path="/bible" element={<Bible />} />
 
           {/* Articles */}
           <Route path="/articles/:slug" element={<ArticleDetail />} />

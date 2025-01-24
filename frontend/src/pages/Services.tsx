@@ -1,5 +1,7 @@
-import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
+import React from 'react';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import { AnimatedWrapper, AnimatedPage } from '@/components/ui/AnimatedWrapper';
 import { Link } from "react-router-dom";
 
 export default function Services() {
@@ -87,15 +89,23 @@ export default function Services() {
   ];
 
   return (
-    <div className="min-h-screen bg-background">
+    <AnimatedPage>
       {/* Hero Section */}
-      <section className="relative py-20 bg-primary/5">
+      <AnimatedWrapper
+        animation="scale"
+        duration={1.2}
+        className="relative py-20 bg-primary/5"
+      >
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-4xl font-bold mb-6">Ibadah GKJ Grogol Jakarta</h1>
-            <p className="text-xl text-muted-foreground mb-8">
-              Mari beribadah dan memuliakan Tuhan bersama-sama dalam persekutuan yang penuh sukacita
-            </p>
+            <AnimatedWrapper animation="slide" direction="down" delay={0.3}>
+              <h1 className="text-4xl font-bold mb-6">Ibadah GKJ Grogol Jakarta</h1>
+            </AnimatedWrapper>
+            <AnimatedWrapper animation="slide" direction="up" delay={0.5}>
+              <p className="text-xl text-muted-foreground mb-8">
+                Mari beribadah dan memuliakan Tuhan bersama-sama dalam persekutuan yang penuh sukacita
+              </p>
+            </AnimatedWrapper>
             <div className="flex gap-4 justify-center">
               <Button size="lg">Lihat Jadwal Ibadah</Button>
               <Button size="lg" variant="outline">
@@ -104,87 +114,95 @@ export default function Services() {
             </div>
           </div>
         </div>
-      </section>
+      </AnimatedWrapper>
 
       {/* Upcoming Services */}
-      <section className="py-16">
+      <AnimatedWrapper animation="slide" direction="up" className="py-16">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold mb-8">Ibadah Minggu Ini</h2>
           <div className="grid md:grid-cols-2 gap-6">
             {upcomingServices.map((service, index) => (
-              <Card key={index} className="p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h3 className="text-xl font-semibold mb-2">{service.title}</h3>
-                    <p className="text-primary font-medium">{service.date}</p>
-                    <p className="text-muted-foreground">{service.time}</p>
+              <AnimatedWrapper key={index} animation="fade" delay={0.2 * index}>
+                <Card className="p-6">
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <h3 className="text-xl font-semibold mb-2">{service.title}</h3>
+                      <p className="text-primary font-medium">{service.date}</p>
+                      <p className="text-muted-foreground">{service.time}</p>
+                    </div>
+                    <Button variant="outline" size="sm">
+                      Daftar Hadir
+                    </Button>
                   </div>
-                  <Button variant="outline" size="sm">
-                    Daftar Hadir
+                  <div className="space-y-2 mb-4">
+                    <p><span className="font-medium">Tema:</span> {service.theme}</p>
+                    <p><span className="font-medium">Pengkhotbah:</span> {service.preacher}</p>
+                    <p><span className="font-medium">Liturgos:</span> {service.liturgist}</p>
+                    <p><span className="font-medium">Lokasi:</span> {service.location}</p>
+                  </div>
+                  <Button variant="secondary" className="w-full" asChild>
+                    <a href={service.streamLink} target="_blank" rel="noopener noreferrer">
+                      Tonton Online
+                    </a>
                   </Button>
-                </div>
-                <div className="space-y-2 mb-4">
-                  <p><span className="font-medium">Tema:</span> {service.theme}</p>
-                  <p><span className="font-medium">Pengkhotbah:</span> {service.preacher}</p>
-                  <p><span className="font-medium">Liturgos:</span> {service.liturgist}</p>
-                  <p><span className="font-medium">Lokasi:</span> {service.location}</p>
-                </div>
-                <Button variant="secondary" className="w-full" asChild>
-                  <a href={service.streamLink} target="_blank" rel="noopener noreferrer">
-                    Tonton Online
-                  </a>
-                </Button>
-              </Card>
+                </Card>
+              </AnimatedWrapper>
             ))}
           </div>
         </div>
-      </section>
+      </AnimatedWrapper>
 
       {/* Weekly Services */}
-      <section className="py-16 bg-muted/30">
+      <AnimatedWrapper animation="slide" direction="up" className="py-16 bg-muted/30">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold mb-8">Ibadah Rutin</h2>
           <div className="grid md:grid-cols-3 gap-6">
             {weeklyServices.map((service, index) => (
-              <Card key={index} className="p-6">
-                <h3 className="text-xl font-semibold mb-2">{service.title}</h3>
-                <p className="text-primary font-medium">{service.day}</p>
-                <p className="text-muted-foreground">{service.time}</p>
-                <p className="mt-2">{service.location}</p>
-              </Card>
+              <AnimatedWrapper key={index} animation="fade" delay={0.2 * index}>
+                <Card className="p-6">
+                  <h3 className="text-xl font-semibold mb-2">{service.title}</h3>
+                  <p className="text-primary font-medium">{service.day}</p>
+                  <p className="text-muted-foreground">{service.time}</p>
+                  <p className="mt-2">{service.location}</p>
+                </Card>
+              </AnimatedWrapper>
             ))}
           </div>
         </div>
-      </section>
+      </AnimatedWrapper>
 
       {/* Special Services */}
-      <section className="py-16">
+      <AnimatedWrapper animation="slide" direction="up" className="py-16">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold mb-8">Ibadah Khusus</h2>
           <div className="grid md:grid-cols-3 gap-6">
             {specialServices.map((service, index) => (
-              <Card key={index} className="p-6">
-                <h3 className="text-xl font-semibold mb-2">{service.title}</h3>
-                <p className="text-primary font-medium">{service.date}</p>
-                <p className="text-muted-foreground">{service.time}</p>
-                <p className="mt-2">{service.location}</p>
-              </Card>
+              <AnimatedWrapper key={index} animation="fade" delay={0.2 * index}>
+                <Card className="p-6">
+                  <h3 className="text-xl font-semibold mb-2">{service.title}</h3>
+                  <p className="text-primary font-medium">{service.date}</p>
+                  <p className="text-muted-foreground">{service.time}</p>
+                  <p className="mt-2">{service.location}</p>
+                </Card>
+              </AnimatedWrapper>
             ))}
           </div>
         </div>
-      </section>
+      </AnimatedWrapper>
 
       {/* Announcements */}
-      <section className="py-16 bg-muted/30">
+      <AnimatedWrapper animation="slide" direction="up" className="py-16 bg-muted/30">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold mb-8">Warta Jemaat</h2>
           <div className="grid md:grid-cols-2 gap-6">
             {announcements.map((announcement, index) => (
-              <Card key={index} className="p-6">
-                <p className="text-sm text-muted-foreground mb-2">{announcement.date}</p>
-                <h3 className="text-xl font-semibold mb-2">{announcement.title}</h3>
-                <p>{announcement.content}</p>
-              </Card>
+              <AnimatedWrapper key={index} animation="fade" delay={0.2 * index}>
+                <Card className="p-6">
+                  <p className="text-sm text-muted-foreground mb-2">{announcement.date}</p>
+                  <h3 className="text-xl font-semibold mb-2">{announcement.title}</h3>
+                  <p>{announcement.content}</p>
+                </Card>
+              </AnimatedWrapper>
             ))}
           </div>
           <div className="text-center mt-8">
@@ -193,31 +211,33 @@ export default function Services() {
             </Button>
           </div>
         </div>
-      </section>
+      </AnimatedWrapper>
 
       {/* Devotionals */}
-      <section className="py-16">
+      <AnimatedWrapper animation="slide" direction="up" className="py-16">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold mb-8">Renungan Harian</h2>
           <div className="grid md:grid-cols-2 gap-6">
             {devotionals.map((devotional, index) => (
-              <Card key={index} className="p-6">
-                <p className="text-sm text-muted-foreground mb-2">{devotional.date}</p>
-                <h3 className="text-xl font-semibold mb-2">{devotional.title}</h3>
-                <p className="text-primary font-medium mb-4">{devotional.verse}</p>
-                <p className="mb-4">{devotional.content}</p>
-                <p className="text-sm text-muted-foreground">Oleh: {devotional.author}</p>
-              </Card>
+              <AnimatedWrapper key={index} animation="fade" delay={0.2 * index}>
+                <Card className="p-6">
+                  <p className="text-sm text-muted-foreground mb-2">{devotional.date}</p>
+                  <h3 className="text-xl font-semibold mb-2">{devotional.title}</h3>
+                  <p className="text-primary font-medium mb-4">{devotional.verse}</p>
+                  <p className="mb-4">{devotional.content}</p>
+                  <p className="text-sm text-muted-foreground">Oleh: {devotional.author}</p>
+                </Card>
+              </AnimatedWrapper>
             ))}
           </div>
           <div className="text-center mt-8">
             <Button variant="outline">Baca Renungan Lainnya</Button>
           </div>
         </div>
-      </section>
+      </AnimatedWrapper>
 
       {/* Live Stream Section */}
-      <section className="py-16 bg-primary/5">
+      <AnimatedWrapper animation="slide" direction="up" className="py-16 bg-primary/5">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Ibadah Online</h2>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
@@ -233,7 +253,7 @@ export default function Services() {
             </a>
           </Button>
         </div>
-      </section>
-    </div>
+      </AnimatedWrapper>
+    </AnimatedPage>
   );
 }

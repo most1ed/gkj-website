@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/Button";
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
-import { Home, Menu, LogIn } from "lucide-react";
+import { Home, Menu, LogIn, BookOpen } from "lucide-react";
 
 export function Navbar() {
   return (
@@ -17,6 +17,9 @@ export function Navbar() {
           <div className="hidden md:flex items-center space-x-6">
             <Link to="/" className="text-sm font-medium hover:text-primary">
               <Home className="h-5 w-5" />
+            </Link>
+            <Link to="/bible" className="text-sm font-medium hover:text-primary">
+              <BookOpen className="h-5 w-5" />
             </Link>
             <Link to="/about" className="text-sm font-medium hover:text-primary">
               Tentang Kami
@@ -38,7 +41,7 @@ export function Navbar() {
             </Link>
             <div className="ml-4 border-l pl-4 flex items-center space-x-4">
               <ThemeToggle />
-              <Link to="/login" className="text-sm font-medium hover:text-primary">
+              <Link to="/auth/login" className="text-sm font-medium hover:text-primary">
                 <LogIn className="h-5 w-5" />
               </Link>
             </div>
@@ -46,7 +49,7 @@ export function Navbar() {
 
           {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center space-x-4">
-            <Link to="/login" className="text-sm font-medium hover:text-primary">
+            <Link to="/auth/login" className="text-sm font-medium hover:text-primary">
               <LogIn className="h-6 w-6" />
             </Link>
             <ThemeToggle />
