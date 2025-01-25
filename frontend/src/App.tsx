@@ -1,5 +1,6 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { PublicLayout } from './components/layout/PublicLayout';
+import { Toaster } from "@/components/ui/Toast/Toaster";
 
 // Pages
 import Home from './pages/Home';
@@ -8,26 +9,28 @@ import Services from './pages/Services';
 import Ministries from './pages/Ministries';
 import Media from './pages/Media';
 import Offerings from './pages/Offerings';
+import Bible from './pages/Bible';
+import ArticleDetail from './pages/ArticleDetail';
 import Announcements from './pages/Announcements';
 import ArchiveWarta from './pages/ArchiveWarta';
 import Schedule from './pages/Schedule';
 import News from './pages/News';
-import NotFound from './pages/NotFound';
-import ArticleDetail from './pages/ArticleDetail';
-import PrivacyPolicy from './pages/PrivacyPolicy';
-import Terms from './pages/Terms';
-import Sitemap from './pages/Sitemap';
-import Bible from './pages/Bible';
-
-// Dashboard
 import Dashboard from './pages/dashboard/Dashboard';
 import Profile from './pages/dashboard/Profile';
 import Documents from './pages/dashboard/Documents';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import Terms from './pages/Terms';
+import Sitemap from './pages/Sitemap';
+import NotFound from './pages/NotFound';
+import Login from './pages/auth/Login';
 
 function App() {
   return (
     <div className="min-h-screen bg-background">
       <Routes>
+        {/* Auth Routes - No Layout */}
+        <Route path="/auth/login" element={<Login />} />
+
         <Route element={<PublicLayout />}>
           {/* Main Menu Routes */}
           <Route path="/" element={<Home />} />
@@ -63,6 +66,7 @@ function App() {
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
+      <Toaster />
     </div>
   );
 }

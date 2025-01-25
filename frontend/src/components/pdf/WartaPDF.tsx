@@ -55,9 +55,9 @@ const styles = StyleSheet.create({
     textAlign: 'justify',
   },
   table: {
-    display: 'table',
-    width: 'auto',
-    marginVertical: 10,
+    display: 'flex',
+    flexDirection: 'column',
+    padding: 10,
   },
   tableRow: {
     flexDirection: 'row',
@@ -181,7 +181,7 @@ const WartaPDF: React.FC<WartaPDFProps> = ({
 
       {/* Footer */}
       <View style={styles.footer}>
-        <Text>GKJ Salatiga © {new Date().getFullYear()}</Text>
+        <Text>GKJ Salatiga {new Date().getFullYear()}</Text>
       </View>
       
       <Text

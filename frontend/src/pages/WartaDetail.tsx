@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/Table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
-import { PDFButton } from "@/components/PDFButton";
+import { PDFButton } from "@/components/pdf";
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { wartaGereja } from "@/data/dummyData";
