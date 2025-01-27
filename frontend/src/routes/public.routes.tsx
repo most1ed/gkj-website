@@ -11,6 +11,7 @@ import Services from "@/features/public/services/ServicesPage";
 import AboutPage from "@/features/public/about/AboutPage";
 import Bible from "@/features/public/bible/BiblePage";
 import Ministries from "@/features/public/ministries/MinistriesPage";
+import OrganizationStructurePage from "@/features/public/about/OrganizationStructurePage";
 
 // Import Legal Pages
 import PrivacyPolicy from "@/features/public/legal/PrivacyPolicyPage";
@@ -18,6 +19,7 @@ import Terms from "@/features/public/legal/TermsPage";
 import Sitemap from "@/features/public/sitemap/SitemapPage";
 import AccessibilityPage from "@/features/public/legal/AccessibilityPage";
 import FinancialReportPage from "@/features/public/financial/FinancialReportPage";
+import SecurityPolicyPage from "@/features/public/legal/SecurityPolicyPage";
 
 export const publicRoutes: RouteObject[] = [
   {
@@ -105,8 +107,16 @@ export const publicRoutes: RouteObject[] = [
         element: <DummyPage title="Pernyataan Misi" /> 
       },
       { 
+        path: "pernyataan-misi", 
+        element: <DummyPage title="Pernyataan Misi" /> 
+      },
+      { 
+        path: "organization-structure", 
+        element: <OrganizationStructurePage /> 
+      },
+      { 
         path: "organizational-structure", 
-        element: <DummyPage title="Struktur Organisasi" /> 
+        element: <OrganizationStructurePage /> 
       },
       { 
         path: "financial-report", 
@@ -118,7 +128,7 @@ export const publicRoutes: RouteObject[] = [
       },
       { 
         path: "security-policy", 
-        element: <DummyPage title="Kebijakan Keamanan" /> 
+        element: <SecurityPolicyPage /> 
       },
       
       // Home Page Sections
