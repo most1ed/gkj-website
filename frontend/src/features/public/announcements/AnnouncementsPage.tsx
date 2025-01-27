@@ -1,114 +1,157 @@
-import { Card } from "@/components/ui/Card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
-import { Church, Users, PiggyBank, Heart, Gift, Bell, Download, Archive } from "lucide-react";
-import { useEffect, useState } from "react";
-import { dummyWarta } from "@/data/dummyWarta";
-import { JadwalPelayanSection } from "@/features/public/warta/components/JadwalPelayanSection";
-import { FellowshipSection } from "@/features/public/warta/components/FellowshipSection";
-import { IbadahSection } from "@/features/public/warta/components/IbadahSection";
-import { WeeklyAnnouncements } from "@/features/public/news/components/WeeklyAnnouncements";
-import { PersembahanSection } from "@/features/public/warta/components/PersembahanSection";
-import { DukunganDoaSection } from "@/features/public/warta/components/DukunganDoaSection";
-import { WartaKhususSection } from "@/features/public/warta/components/WartaKhususSection";
-import { Button } from "@/components/ui/Button";
-import { Link } from "react-router-dom";
+import React from 'react';
+import { AnimatedPage } from '@/components/ui/AnimatedWrapper';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card';
 
 export default function AnnouncementsPage() {
-  const [data, setData] = useState<WartaData | null>(null);
-
-  useEffect(() => {
-    // Simulate API call
-    setData(dummyWarta);
-  }, []);
-
-  const handleDownload = () => {
-    // TODO: Implement download functionality
-    console.log("Downloading warta...");
-  };
-
-  if (!data) {
-    return (
-      <div className="container mx-auto py-6">
-        <p>Loading...</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="container mx-auto py-6">
-      <div className="text-center mb-6">
-        <h1 className="text-3xl font-bold">Warta Jemaat</h1>
-        <p className="text-muted-foreground mt-2">
-          Informasi terkini seputar kegiatan dan pelayanan gereja
-        </p>
-        <div className="flex justify-center gap-4 mt-4">
-          <Button variant="outline" onClick={handleDownload} className="gap-2">
-            <Download className="h-4 w-4" />
-            Unduh Warta
-          </Button>
-          <Link to="/arsip-warta">
-            <Button variant="outline" className="gap-2">
-              <Archive className="h-4 w-4" />
-              Arsip Warta
-            </Button>
-          </Link>
+    <AnimatedPage>
+      <div className="container mx-auto py-12 px-4">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold mb-4">Warta Jemaat</h1>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Informasi terkini seputar kegiatan, pelayanan, dan pengumuman penting di GKJ Grogol Jakarta
+          </p>
         </div>
-      </div>
 
-      <Tabs defaultValue="ibadah" className="w-full">
-        <TabsList className="w-full">
-          <TabsTrigger value="ibadah" className="flex items-center gap-2 py-2">
-            <Church className="h-4 w-4" />
-            <span className="hidden sm:inline">Ibadah</span>
-          </TabsTrigger>
-          <TabsTrigger value="jadwal" className="flex items-center gap-2 py-2">
-            <Users className="h-4 w-4" />
-            <span className="hidden sm:inline">Jadwal</span>
-          </TabsTrigger>
-          <TabsTrigger value="persembahan" className="flex items-center gap-2 py-2">
-            <PiggyBank className="h-4 w-4" />
-            <span className="hidden sm:inline">Persembahan</span>
-          </TabsTrigger>
-          <TabsTrigger value="doa" className="flex items-center gap-2 py-2">
-            <Heart className="h-4 w-4" />
-            <span className="hidden sm:inline">Dukungan Doa</span>
-          </TabsTrigger>
-          <TabsTrigger value="fellowship" className="flex items-center gap-2 py-2">
-            <Gift className="h-4 w-4" />
-            <span className="hidden sm:inline">Fellowship</span>
-          </TabsTrigger>
-          <TabsTrigger value="khusus" className="flex items-center gap-2 py-2">
-            <Bell className="h-4 w-4" />
-            <span className="hidden sm:inline">Warta Khusus</span>
-          </TabsTrigger>
-        </TabsList>
+        <Tabs defaultValue="ibadah" className="space-y-6">
+          <TabsList className="grid grid-cols-3 lg:grid-cols-4 gap-2">
+            <TabsTrigger value="ibadah">Ibadah</TabsTrigger>
+            <TabsTrigger value="pelayanan">Pelayanan</TabsTrigger>
+            <TabsTrigger value="sosial">Sosial</TabsTrigger>
+            <TabsTrigger value="pengumuman">Pengumuman</TabsTrigger>
+          </TabsList>
 
-        <div className="mt-6">
           <TabsContent value="ibadah">
-            <IbadahSection data={data.ibadah} />
+            <div className="grid md:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Jadwal Ibadah</CardTitle>
+                  <CardDescription>Minggu, 2 Februari 2025</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p>Tema: Kasih Kristus Memerdekakan</p>
+                  <p>Waktu: 09:00 WIB</p>
+                  <p>Liturgos: Sdr. Andreas</p>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle>Jadwal Pelayanan</CardTitle>
+                  <CardDescription>Periode Februari 2025</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ul className="list-disc pl-5">
+                    <li>Musik: Tim Musik GKJ</li>
+                    <li>Multimedia: Sdr. Budi</li>
+                    <li>Doa Syafaat: Sdri. Maria</li>
+                  </ul>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
 
-          <TabsContent value="jadwal">
-            <JadwalPelayanSection data={data.jadwalPelayan} />
+          <TabsContent value="pelayanan">
+            <div className="grid md:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Pelayanan Gereja</CardTitle>
+                  <CardDescription>Bidang Pelayanan</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ul className="list-disc pl-5">
+                    <li>Koordinasi Tim Musik</li>
+                    <li>Persiapan Sakramen</li>
+                    <li>Pengembangan Pelayanan Anak</li>
+                  </ul>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle>Keuangan & Persembahan</CardTitle>
+                  <CardDescription>Laporan Bulanan</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <p>Total Persembahan Januari: Rp 125.000.000</p>
+                  <p>Alokasi: 
+                    <ul className="list-disc pl-5">
+                      <li>Operasional: 50%</li>
+                      <li>Misi: 30%</li>
+                      <li>Sosial: 20%</li>
+                    </ul>
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
 
-          <TabsContent value="persembahan">
-            <PersembahanSection data={data.persembahan} />
+          <TabsContent value="sosial">
+            <div className="grid md:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Kegiatan Sosial</CardTitle>
+                  <CardDescription>Februari 2025</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ul className="list-disc pl-5">
+                    <li>Bakti Sosial di Panti Asuhan</li>
+                    <li>Kunjungan Lansia</li>
+                    <li>Pembagian Sembako</li>
+                  </ul>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle>Dukungan Doa</CardTitle>
+                  <CardDescription>Pokok Doa Jemaat</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ul className="list-disc pl-5">
+                    <li>Bpk. Sutarno - Pemulihan Kesehatan</li>
+                    <li>Keluarga Alm. Ibu Hartini</li>
+                    <li>Misi Penginjilan</li>
+                  </ul>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
 
-          <TabsContent value="doa">
-            <DukunganDoaSection data={data.dukunganDoa} />
+          <TabsContent value="pengumuman">
+            <div className="grid md:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Pengumuman Penting</CardTitle>
+                  <CardDescription>Informasi Terkini</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ul className="list-disc pl-5">
+                    <li>Persiapan HUT GKJ Grogol</li>
+                    <li>Pendaftaran Sekolah Minggu</li>
+                    <li>Rapat Majelis Gereja</li>
+                  </ul>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle>Warta Khusus</CardTitle>
+                  <CardDescription>Informasi Eksklusif</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ul className="list-disc pl-5">
+                    <li>Laporan Tahunan 2024</li>
+                    <li>Rencana Pembangunan Gedung</li>
+                    <li>Program Pengembangan Jemaat</li>
+                  </ul>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
-
-          <TabsContent value="fellowship">
-            <FellowshipSection data={data.fellowship} />
-          </TabsContent>
-
-          <TabsContent value="khusus">
-            <WartaKhususSection data={data.wartaKhusus} />
-          </TabsContent>
-        </div>
-      </Tabs>
-    </div>
+        </Tabs>
+      </div>
+    </AnimatedPage>
   );
 }
