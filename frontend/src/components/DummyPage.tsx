@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
 
 interface DummyPageProps {
-  title: string;
+  title?: string;
 }
 
-export const DummyPage: React.FC<DummyPageProps> = ({ title }) => {
+export const DummyPage: React.FC<DummyPageProps> = ({ title = 'Dummy Page' }) => {
   useEffect(() => {
     console.log(`Rendering DummyPage: ${title}`);
     

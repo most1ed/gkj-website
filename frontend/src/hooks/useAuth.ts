@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { auth } from '@/lib/api';
+import { auth } from '@/utils/api';
 
 interface LoginCredentials {
   username: string;
@@ -39,20 +39,8 @@ export const useAuth = () => {
       localStorage.setItem('user', JSON.stringify(userData));
       setUser(userData);
       
-      // Redirect based on role
-      switch (credentials.role) {
-        case 'admin':
-          navigate('/admin/dashboard');
-          break;
-        case 'majelis':
-          navigate('/dashboard');
-          break;
-        case 'warga':
-          navigate('/dashboard');
-          break;
-        default:
-          navigate('/');
-      }
+      // Redirect to a simple DummyPage for all roles
+      navigate('/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');
     } finally {

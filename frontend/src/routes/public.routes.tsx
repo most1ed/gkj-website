@@ -12,14 +12,20 @@ import AboutPage from "@/features/public/about/AboutPage";
 import Bible from "@/features/public/bible/BiblePage";
 import Ministries from "@/features/public/ministries/MinistriesPage";
 import OrganizationStructurePage from "@/features/public/about/OrganizationStructurePage";
+import MissionStatementPage from "@/features/public/about/MissionStatementPage";
+import AccessibilityPage from "@/features/public/legal/AccessibilityPage";
+import FinancialReportPage from "@/features/public/financial/FinancialReportPage";
+import SecurityPolicyPage from "@/features/public/legal/SecurityPolicyPage";
 
 // Import Legal Pages
 import PrivacyPolicy from "@/features/public/legal/PrivacyPolicyPage";
 import Terms from "@/features/public/legal/TermsPage";
 import Sitemap from "@/features/public/sitemap/SitemapPage";
-import AccessibilityPage from "@/features/public/legal/AccessibilityPage";
-import FinancialReportPage from "@/features/public/financial/FinancialReportPage";
-import SecurityPolicyPage from "@/features/public/legal/SecurityPolicyPage";
+import AnnouncementsPage from "@/features/public/announcements/AnnouncementsPage";
+
+// Import the new ArchiveWartaPage
+import ArchiveWartaPage from "@/features/public/archive-warta/ArchiveWartaPage";
+import WartaDetailPage from "@/features/public/archive-warta/WartaDetailPage";
 
 export const publicRoutes: RouteObject[] = [
   {
@@ -64,15 +70,15 @@ export const publicRoutes: RouteObject[] = [
       },
       { 
         path: "announcements", 
-        element: <DummyPage title="Announcements" /> 
+        element: <AnnouncementsPage /> 
       },
       { 
         path: "arsip-warta", 
-        element: <DummyPage title="Archive Warta" /> 
+        element: <ArchiveWartaPage /> 
       },
       { 
         path: "warta/:slug", 
-        element: <DummyPage title="Warta Details" /> 
+        element: <WartaDetailPage /> 
       },
       { 
         path: "articles/:slug", 
@@ -99,16 +105,12 @@ export const publicRoutes: RouteObject[] = [
         element: <Sitemap /> 
       },
       { 
-        path: "accessibility", 
-        element: <DummyPage title="Akses & Inklusi" /> 
-      },
-      { 
         path: "mission-statement", 
-        element: <DummyPage title="Pernyataan Misi" /> 
+        element: <MissionStatementPage /> 
       },
       { 
         path: "pernyataan-misi", 
-        element: <DummyPage title="Pernyataan Misi" /> 
+        element: <MissionStatementPage /> 
       },
       { 
         path: "organization-structure", 

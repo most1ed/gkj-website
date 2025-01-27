@@ -1,15 +1,15 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, User, ChevronDown } from 'lucide-react';
-import { Button } from '../../components/ui/Button';
-import { Input } from '../../components/ui/Input';
-import { useAuth } from '../../hooks/useAuth';
-import { useToast } from '../../hooks/useToast';
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/useToast";
 import {
   Collapsible,
   CollapsibleContent,
-  CollapsibleTrigger,
-} from "../../components/ui/Collapsible";
+  CollapsibleTrigger
+} from "@/components/ui/Collapsible";
 
 const savedCredentials = [
   { 
@@ -48,10 +48,18 @@ export default function Login() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!selectedUser) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Please select a user role',
+      });
+      return;
+    }
+    
     setLoading(true);
-
     try {
-      await login(selectedUser?.username || '', password);
+      await login(selectedUser.username, password, selectedUser.role);
       navigate('/dashboard');
     } catch (error) {
       toast({
@@ -65,13 +73,15 @@ export default function Login() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
-      <div className="w-full max-w-[350px] space-y-6">
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="w-full max-w-md p-6 space-y-6">
         <div className="flex flex-col items-center space-y-2 text-center">
-          <img src="/logo.png" alt="GKJ" className="h-12 w-auto" />
-          <h1 className="text-2xl font-semibold tracking-tight">
-            GKJ Grogol Jakarta
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+            GKJ Panel
           </h1>
+          <p className="text-sm text-muted-foreground">
+            Welcome back! Please login to continue.
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">

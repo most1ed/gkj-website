@@ -1,18 +1,15 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { User, LoginCredentials, AuthResponse, AuthContextType } from '@/lib/auth/types';
-import { api } from '@/lib/api';
 
 interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: 'admin' | 'majelis' | 'user';
+  username: string;
+  role: 'admin' | 'majelis' | 'warga';
 }
 
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  isLoading: boolean;
+  login: (username: string, password: string, role: User['role']) => Promise<void>;
   logout: () => void;
 }
 
@@ -22,72 +19,49 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-const STORAGE_KEY = 'gkj_auth';
-
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [user, setUser] = useState<User | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(() => {
+    const savedUser = localStorage.getItem('user');
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
+  const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    // Check local storage for existing session
-    const savedAuth = localStorage.getItem(STORAGE_KEY);
-    if (savedAuth) {
-      const { user, token } = JSON.parse(savedAuth);
-      setUser(user);
-      setIsAuthenticated(true);
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    }
-    setIsLoading(false);
-  }, []);
+  const isAuthenticated = Boolean(user);
 
-  const login = async (email: string, password: string) => {
+  const login = async (username: string, password: string, role: User['role']) => {
+    setIsLoading(true);
     try {
-      const response = await api.post<AuthResponse>('/auth/login', { email, password });
-      const { user, token } = response.data;
-
-      // Save to local storage
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ user, token }));
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 500));
       
-      // Set user in state
-      setUser(user);
-      
-      // Set token in axios defaults
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
-      setIsAuthenticated(true);
-    } catch (error) {
-      console.error('Login failed:', error);
-      throw error;
+      const userData: User = { username, role };
+      localStorage.setItem('user', JSON.stringify(userData));
+      setUser(userData);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const logout = () => {
-    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem('user');
     setUser(null);
-    setIsAuthenticated(false);
-    delete api.defaults.headers.common['Authorization'];
   };
 
   const value = {
     user,
     isAuthenticated,
-    login,
-    logout,
     isLoading,
+    login,
+    logout
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+  if (!context) {
+    throw new Error('useAuth must be used within AuthProvider');
   }
   return context;
 }

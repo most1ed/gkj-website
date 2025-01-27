@@ -5,7 +5,6 @@ const navigation = {
     { name: 'Kebijakan Privasi', href: '/privacy-policy' },
     { name: 'Syarat & Ketentuan', href: '/terms' },
     { name: 'Peta Situs', href: '/sitemap' },
-    { name: 'Akses & Inklusi', href: '/accessibility' },
     { name: 'Pernyataan Misi', href: '/mission-statement' },
     { name: 'Struktur Organisasi', href: '/organizational-structure' },
     { name: 'Laporan Keuangan', href: '/financial-reports' },

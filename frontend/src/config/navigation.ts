@@ -49,11 +49,6 @@ export const userNavigation = [
             title: 'Dokumen Saya',
             href: '/dashboard/documents',
             description: 'Kelola dokumen pribadi'
-          },
-          {
-            title: 'Permintaan Dokumen',
-            href: '/dashboard/document-requests',
-            description: 'Status permintaan dokumen'
           }
         ]
       },
@@ -61,133 +56,34 @@ export const userNavigation = [
         title: 'Kegiatan',
         href: '/dashboard/events',
         icon: Calendar,
-        description: 'Informasi kegiatan',
-        children: [
-          {
-            title: 'Kalender',
-            href: '/dashboard/events',
-            description: 'Kalender kegiatan'
-          },
-          {
-            title: 'Pendaftaran',
-            href: '/dashboard/events/registration',
-            description: 'Pendaftaran acara'
-          }
-        ]
-      },
-      {
-        title: 'Persembahan',
-        href: '/dashboard/offerings',
-        icon: DollarSign,
-        description: 'Manajemen persembahan',
-        children: [
-          {
-            title: 'Riwayat',
-            href: '/dashboard/offerings/history',
-            description: 'Riwayat persembahan'
-          },
-          {
-            title: 'Pembayaran',
-            href: '/dashboard/offerings/payment',
-            description: 'Pembayaran persembahan'
-          }
-        ]
-      }
-    ]
-  }
-];
-
-// Majelis Navigation
-export const majelisNavigation = [
-  {
-    title: 'Menu Majelis',
-    items: [
-      {
-        title: 'Jemaat',
-        href: '/dashboard/jemaat',
-        icon: Users,
-        description: 'Manajemen jemaat',
-        children: [
-          {
-            title: 'Database',
-            href: '/dashboard/jemaat',
-            description: 'Database jemaat'
-          },
-          {
-            title: 'Keanggotaan',
-            href: '/dashboard/jemaat/membership',
-            description: 'Manajemen keanggotaan'
-          }
-        ]
-      },
-      {
-        title: 'Ibadah',
-        href: '/dashboard/ibadah',
-        icon: Church,
-        description: 'Manajemen ibadah',
-        children: [
-          {
-            title: 'Jadwal',
-            href: '/dashboard/services-schedule',
-            description: 'Jadwal ibadah'
-          },
-          {
-            title: 'Liturgi',
-            href: '/dashboard/services-liturgy',
-            description: 'Liturgi ibadah'
-          },
-          {
-            title: 'Pengumuman',
-            href: '/dashboard/services-announcements',
-            description: 'Pengumuman ibadah'
-          }
-        ]
-      },
-      {
-        title: 'Pelayanan',
-        href: '/dashboard/pelayanan',
-        icon: HeartHandshake,
-        description: 'Manajemen pelayanan',
-        children: [
-          {
-            title: 'Pastoral',
-            href: '/dashboard/ministry-pastoral',
-            description: 'Pelayanan pastoral'
-          },
-          {
-            title: 'Diakonia',
-            href: '/dashboard/ministry-diakonia',
-            description: 'Pelayanan diakonia'
-          }
-        ]
+        description: 'Daftar kegiatan'
       },
       {
         title: 'Keuangan',
         href: '/dashboard/finance',
-        icon: PiggyBank,
-        description: 'Manajemen keuangan',
-        children: [
-          {
-            title: 'Laporan',
-            href: '/dashboard/finance/reports',
-            description: 'Laporan keuangan'
-          },
-          {
-            title: 'Persembahan',
-            href: '/dashboard/finance/offerings',
-            description: 'Manajemen persembahan'
-          }
-        ]
+        icon: DollarSign,
+        description: 'Laporan keuangan'
+      },
+      {
+        title: 'Pelayanan',
+        href: '/dashboard/service',
+        icon: HeartHandshake,
+        description: 'Informasi pelayanan'
       }
     ]
   }
 ];
 
-// Admin Navigation
 export const adminNavigation = [
   {
     title: 'Menu Admin',
     items: [
+      {
+        title: 'Dashboard',
+        href: '/dashboard',
+        icon: Home,
+        description: 'Overview dan statistik umum'
+      },
       {
         title: 'Konten',
         href: '/dashboard/konten',
@@ -196,22 +92,22 @@ export const adminNavigation = [
         children: [
           {
             title: 'Tentang Gereja',
-            href: '/dashboard/content/about',
+            href: '/dashboard/konten/about',
             description: 'Informasi gereja'
           },
           {
             title: 'Sejarah',
-            href: '/dashboard/content/history',
+            href: '/dashboard/konten/history',
             description: 'Sejarah gereja'
           },
           {
             title: 'Visi & Misi',
-            href: '/dashboard/content/vision-mission',
+            href: '/dashboard/konten/vision-mission',
             description: 'Visi dan misi'
           },
           {
             title: 'Organisasi',
-            href: '/dashboard/content/organization',
+            href: '/dashboard/konten/organization',
             description: 'Struktur organisasi'
           }
         ]
@@ -247,17 +143,17 @@ export const adminNavigation = [
         children: [
           {
             title: 'Daftar Artikel',
-            href: '/dashboard/articles/articles',
+            href: '/dashboard/artikel/articles',
             description: 'Kelola artikel'
           },
           {
             title: 'Kategori',
-            href: '/dashboard/articles/categories',
+            href: '/dashboard/artikel/categories',
             description: 'Kategori artikel'
           },
           {
             title: 'Tag',
-            href: '/dashboard/articles/tags',
+            href: '/dashboard/artikel/tags',
             description: 'Tag artikel'
           }
         ]
@@ -270,17 +166,17 @@ export const adminNavigation = [
         children: [
           {
             title: 'Bacaan Harian',
-            href: '/dashboard/bible/daily-reading',
+            href: '/dashboard/alkitab/daily-reading',
             description: 'Bacaan alkitab harian'
           },
           {
             title: 'Renungan',
-            href: '/dashboard/bible/devotional',
+            href: '/dashboard/alkitab/devotional',
             description: 'Renungan harian'
           },
           {
             title: 'Pengaturan',
-            href: '/dashboard/bible/settings',
+            href: '/dashboard/alkitab/settings',
             description: 'Pengaturan alkitab'
           }
         ]
@@ -293,12 +189,12 @@ export const adminNavigation = [
         children: [
           {
             title: 'Data Majelis',
-            href: '/dashboard/master-council',
+            href: '/dashboard/master/council',
             description: 'Manajemen majelis'
           },
           {
             title: 'Data Pengguna',
-            href: '/dashboard/master-users',
+            href: '/dashboard/master/users',
             description: 'Manajemen pengguna'
           }
         ]
@@ -311,17 +207,17 @@ export const adminNavigation = [
         children: [
           {
             title: 'Website',
-            href: '/dashboard/settings-website',
+            href: '/dashboard/pengaturan/website',
             description: 'Pengaturan website'
           },
           {
             title: 'Email',
-            href: '/dashboard/settings-email',
+            href: '/dashboard/pengaturan/email',
             description: 'Pengaturan email'
           },
           {
             title: 'Backup',
-            href: '/dashboard/settings-backup',
+            href: '/dashboard/pengaturan/backup',
             description: 'Backup data'
           }
         ]

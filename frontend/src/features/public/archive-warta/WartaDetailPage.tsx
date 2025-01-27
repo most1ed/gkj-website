@@ -1,92 +1,88 @@
-import { useParams, Link } from 'react-router-dom';
-import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
-import { PDFButton } from "@/components/common/pdf";
-import { format } from 'date-fns';
-import { id } from 'date-fns/locale';
-import { wartaGereja } from "@/data/dummyData";
-import { DummyPage } from "@/components/DummyPage";
+import React from 'react';
+import { useParams } from 'react-router-dom';
+import { AnimatedPage } from '@/components/ui/AnimatedWrapper';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
+import { Download, FileText } from 'lucide-react';
 
-// Dummy archive data - replace with actual API call later
-const archiveData = Array.from({ length: 12 }, (_, i) => {
-  const date = new Date(2025, 0, 22);
-  date.setMonth(date.getMonth() - i);
-  return {
-    id: i + 1,
-    date: date,
-    data: wartaGereja // Using the correct data structure
-  };
-});
+// Dummy data - replace with actual data fetching
+const wartaDetails = {
+  '2025-01': {
+    title: 'Warta Jemaat Januari 2025',
+    date: '21 Januari 2025',
+    description: 'Informasi terkini seputar kegiatan gereja bulan Januari 2025',
+    content: `
+      <h2>Rangkuman Kegiatan Gereja</h2>
+      <p>Berikut adalah beberapa kegiatan penting yang telah dan akan dilaksanakan:</p>
+      <ul>
+        <li>Ibadah Minggu: Tema "Kasih Kristus Memerdekakan"</li>
+        <li>Jadwal Pelayanan Sakramen Perjamuan: 2 Februari 2025</li>
+        <li>Kegiatan Sosial: Bakti Sosial di Lingkungan Sekitar</li>
+      </ul>
+    `,
+    pdfUrl: '/wartas/2025-01.pdf'
+  },
+  '2024-12': {
+    title: 'Warta Jemaat Desember 2024',
+    date: '15 Desember 2024',
+    description: 'Rangkuman kegiatan akhir tahun 2024',
+    content: `
+      <h2>Refleksi Akhir Tahun</h2>
+      <p>Sebuah tinjauan mendalam tentang perjalanan rohani dan kegiatan gereja sepanjang tahun 2024.</p>
+    `,
+    pdfUrl: '/wartas/2024-12.pdf'
+  }
+};
 
-export default function WartaDetail() {
-  const { id } = useParams();
-  const archive = archiveData.find(item => item.id === Number(id));
+export default function WartaDetailPage() {
+  const { slug } = useParams();
+  const warta = wartaDetails[slug] || null;
 
-  if (!archive) {
+  if (!warta) {
     return (
-      <div className="container mx-auto py-6">
-        <div className="text-center space-y-4">
-          <h2 className="text-2xl font-bold">Warta tidak ditemukan</h2>
-          <Button asChild>
-            <Link to="/arsip-warta">Kembali ke Arsip</Link>
-          </Button>
+      <AnimatedPage>
+        <div className="container mx-auto py-12 px-4 text-center">
+          <h1 className="text-4xl font-bold mb-4">Warta Tidak Ditemukan</h1>
+          <p className="text-muted-foreground">Maaf, warta yang Anda cari tidak tersedia.</p>
         </div>
-      </div>
+      </AnimatedPage>
     );
   }
 
-  const { data } = archive;
-
   return (
-    <div className="container mx-auto py-6">
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <div>
-            <h2 className="text-3xl font-bold tracking-tight">Warta Jemaat</h2>
-            <p className="text-muted-foreground">
-              {format(archive.date, 'EEEE, dd MMMM yyyy', { locale: id })}
-            </p>
-          </div>
-          <div className="space-x-2">
-            <PDFButton 
-              wartaJemaat={data} 
-              jadwalIbadah={data.tataIbadah} 
-              jurnalKebaktian={[]} 
-              dukunganDoa={data.dukunganDoa}
-              tanggal={archive.date}
+    <AnimatedPage>
+      <div className="container mx-auto py-12 px-4">
+        <Card className="max-w-4xl mx-auto">
+          <CardHeader>
+            <CardTitle>{warta.title}</CardTitle>
+            <CardDescription>{warta.date}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div 
+              className="prose max-w-none mb-6" 
+              dangerouslySetInnerHTML={{ __html: warta.content }}
             />
-            <Button variant="outline" asChild>
-              <Link to="/arsip-warta">Kembali ke Arsip</Link>
-            </Button>
-          </div>
-        </div>
 
-        <Tabs defaultValue="sambutan" className="mt-8">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="sambutan">Sambutan</TabsTrigger>
-            <TabsTrigger value="tata-ibadah">Tata Ibadah</TabsTrigger>
-            <TabsTrigger value="doa">Dukungan Doa</TabsTrigger>
-            <TabsTrigger value="pengumuman">Pengumuman</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="sambutan">
-            <DummyPage title="Sambutan" />
-          </TabsContent>
-
-          <TabsContent value="tata-ibadah">
-            <DummyPage title="Tata Ibadah" />
-          </TabsContent>
-
-          <TabsContent value="doa">
-            <DummyPage title="Dukungan Doa" />
-          </TabsContent>
-
-          <TabsContent value="pengumuman">
-            <DummyPage title="Pengumuman" />
-          </TabsContent>
-        </Tabs>
+            <div className="flex space-x-4">
+              <a 
+                href={warta.pdfUrl} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="inline-flex items-center px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+              >
+                <Download className="mr-2 h-4 w-4" />
+                Unduh PDF
+              </a>
+              <a 
+                href="/arsip-warta" 
+                className="inline-flex items-center px-4 py-2 bg-secondary text-secondary-foreground rounded-md hover:bg-secondary/90 transition-colors"
+              >
+                <FileText className="mr-2 h-4 w-4" />
+                Kembali ke Arsip
+              </a>
+            </div>
+          </CardContent>
+        </Card>
       </div>
-    </div>
+    </AnimatedPage>
   );
 }

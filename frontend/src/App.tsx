@@ -1,23 +1,35 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { publicRoutes } from '@/routes/public.routes';
-import { authRoutes } from '@/routes/auth.routes';
-import { Toaster } from '@/components/ui/Toast/Toaster';
-import { AuthProvider } from '@/providers/AuthContext';
+import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
+import LoginPage from '@/features/auth/login/LoginPage';
+import { DummyPage } from '@/components/DummyPage';
+import { DashboardLayout } from '@/layouts/DashboardLayout';
 
-// Only use public routes for now
 const router = createBrowserRouter([
-  ...publicRoutes,
-  ...authRoutes,
-  // panelRoutes, and protectedRoutes will be added later
+  {
+    path: "/",
+    element: <Navigate to="/auth/login" replace />
+  },
+  {
+    path: "/auth/login",
+    element: <LoginPage />
+  },
+  {
+    path: "/dashboard",
+    element: <DashboardLayout />,
+    children: [
+      {
+        index: true,
+        element: <DummyPage title="Dashboard" />
+      }
+    ]
+  },
+  {
+    path: "*",
+    element: <Navigate to="/auth/login" replace />
+  }
 ]);
 
 function App() {
-  return (
-    <AuthProvider>
-      <RouterProvider router={router} />
-      <Toaster />
-    </AuthProvider>
-  );
+  return <RouterProvider router={router} />;
 }
 
 export default App;

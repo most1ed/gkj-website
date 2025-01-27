@@ -1,4 +1,4 @@
-import { AdminLayout } from '@/components/layout/AdminLayout';
+import { AdminLayout } from "@/layouts/AdminLayout";
 import { Card } from '@/components/ui/Card';
 import {
   UsersIcon,

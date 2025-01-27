@@ -1,64 +1,56 @@
-import { ReactNode, useState } from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ChevronDown, ChevronRight, LucideIcon } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/Button';
-import { ScrollArea } from '@/components/ui/ScrollArea';
 import { NavigationItem } from '@/config/navigation';
+import { ScrollArea } from '@/components/ui/ScrollArea';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface SidebarProps {
   items: NavigationItem[];
-  header?: ReactNode;
-  footer?: ReactNode;
-  collapsed?: boolean;
-  onCollapse?: (collapsed: boolean) => void;
+  isMobile?: boolean;
+  isCollapsed?: boolean;
+  onClose?: () => void;
 }
 
 export function Sidebar({ 
   items, 
-  header, 
-  footer, 
-  collapsed = false,
-  onCollapse 
+  isMobile = false, 
+  isCollapsed = false,
+  onClose 
 }: SidebarProps) {
   const location = useLocation();
-  const [expanded, setExpanded] = useState<string[]>([]);
+  const [openMenus, setOpenMenus] = useState<string[]>([]);
 
-  const toggleExpand = (title: string) => {
-    if (collapsed) return;
-    setExpanded(current =>
+  const isActive = (href: string) => {
+    if (href === '/') return location.pathname === href;
+    return location.pathname.startsWith(href);
+  };
+
+  const toggleMenu = (title: string) => {
+    setOpenMenus(current => 
       current.includes(title)
         ? current.filter(t => t !== title)
         : [...current, title]
     );
   };
 
-  const isActive = (href: string) => {
-    if (href === '/') {
-      return location.pathname === href;
-    }
-    return location.pathname.startsWith(href);
-  };
-
-  const NavigationItem = ({ item }: { item: NavigationItem }) => {
+  const renderMenuItem = (item: NavigationItem, depth = 0) => {
     const isItemActive = item.href ? isActive(item.href) : false;
-    const isExpanded = expanded.includes(item.title);
-    const hasSubItems = item.items && item.items.length > 0;
+    const hasChildren = item.items && item.items.length > 0;
+    const isMenuOpen = openMenus.includes(item.title);
     const Icon = item.icon;
 
-    if (item.href && !hasSubItems) {
-      return (
-        <Link
-          to={item.href}
-          className={cn(
-            "group flex h-10 items-center gap-3 rounded-lg px-3 transition-all duration-150",
-            isItemActive 
-              ? "bg-accent/50" 
-              : "hover:bg-accent/30",
-            collapsed && "justify-center w-10 px-0 mx-auto"
-          )}
-        >
+    // Base menu item content
+    const menuItemContent = (
+      <div 
+        className={cn(
+          "group flex items-center justify-between gap-3 rounded-lg px-3 py-2 transition-all duration-150",
+          isItemActive ? "bg-accent/50" : "hover:bg-accent/30",
+          isMobile ? "w-full" : (isCollapsed ? "justify-center w-10 mx-auto" : "w-full")
+        )}
+      >
+        <div className="flex items-center gap-3">
           <div className={cn(
             "flex h-5 w-5 items-center justify-center",
             isItemActive 
@@ -67,9 +59,10 @@ export function Sidebar({
           )}>
             <Icon className="h-[18px] w-[18px]" />
           </div>
-          {!collapsed && (
+          
+          {!isCollapsed && (
             <span className={cn(
-              "text-sm font-medium truncate flex-1",
+              "text-sm font-medium truncate",
               isItemActive 
                 ? "text-primary" 
                 : "text-muted-foreground group-hover:text-foreground"
@@ -77,59 +70,63 @@ export function Sidebar({
               {item.title}
             </span>
           )}
+        </div>
+
+        {hasChildren && !isCollapsed && (
+          <ChevronDown 
+            className={cn(
+              "h-4 w-4 transition-transform", 
+              isMenuOpen ? "rotate-180" : ""
+            )} 
+          />
+        )}
+      </div>
+    );
+
+    // Render logic based on mobile or desktop
+    if (!hasChildren) {
+      const linkContent = item.href ? (
+        <Link 
+          to={item.href} 
+          onClick={isMobile ? onClose : undefined}
+        >
+          {menuItemContent}
         </Link>
+      ) : (
+        <div>{menuItemContent}</div>
       );
+
+      return linkContent;
     }
 
+    // Items with children
     return (
-      <>
-        <Button
-          variant="ghost"
-          className={cn(
-            "group h-10 w-full justify-start gap-3 rounded-lg px-3 hover:bg-accent/30",
-            collapsed && "justify-center w-10 px-0 mx-auto"
-          )}
-          onClick={() => toggleExpand(item.title)}
+      <div>
+        <div 
+          onClick={() => {
+            if (isMobile || !isCollapsed) toggleMenu(item.title);
+          }}
+          className="cursor-pointer"
         >
-          <div className={cn(
-            "flex h-5 w-5 items-center justify-center",
-            "text-muted-foreground group-hover:text-foreground"
-          )}>
-            <Icon className="h-[18px] w-[18px]" />
-          </div>
-          {!collapsed && (
-            <>
-              <span className="flex-1 text-sm font-medium truncate text-muted-foreground group-hover:text-foreground">
-                {item.title}
-              </span>
-              {hasSubItems && (
-                <motion.span
-                  animate={{ rotate: isExpanded ? 90 : 0 }}
-                  transition={{ duration: 0.2 }}
-                  className="text-muted-foreground"
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </motion.span>
-              )}
-            </>
-          )}
-        </Button>
+          {menuItemContent}
+        </div>
 
-        {hasSubItems && !collapsed && (
-          <AnimatePresence initial={false}>
-            {isExpanded && (
+        {/* Submenu rendering */}
+        {!isCollapsed && (
+          <AnimatePresence>
+            {isMenuOpen && (
               <motion.div
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: "auto", opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.2 }}
                 className="overflow-hidden"
               >
-                <div className="ml-4 space-y-1 mt-1">
-                  {item.items.map((subItem) => (
+                <div className={`ml-${depth * 4} space-y-1 mt-1`}>
+                  {item.items?.map((subItem) => (
                     <Link
                       key={subItem.href}
                       to={subItem.href}
+                      onClick={isMobile ? onClose : undefined}
                       className={cn(
                         "flex h-9 items-center gap-2 rounded-lg px-3 text-sm transition-all duration-150 hover:bg-accent/30 group",
                         isActive(subItem.href) && "bg-accent/50"
@@ -137,11 +134,15 @@ export function Sidebar({
                     >
                       <span className={cn(
                         "h-1.5 w-1.5 rounded-full",
-                        isActive(subItem.href) ? "bg-primary" : "bg-muted-foreground group-hover:bg-foreground"
+                        isActive(subItem.href) 
+                          ? "bg-primary" 
+                          : "bg-muted-foreground group-hover:bg-foreground"
                       )} />
                       <span className={cn(
                         "font-medium truncate",
-                        isActive(subItem.href) ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
+                        isActive(subItem.href) 
+                          ? "text-primary" 
+                          : "text-muted-foreground group-hover:text-foreground"
                       )}>
                         {subItem.title}
                       </span>
@@ -152,21 +153,24 @@ export function Sidebar({
             )}
           </AnimatePresence>
         )}
-      </>
+      </div>
     );
   };
 
   return (
-    <div className="flex h-full flex-col">
-      {header}
-      <ScrollArea className="flex-1 overflow-hidden px-3">
-        <div className="space-y-2 py-2">
-          {items.map((item) => (
-            <NavigationItem key={item.title} item={item} />
+    <nav className={cn(
+      "flex flex-col h-full w-full",
+      isMobile ? "p-2" : (isCollapsed ? "items-center" : "items-stretch")
+    )}>
+      <ScrollArea className="flex-1 overflow-hidden">
+        <div className="space-y-1">
+          {items.map((item, index) => (
+            <div key={index}>
+              {renderMenuItem(item)}
+            </div>
           ))}
         </div>
       </ScrollArea>
-      {footer}
-    </div>
+    </nav>
   );
 }
