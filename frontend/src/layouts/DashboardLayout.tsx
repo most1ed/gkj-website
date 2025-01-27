@@ -1,127 +1,100 @@
-import { ReactNode, useState } from 'react';
-import { ChevronLeft, ChevronRight, LogOut, Menu, User } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import React from 'react';
+import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { 
+  Home, 
+  Users, 
+  Calendar, 
+  DollarSign, 
+  LogOut 
+} from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import { useAuth } from '@/hooks/useAuth';
-import { Sidebar } from '@/components/navigation/Sidebar';
-import { userNavigation } from '@/config/navigation';
 
 interface DashboardLayoutProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/auth/login');
+  };
+
+  const navItems = [
+    { 
+      icon: Home, 
+      label: 'Dashboard', 
+      path: '/dashboard', 
+      roles: ['Administrator', 'Majelis', 'Warga Gereja'] 
+    },
+    { 
+      icon: Users, 
+      label: 'Manajemen Pengguna', 
+      path: '/dashboard/users', 
+      roles: ['Administrator'] 
+    },
+    { 
+      icon: Calendar, 
+      label: 'Kegiatan Gereja', 
+      path: '/dashboard/activities', 
+      roles: ['Administrator', 'Majelis'] 
+    },
+    { 
+      icon: DollarSign, 
+      label: 'Laporan Keuangan', 
+      path: '/dashboard/finance', 
+      roles: ['Administrator', 'Majelis'] 
+    }
+  ];
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Mobile header */}
-      <div className="sticky top-4 z-40 mx-4 flex h-14 items-center gap-4 rounded-xl bg-card px-4 shadow-lg lg:hidden">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 rounded-full"
-          onClick={() => setSidebarOpen(true)}
-        >
-          <Menu className="h-4 w-4" />
-        </Button>
-        <img className="h-6 w-auto" src="/logo.png" alt="GKJ" />
-        <div className="ml-auto flex items-center gap-2">
-          <ThemeToggle />
+    <div className="flex h-screen">
+      <div className="w-64 bg-gray-100 p-6 border-r">
+        <div className="mb-12 text-center">
+          <h2 className="text-2xl font-bold">Dashboard GKJ</h2>
+          <p className="text-sm text-gray-600">{user?.username}</p>
         </div>
-      </div>
 
-      {/* Mobile sidebar backdrop */}
-      <div className={cn(
-        "fixed inset-0 z-50 bg-background/80 backdrop-blur-sm lg:hidden",
-        sidebarOpen ? "block" : "hidden"
-      )} onClick={() => setSidebarOpen(false)} />
+        <nav className="space-y-2">
+          {navItems
+            .filter(item => item.roles.includes(user?.role || ''))
+            .map(item => (
+              <NavLink 
+                key={item.path} 
+                to={item.path} 
+                className={({ isActive }) => `
+                  flex items-center p-3 rounded-lg transition-colors 
+                  ${isActive 
+                    ? 'bg-primary text-primary-foreground' 
+                    : 'hover:bg-gray-200 text-gray-700'
+                  }
+                `}
+              >
+                <item.icon className="mr-3" size={20} />
+                {item.label}
+              </NavLink>
+            ))
+          }
+        </nav>
 
-      {/* Mobile sidebar */}
-      <div className={cn(
-        "fixed top-20 left-4 bottom-24 z-50 w-64 rounded-xl bg-card shadow-lg transition-transform duration-300 lg:hidden",
-        sidebarOpen ? "translate-x-0" : "-translate-x-full"
-      )}>
-        <Sidebar
-          items={userNavigation}
-          collapsed={false}
-        />
-      </div>
-
-      {/* Desktop header */}
-      <div className="fixed top-4 right-4 left-4 z-40 hidden h-14 items-center rounded-xl bg-card px-4 shadow-lg lg:flex">
-        <img className="h-6 w-auto" src="/logo.png" alt="GKJ" />
-        <div className="ml-auto flex items-center gap-2">
-          <ThemeToggle />
-          <div className="flex items-center gap-3 border-l pl-3 ml-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
-              <User className="h-4 w-4 text-primary" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">{user?.username}</p>
-              <p className="text-xs text-muted-foreground capitalize truncate">{user?.role}</p>
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => logout()}
-              className="h-8 rounded-full hover:bg-destructive/10 hover:text-destructive"
-            >
-              <LogOut className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      {/* Desktop sidebar */}
-      <div className={cn(
-        "hidden lg:fixed lg:top-24 lg:bottom-24 lg:left-4 lg:flex lg:w-64 lg:flex-col lg:rounded-xl lg:bg-card lg:shadow-lg lg:transition-all lg:duration-300",
-        sidebarCollapsed && "lg:w-16"
-      )}>
-        <div className="flex items-center justify-end p-2 border-b">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 rounded-full hover:bg-accent"
-            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+        <div className="absolute bottom-6 left-6 right-6">
+          <Button 
+            variant="destructive" 
+            className="w-full" 
+            onClick={handleLogout}
           >
-            {sidebarCollapsed ? (
-              <ChevronRight className="h-4 w-4" />
-            ) : (
-              <ChevronLeft className="h-4 w-4" />
-            )}
+            <LogOut className="mr-2" size={20} />
+            Logout
           </Button>
         </div>
-        <Sidebar
-          items={userNavigation}
-          collapsed={sidebarCollapsed}
-        />
       </div>
 
-      {/* Main content */}
-      <div className={cn(
-        "pt-24 pb-24 lg:pl-72 transition-all duration-300",
-        sidebarCollapsed && "lg:pl-24"
-      )}>
-        <main className="px-4">
-          <div className="mx-auto max-w-7xl">
-            {children}
-          </div>
-        </main>
-      </div>
-
-      {/* Footer */}
-      <footer className="fixed bottom-4 right-4 left-4 z-40 flex h-14 items-center justify-between rounded-xl bg-card px-4 shadow-lg">
-        <div className="text-sm text-muted-foreground">
-          2025 GKJ. All rights reserved.
-        </div>
-        <div className="text-sm text-muted-foreground">
-          Version 1.0.0
-        </div>
-      </footer>
+      <main className="flex-1 overflow-y-auto bg-white">
+        {children}
+      </main>
     </div>
   );
 }
