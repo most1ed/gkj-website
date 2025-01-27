@@ -1,186 +1,198 @@
+import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { 
+  HomeIcon, 
+  InformationCircleIcon, 
+  DocumentTextIcon,
+  MegaphoneIcon,
+  PhotoIcon,
+  HeartIcon,
+  UserGroupIcon,
+  LockClosedIcon
+} from '@heroicons/react/24/outline';
 
-const sitemapData = {
-  beranda: {
-    title: 'Beranda',
-    path: '/',
-    items: []
-  },
-  tentangKami: {
-    title: 'Tentang Kami',
-    path: '/about',
+const sitemapSections = [
+  {
+    category: 'Navigasi Utama',
     items: [
-      { title: 'Sejarah GKJ', path: '/about#sejarah' },
-      { title: 'Visi & Misi', path: '/about#visi-misi' },
-      { title: 'Majelis', path: '/about#majelis' },
-      { title: 'Pendeta', path: '/about#pendeta' },
-      { title: 'Lokasi', path: '/about#lokasi' },
+      { 
+        title: 'Beranda', 
+        path: '/', 
+        icon: HomeIcon,
+        description: 'Halaman depan dengan informasi terkini'
+      },
+      { 
+        title: 'Tentang Kami', 
+        path: '/about', 
+        icon: InformationCircleIcon,
+        description: 'Sejarah, visi, misi, dan struktur organisasi'
+      },
+      { 
+        title: 'Ibadah', 
+        path: '/services', 
+        icon: DocumentTextIcon,
+        description: 'Jadwal dan informasi layanan ibadah'
+      }
     ]
   },
-  ibadah: {
-    title: 'Ibadah',
-    path: '/services',
+  {
+    category: 'Pelayanan & Media',
     items: [
-      { title: 'Jadwal Ibadah', path: '/services#jadwal' },
-      { title: 'Ibadah Minggu', path: '/services#minggu' },
-      { title: 'Ibadah Kategorial', path: '/services#kategorial' },
-      { title: 'Ibadah Khusus', path: '/services#khusus' },
-      { title: 'Streaming', path: '/services#streaming' },
+      { 
+        title: 'Pelayanan', 
+        path: '/ministries', 
+        icon: UserGroupIcon,
+        description: 'Komisi dan bidang pelayanan gereja'
+      },
+      { 
+        title: 'Media', 
+        path: '/media', 
+        icon: PhotoIcon,
+        description: 'Galeri foto, video, dan publikasi'
+      },
+      { 
+        title: 'Warta', 
+        path: '/announcements', 
+        icon: MegaphoneIcon,
+        description: 'Pengumuman dan berita terbaru'
+      }
     ]
   },
-  warta: {
-    title: 'Warta',
-    path: '/announcements',
+  {
+    category: 'Administrasi',
     items: [
-      { title: 'Warta Jemaat', path: '/announcements' },
-      { title: 'Arsip Warta', path: '/arsip-warta' },
-      { title: 'Jadwal Kegiatan', path: '/schedule' },
-      { title: 'Berita', path: '/news' },
+      { 
+        title: 'Persembahan', 
+        path: '/offerings', 
+        icon: HeartIcon,
+        description: 'Informasi dan panduan persembahan'
+      },
+      { 
+        title: 'Jadwal Kegiatan', 
+        path: '/schedule', 
+        icon: DocumentTextIcon,
+        description: 'Kalender kegiatan gereja'
+      }
     ]
   },
-  pelayanan: {
-    title: 'Pelayanan',
-    path: '/ministries',
+  {
+    category: 'Sumber Daya Sinode',
     items: [
-      { title: 'Komisi Anak', path: '/ministries#anak' },
-      { title: 'Komisi Remaja', path: '/ministries#remaja' },
-      { title: 'Komisi Pemuda', path: '/ministries#pemuda' },
-      { title: 'Komisi Dewasa', path: '/ministries#dewasa' },
-      { title: 'Komisi Lansia', path: '/ministries#lansia' },
-      { title: 'Komisi Kesenian', path: '/ministries#kesenian' },
-      { title: 'Bidang Pembinaan', path: '/ministries#pembinaan' },
-      { title: 'Bidang Kesaksian', path: '/ministries#kesaksian' },
-      { title: 'Bidang Pelayanan', path: '/ministries#pelayanan' },
+      { 
+        title: 'Berita Sinode', 
+        href: 'https://sinodegkj.or.id/berita/', 
+        icon: MegaphoneIcon,
+        description: 'Berita terkini dari Sinode GKJ'
+      },
+      { 
+        title: 'Kotbah Jangkep', 
+        href: 'https://sinodegkj.or.id/materi/kotbah/', 
+        icon: DocumentTextIcon,
+        description: 'Kumpulan kotbah lengkap'
+      },
+      { 
+        title: 'Renungan Harian', 
+        href: 'https://sinodegkj.or.id/materi/renungan-harian/', 
+        icon: HeartIcon,
+        description: 'Renungan harian untuk pendalaman iman'
+      }
     ]
   },
-  media: {
-    title: 'Media',
-    path: '/media',
+  {
+    category: 'Informasi Legal',
     items: [
-      { title: 'Galeri Foto', path: '/media#foto' },
-      { title: 'Video Ibadah', path: '/media#video' },
-      { title: 'Audio Khotbah', path: '/media#audio' },
-      { title: 'Materi Pembinaan', path: '/media#materi' },
-      { title: 'Publikasi', path: '/media#publikasi' },
-    ]
-  },
-  persembahan: {
-    title: 'Persembahan',
-    path: '/offerings',
-    items: [
-      { title: 'Persembahan Mingguan', path: '/offerings#mingguan' },
-      { title: 'Persembahan Khusus', path: '/offerings#khusus' },
-      { title: 'Laporan Keuangan', path: '/offerings#laporan' },
-      { title: 'Cara Memberi', path: '/offerings#panduan' },
-    ]
-  },
-  akun: {
-    title: 'Akun',
-    path: '/login',
-    items: [
-      { title: 'Masuk', path: '/login' },
-      { title: 'Daftar', path: '/register' },
-      { title: 'Lupa Password', path: '/forgot-password' },
-    ]
-  },
-  legal: {
-    title: 'Legal',
-    items: [
-      { title: 'Kebijakan Privasi', path: '/privacy-policy' },
-      { title: 'Syarat & Ketentuan', path: '/terms' },
-      { title: 'Peta Situs', path: '/sitemap' },
+      { 
+        title: 'Kebijakan Privasi', 
+        path: '/privacy-policy', 
+        icon: LockClosedIcon,
+        description: 'Perlindungan data dan privasi'
+      },
+      { 
+        title: 'Syarat & Ketentuan', 
+        path: '/terms', 
+        icon: DocumentTextIcon,
+        description: 'Ketentuan penggunaan layanan'
+      },
+      { 
+        title: 'Struktur Organisasi', 
+        path: '/organizational-structure', 
+        icon: UserGroupIcon,
+        description: 'Struktur kepemimpinan gereja'
+      }
     ]
   }
-};
+];
 
 export default function Sitemap() {
   return (
-    <>
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="container mx-auto px-4 py-16 max-w-6xl"
+    >
       <Helmet>
         <title>Peta Situs - GKJ Grogol Jakarta</title>
-        <meta name="description" content="Peta situs GKJ Grogol Jakarta - Temukan semua halaman dan konten website dengan mudah" />
+        <meta name="description" content="Navigasi lengkap website GKJ Grogol Jakarta" />
       </Helmet>
 
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <h1 className="text-3xl font-bold mb-8">Peta Situs</h1>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {Object.values(sitemapData).map((section) => (
-            <div key={section.title} className="space-y-4">
-              <h2 className="text-xl font-semibold">
-                {section.path ? (
-                  <Link to={section.path} className="hover:text-primary">
-                    {section.title}
-                  </Link>
-                ) : (
-                  section.title
-                )}
-              </h2>
-              {section.items && section.items.length > 0 && (
-                <ul className="space-y-2 ml-4">
-                  {section.items.map((item) => (
-                    <li key={item.path}>
-                      <Link
-                        to={item.path}
-                        className="text-muted-foreground hover:text-primary"
-                      >
-                        {item.title}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-12 pt-8 border-t">
-          <h2 className="text-xl font-semibold mb-4">Sumber Daya Sinode GKJ</h2>
-          <ul className="space-y-2 ml-4">
-            <li>
-              <a
-                href="https://sinodegkj.or.id/berita/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-primary"
-              >
-                Berita Sinode
-              </a>
-            </li>
-            <li>
-              <a
-                href="https://sinodegkj.or.id/materi/kotbah/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-primary"
-              >
-                Kotbah Jangkep
-              </a>
-            </li>
-            <li>
-              <a
-                href="https://sinodegkj.or.id/materi/renungan-harian/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-primary"
-              >
-                Renungan Harian
-              </a>
-            </li>
-            <li>
-              <a
-                href="https://perpustakaan.sinodegkj.or.id/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-primary"
-              >
-                Perpustakaan Sinode
-              </a>
-            </li>
-          </ul>
-        </div>
+      <div className="text-center mb-12">
+        <h1 className="text-4xl font-bold text-foreground mb-4">
+          Peta Situs
+        </h1>
+        <p className="text-muted-foreground max-w-2xl mx-auto">
+          Jelajahi seluruh konten dan layanan GKJ Grogol Jakarta dengan mudah
+        </p>
       </div>
-    </>
+
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {sitemapSections.map((section) => (
+          <div
+            key={section.category}
+            className="bg-card border border-border rounded-xl p-6 space-y-4"
+          >
+            <h2 className="text-xl font-semibold text-foreground border-b border-border pb-3 mb-4">
+              {section.category}
+            </h2>
+
+            {section.items.map((item) => {
+              const LinkComponent = item.path ? Link : 'a';
+              const linkProps = item.path 
+                ? { to: item.path } 
+                : { href: item.href, target: '_blank', rel: 'noopener noreferrer' };
+
+              return (
+                <LinkComponent
+                  key={item.title}
+                  {...linkProps}
+                  className="flex items-center space-x-4 group hover:bg-accent/10 p-3 -mx-3 rounded-lg transition-colors"
+                >
+                  <item.icon 
+                    className="h-8 w-8 text-primary/60 
+                      group-hover:text-primary transition-colors" 
+                  />
+                  <div>
+                    <h3 className="text-lg font-medium text-foreground group-hover:text-primary transition-colors">
+                      {item.title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      {item.description}
+                    </p>
+                  </div>
+                </LinkComponent>
+              );
+            })}
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-12 text-center">
+        <p className="text-xs text-muted-foreground/50">
+          Terakhir diperbarui: Januari 2024 | Versi 1.3
+        </p>
+      </div>
+    </motion.div>
   );
 }

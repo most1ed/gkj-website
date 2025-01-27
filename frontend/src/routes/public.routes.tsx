@@ -17,6 +17,7 @@ import PrivacyPolicy from "@/features/public/legal/PrivacyPolicyPage";
 import Terms from "@/features/public/legal/TermsPage";
 import Sitemap from "@/features/public/sitemap/SitemapPage";
 import AccessibilityPage from "@/features/public/legal/AccessibilityPage";
+import FinancialReportPage from "@/features/public/financial/FinancialReportPage";
 
 export const publicRoutes: RouteObject[] = [
   {
@@ -97,7 +98,7 @@ export const publicRoutes: RouteObject[] = [
       },
       { 
         path: "accessibility", 
-        element: <AccessibilityPage /> 
+        element: <DummyPage title="Akses & Inklusi" /> 
       },
       { 
         path: "mission-statement", 
@@ -108,8 +109,12 @@ export const publicRoutes: RouteObject[] = [
         element: <DummyPage title="Struktur Organisasi" /> 
       },
       { 
+        path: "financial-report", 
+        element: <FinancialReportPage /> 
+      },
+      { 
         path: "financial-reports", 
-        element: <DummyPage title="Laporan Keuangan" /> 
+        element: <FinancialReportPage /> 
       },
       { 
         path: "security-policy", 

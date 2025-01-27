@@ -1,120 +1,183 @@
+import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  ShieldCheckIcon, 
+  CodeBracketIcon,
+  LightBulbIcon,
+  LockClosedIcon 
+} from '@heroicons/react/24/outline';
 
 export default function PrivacyPolicy() {
+  const [activeSection, setActiveSection] = useState<string | null>(null);
+
+  const privacySections = [
+    {
+      id: 'data-collection',
+      title: 'Data Collection',
+      icon: CodeBracketIcon,
+      description: 'Transparent and secure data gathering practices.',
+      details: [
+        'Minimal personal information collection',
+        'Explicit consent mechanisms',
+        'Anonymous data processing',
+        'Zero tracking without permission'
+      ]
+    },
+    {
+      id: 'usage-policy',
+      title: 'Usage Policy',
+      icon: LightBulbIcon,
+      description: 'Intelligent and ethical data utilization.',
+      details: [
+        'Purpose-driven data usage',
+        'User-centric information handling',
+        'Predictive privacy protection',
+        'Continuous improvement protocols'
+      ]
+    },
+    {
+      id: 'security-measures',
+      title: 'Security Protocols',
+      icon: ShieldCheckIcon,
+      description: 'Advanced protection for your digital identity.',
+      details: [
+        'Military-grade encryption',
+        'Real-time threat monitoring',
+        'Decentralized security architecture',
+        'Proactive vulnerability management'
+      ]
+    },
+    {
+      id: 'data-sharing',
+      title: 'Data Sharing',
+      icon: LockClosedIcon,
+      description: 'Rigorous control over information distribution.',
+      details: [
+        'Zero third-party data selling',
+        'Granular sharing permissions',
+        'Transparent partner agreements',
+        'User-controlled data boundaries'
+      ]
+    }
+  ];
+
   return (
-    <>
+    <div className="container mx-auto px-4 py-16 max-w-4xl">
       <Helmet>
-        <title>Kebijakan Privasi - GKJ Grogol Jakarta</title>
-        <meta name="description" content="Kebijakan privasi GKJ Grogol Jakarta mengenai penggunaan data dan informasi pengunjung website" />
+        <title>Privacy Policy - Next-Gen Digital Trust</title>
+        <meta name="description" content="Cutting-edge privacy protection for the digital era" />
       </Helmet>
 
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <h1 className="text-3xl font-bold mb-8">Kebijakan Privasi</h1>
-        
-        <div className="prose prose-slate max-w-none space-y-6">
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">Pendahuluan</h2>
-            <p>
-              GKJ Grogol Jakarta berkomitmen untuk melindungi privasi Anda. Kebijakan privasi ini menjelaskan bagaimana kami mengumpulkan, 
-              menggunakan, dan melindungi informasi yang Anda berikan kepada kami melalui website www.gkjgrogoljakarta.org.
-            </p>
-          </section>
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="text-center mb-12"
+      >
+        <h1 className="text-4xl font-semibold text-primary/80 mb-4">
+          Digital Privacy Reimagined
+        </h1>
+        <p className="text-muted-foreground/70 max-w-2xl mx-auto">
+          Pioneering a new standard of digital trust and transparency
+        </p>
+      </motion.div>
 
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">Informasi yang Kami Kumpulkan</h2>
-            <p>Kami dapat mengumpulkan informasi berikut:</p>
-            <ul className="list-disc pl-6 space-y-2">
-              <li>Nama dan informasi kontak (email, nomor telepon) saat Anda mendaftar untuk kegiatan gereja</li>
-              <li>Informasi yang Anda berikan saat mengisi formulir kontak atau formulir lainnya</li>
-              <li>Data teknis seperti alamat IP dan informasi browser saat Anda mengakses website kami</li>
-              <li>Informasi yang Anda berikan saat berpartisipasi dalam survei atau mengisi formulir umpan balik</li>
-            </ul>
-          </section>
+      <div className="space-y-4">
+        {privacySections.map((section) => (
+          <motion.div
+            key={section.id}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="border-b border-border/50 last:border-b-0"
+          >
+            <button 
+              onClick={() => setActiveSection(activeSection === section.id ? null : section.id)}
+              className="w-full text-left py-4 flex items-center justify-between 
+                         hover:bg-accent/30 transition-colors rounded-lg"
+            >
+              <div className="flex items-center space-x-4">
+                <section.icon 
+                  className={`h-6 w-6 text-primary/60 
+                    ${activeSection === section.id ? 'rotate-6' : ''} 
+                    transition-transform`} 
+                />
+                <span className="font-medium text-foreground/80">
+                  {section.title}
+                </span>
+              </div>
+              <motion.div
+                animate={{ 
+                  rotate: activeSection === section.id ? 180 : 0 
+                }}
+                transition={{ duration: 0.2 }}
+              >
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  strokeWidth={1.5} 
+                  stroke="currentColor" 
+                  className="w-5 h-5 text-muted-foreground/60"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                </svg>
+              </motion.div>
+            </button>
 
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">Penggunaan Informasi</h2>
-            <p>Kami menggunakan informasi yang dikumpulkan untuk:</p>
-            <ul className="list-disc pl-6 space-y-2">
-              <li>Mengelola keanggotaan dan kegiatan gereja</li>
-              <li>Mengirimkan informasi tentang kegiatan dan pelayanan gereja</li>
-              <li>Meningkatkan layanan website dan pengalaman pengguna</li>
-              <li>Mengirimkan warta jemaat dan materi rohani lainnya (jika Anda berlangganan)</li>
-              <li>Menanggapi pertanyaan dan permintaan Anda</li>
-            </ul>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">Perlindungan Data</h2>
-            <p>
-              Kami menerapkan langkah-langkah keamanan yang sesuai untuk melindungi informasi Anda dari akses yang tidak sah, 
-              perubahan, pengungkapan, atau penghapusan yang tidak sah.
-            </p>
-            <ul className="list-disc pl-6 space-y-2">
-              <li>Data disimpan dalam sistem yang aman dan dilindungi</li>
-              <li>Akses ke data pribadi dibatasi hanya untuk staf yang berwenang</li>
-              <li>Kami secara teratur meninjau dan memperbarui prosedur keamanan kami</li>
-            </ul>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">Berbagi Informasi</h2>
-            <p>
-              Kami tidak akan menjual, menyewakan, atau menukar informasi pribadi Anda dengan pihak ketiga tanpa izin Anda, 
-              kecuali jika diwajibkan oleh hukum atau untuk kepentingan pelayanan gereja.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">Cookie dan Teknologi Pelacakan</h2>
-            <p>
-              Website kami menggunakan cookie dan teknologi pelacakan serupa untuk meningkatkan pengalaman pengguna. 
-              Anda dapat mengatur browser Anda untuk menolak cookie, namun ini mungkin mempengaruhi fungsionalitas website.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">Hak-Hak Anda</h2>
-            <p>Anda memiliki hak untuk:</p>
-            <ul className="list-disc pl-6 space-y-2">
-              <li>Mengakses informasi pribadi Anda yang kami simpan</li>
-              <li>Meminta koreksi informasi yang tidak akurat</li>
-              <li>Meminta penghapusan informasi Anda</li>
-              <li>Menarik persetujuan Anda untuk penggunaan data</li>
-              <li>Mengajukan keluhan tentang penanganan data Anda</li>
-            </ul>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">Perubahan Kebijakan Privasi</h2>
-            <p>
-              Kami dapat memperbarui kebijakan privasi ini dari waktu ke waktu. Perubahan akan diumumkan di website ini 
-              dan, jika signifikan, kami akan memberikan pemberitahuan tambahan.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">Kontak</h2>
-            <p>
-              Jika Anda memiliki pertanyaan tentang kebijakan privasi ini atau penanganan data Anda, silakan hubungi kami di:
-            </p>
-            <div className="mt-4">
-              <p>Email: gkjgrogol@yahoo.com</p>
-              <p>Telepon: (021) 5659044</p>
-              <p>
-                Alamat: Kompleks Rasa Sayang Blok HH No. 1,<br />
-                Wijaya Kusuma, Grogol,<br />
-                Jakarta Barat 11460
-              </p>
-            </div>
-          </section>
-
-          <section className="mt-8 pt-8 border-t">
-            <p className="text-sm text-muted-foreground">
-              Terakhir diperbarui: Januari 2024
-            </p>
-          </section>
-        </div>
+            <AnimatePresence>
+              {activeSection === section.id && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ 
+                    opacity: 1, 
+                    height: 'auto',
+                    transition: { 
+                      duration: 0.3,
+                      ease: "easeInOut" 
+                    }
+                  }}
+                  exit={{ 
+                    opacity: 0, 
+                    height: 0,
+                    transition: { duration: 0.2 }
+                  }}
+                  className="px-4 py-4 bg-accent/20 rounded-b-lg"
+                >
+                  <p className="text-muted-foreground/70 text-sm mb-3">
+                    {section.description}
+                  </p>
+                  <ul className="space-y-2 text-foreground/80 text-sm">
+                    {section.details.map((detail, idx) => (
+                      <li 
+                        key={idx}
+                        className="flex items-center space-x-2 
+                          text-muted-foreground/70 hover:text-foreground/90 
+                          transition-colors"
+                      >
+                        <span className="w-2 h-2 bg-primary/50 rounded-full"></span>
+                        <span>{detail}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        ))}
       </div>
-    </>
+
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+        className="text-center mt-12"
+      >
+        <p className="text-xs text-muted-foreground/50">
+          Last Updated: January 2024 | Version 2.0 
+        </p>
+      </motion.div>
+    </div>
   );
 }

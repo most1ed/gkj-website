@@ -1,139 +1,183 @@
+import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  DocumentTextIcon, 
+  ShieldCheckIcon,
+  LightBulbIcon,
+  CodeBracketIcon
+} from '@heroicons/react/24/outline';
 
 export default function Terms() {
+  const [activeSection, setActiveSection] = useState<string | null>(null);
+
+  const termsSections = [
+    {
+      id: 'usage-guidelines',
+      title: 'Ketentuan Umum',
+      icon: DocumentTextIcon,
+      description: 'Panduan dasar penggunaan website GKJ Grogol Jakarta.',
+      details: [
+        'Persetujuan atas seluruh ketentuan',
+        'Kewajiban mematuhi aturan website',
+        'Hak untuk tidak menggunakan website',
+        'Komitmen terhadap transparansi'
+      ]
+    },
+    {
+      id: 'content-policy',
+      title: 'Penggunaan Website',
+      icon: CodeBracketIcon,
+      description: 'Tujuan dan batasan penggunaan website kami.',
+      details: [
+        'Informasi resmi GKJ Grogol Jakarta',
+        'Pendaftaran kegiatan gereja',
+        'Materi rohani dan informasi pelayanan',
+        'Partisipasi kegiatan online'
+      ]
+    },
+    {
+      id: 'digital-rights',
+      title: 'Konten dan Hak Cipta',
+      icon: ShieldCheckIcon,
+      description: 'Aturan penggunaan konten dan perlindungan hak cipta.',
+      details: [
+        'Konten milik GKJ Grogol Jakarta',
+        'Penggunaan pribadi dan non-komersial',
+        'Izin tertulis untuk distribusi',
+        'Perlindungan hak intelektual'
+      ]
+    },
+    {
+      id: 'transaction-policy',
+      title: 'Persembahan Online',
+      icon: LightBulbIcon,
+      description: 'Prosedur dan ketentuan persembahan online.',
+      details: [
+        'Verifikasi data transfer',
+        'Konfirmasi transfer resmi',
+        'Pencatatan sesuai peruntukan',
+        'Keamanan transaksi digital'
+      ]
+    }
+  ];
+
   return (
-    <>
+    <div className="container mx-auto px-4 py-16 max-w-4xl">
       <Helmet>
         <title>Syarat & Ketentuan - GKJ Grogol Jakarta</title>
-        <meta name="description" content="Syarat dan ketentuan penggunaan website GKJ Grogol Jakarta" />
+        <meta name="description" content="Syarat dan ketentuan resmi penggunaan website GKJ Grogol Jakarta" />
       </Helmet>
 
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
-        <h1 className="text-3xl font-bold mb-8">Syarat & Ketentuan</h1>
-        
-        <div className="prose prose-slate max-w-none space-y-6">
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">1. Ketentuan Umum</h2>
-            <p>
-              Dengan mengakses dan menggunakan website GKJ Grogol Jakarta, Anda menyetujui untuk terikat oleh syarat dan ketentuan ini. 
-              Jika Anda tidak setuju dengan bagian apapun dari ketentuan ini, Anda tidak diperkenankan menggunakan website ini.
-            </p>
-          </section>
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="text-center mb-12"
+      >
+        <h1 className="text-4xl font-semibold text-primary/80 mb-4">
+          Syarat & Ketentuan
+        </h1>
+        <p className="text-muted-foreground/70 max-w-2xl mx-auto">
+          Panduan resmi dan komprehensif untuk penggunaan website GKJ Grogol Jakarta.
+        </p>
+      </motion.div>
 
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">2. Penggunaan Website</h2>
-            <p>Website ini ditujukan untuk:</p>
-            <ul className="list-disc pl-6 space-y-2">
-              <li>Memberikan informasi tentang GKJ Grogol Jakarta dan kegiatannya</li>
-              <li>Memfasilitasi pendaftaran untuk kegiatan gereja</li>
-              <li>Menyediakan materi-materi rohani dan informasi pelayanan</li>
-              <li>Memungkinkan jemaat berpartisipasi dalam kegiatan online</li>
-            </ul>
-          </section>
+      <div className="space-y-4">
+        {termsSections.map((section) => (
+          <motion.div
+            key={section.id}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="border-b border-border/50 last:border-b-0"
+          >
+            <button 
+              onClick={() => setActiveSection(activeSection === section.id ? null : section.id)}
+              className="w-full text-left py-4 flex items-center justify-between 
+                         hover:bg-accent/30 transition-colors rounded-lg"
+            >
+              <div className="flex items-center space-x-4">
+                <section.icon 
+                  className={`h-6 w-6 text-primary/60 
+                    ${activeSection === section.id ? 'rotate-6' : ''} 
+                    transition-transform`} 
+                />
+                <span className="font-medium text-foreground/80">
+                  {section.title}
+                </span>
+              </div>
+              <motion.div
+                animate={{ 
+                  rotate: activeSection === section.id ? 180 : 0 
+                }}
+                transition={{ duration: 0.2 }}
+              >
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  strokeWidth={1.5} 
+                  stroke="currentColor" 
+                  className="w-5 h-5 text-muted-foreground/60"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                </svg>
+              </motion.div>
+            </button>
 
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">3. Keanggotaan dan Registrasi</h2>
-            <p>Untuk beberapa fitur website, Anda mungkin perlu melakukan registrasi:</p>
-            <ul className="list-disc pl-6 space-y-2">
-              <li>Informasi yang diberikan harus akurat dan lengkap</li>
-              <li>Anda bertanggung jawab menjaga kerahasiaan akun Anda</li>
-              <li>Memberitahu kami jika ada penggunaan tidak sah atas akun Anda</li>
-              <li>GKJ Grogol berhak menonaktifkan akun yang melanggar ketentuan</li>
-            </ul>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">4. Konten dan Hak Cipta</h2>
-            <ul className="list-disc pl-6 space-y-2">
-              <li>Seluruh konten website adalah milik GKJ Grogol Jakarta atau pemberi lisensinya</li>
-              <li>Konten hanya boleh digunakan untuk keperluan pribadi dan non-komersial</li>
-              <li>Dilarang menyalin, memodifikasi, atau mendistribusikan konten tanpa izin tertulis</li>
-              <li>Penggunaan logo dan nama GKJ Grogol Jakarta harus dengan izin tertulis</li>
-            </ul>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">5. Persembahan Online</h2>
-            <p>Untuk layanan persembahan online:</p>
-            <ul className="list-disc pl-6 space-y-2">
-              <li>Pastikan data transfer dan nominal sudah benar</li>
-              <li>Simpan bukti transfer sebagai referensi</li>
-              <li>Konfirmasi transfer akan diproses pada hari kerja</li>
-              <li>Persembahan akan dicatat sesuai peruntukan yang dipilih</li>
-            </ul>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">6. Pendaftaran Kegiatan</h2>
-            <p>Untuk pendaftaran kegiatan gereja:</p>
-            <ul className="list-disc pl-6 space-y-2">
-              <li>Pendaftaran hanya valid setelah konfirmasi dari panitia</li>
-              <li>Perubahan atau pembatalan harus dilakukan minimal 24 jam sebelumnya</li>
-              <li>Harap memberikan informasi yang akurat untuk keperluan administrasi</li>
-              <li>Kehadiran akan dicatat sesuai protokol yang berlaku</li>
-            </ul>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">7. Materi Rohani</h2>
-            <ul className="list-disc pl-6 space-y-2">
-              <li>Materi kotbah dan renungan adalah untuk penggunaan pribadi</li>
-              <li>Dilarang mengubah atau mendistribusikan ulang tanpa izin</li>
-              <li>Kutipan harus mencantumkan sumber dari GKJ Grogol Jakarta</li>
-              <li>Penggunaan untuk keperluan pelayanan harus dengan pemberitahuan</li>
-            </ul>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">8. Batasan Tanggung Jawab</h2>
-            <ul className="list-disc pl-6 space-y-2">
-              <li>Website disediakan "sebagaimana adanya" tanpa jaminan apapun</li>
-              <li>GKJ Grogol tidak bertanggung jawab atas kerugian yang timbul dari penggunaan website</li>
-              <li>Kami berusaha menjaga keakuratan informasi namun tidak menjamin 100% bebas kesalahan</li>
-              <li>Pengguna bertanggung jawab atas risiko penggunaan website</li>
-            </ul>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">9. Perubahan Ketentuan</h2>
-            <p>
-              GKJ Grogol Jakarta berhak mengubah syarat dan ketentuan ini sewaktu-waktu. Perubahan akan diumumkan melalui website 
-              dan berlaku sejak tanggal publikasi. Penggunaan berkelanjutan atas website ini setelah perubahan berarti Anda 
-              menyetujui ketentuan yang diperbarui.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">10. Hukum yang Berlaku</h2>
-            <p>
-              Syarat dan ketentuan ini tunduk pada hukum yang berlaku di Republik Indonesia. Setiap perselisihan akan 
-              diselesaikan secara musyawarah mufakat atau melalui forum yang berwenang di Jakarta.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold mb-4">11. Kontak</h2>
-            <p>
-              Jika Anda memiliki pertanyaan tentang syarat dan ketentuan ini, silakan hubungi kami di:
-            </p>
-            <div className="mt-4">
-              <p>Email: gkjgrogol@yahoo.com</p>
-              <p>Telepon: (021) 5659044</p>
-              <p>
-                Alamat: Kompleks Rasa Sayang Blok HH No. 1,<br />
-                Wijaya Kusuma, Grogol,<br />
-                Jakarta Barat 11460
-              </p>
-            </div>
-          </section>
-
-          <section className="mt-8 pt-8 border-t">
-            <p className="text-sm text-muted-foreground">
-              Terakhir diperbarui: Januari 2024
-            </p>
-          </section>
-        </div>
+            <AnimatePresence>
+              {activeSection === section.id && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ 
+                    opacity: 1, 
+                    height: 'auto',
+                    transition: { 
+                      duration: 0.3,
+                      ease: "easeInOut" 
+                    }
+                  }}
+                  exit={{ 
+                    opacity: 0, 
+                    height: 0,
+                    transition: { duration: 0.2 }
+                  }}
+                  className="px-4 py-4 bg-accent/20 rounded-b-lg"
+                >
+                  <p className="text-muted-foreground/70 text-sm mb-3">
+                    {section.description}
+                  </p>
+                  <ul className="space-y-2 text-foreground/80 text-sm">
+                    {section.details.map((detail, idx) => (
+                      <li 
+                        key={idx}
+                        className="flex items-center space-x-2 
+                          text-muted-foreground/70 hover:text-foreground/90 
+                          transition-colors"
+                      >
+                        <span className="w-2 h-2 bg-primary/50 rounded-full"></span>
+                        <span>{detail}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        ))}
       </div>
-    </>
+
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
+        className="text-center mt-12"
+      >
+        <p className="text-xs text-muted-foreground/50">
+          Terakhir diperbarui: Januari 2024 | Versi 1.2
+        </p>
+      </motion.div>
+    </div>
   );
 }
