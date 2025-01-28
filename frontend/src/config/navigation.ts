@@ -29,44 +29,44 @@ export const userNavigation = [
     items: [
       {
         title: 'Dashboard',
-        href: '/dashboard',
+        href: '/DummyPage',
         icon: Home,
         description: 'Overview dan statistik umum'
       },
       {
         title: 'Profil',
-        href: '/dashboard/profile',
+        href: '/DummyPage',
         icon: User,
         description: 'Manajemen profil pengguna'
       },
       {
         title: 'Dokumen',
-        href: '/dashboard/documents',
+        href: '/DummyPage',
         icon: FileText,
         description: 'Manajemen dokumen',
         children: [
           {
             title: 'Dokumen Saya',
-            href: '/dashboard/documents',
+            href: '/DummyPage',
             description: 'Kelola dokumen pribadi'
           }
         ]
       },
       {
         title: 'Kegiatan',
-        href: '/dashboard/events',
+        href: '/DummyPage',
         icon: Calendar,
         description: 'Daftar kegiatan'
       },
       {
         title: 'Keuangan',
-        href: '/dashboard/finance',
+        href: '/DummyPage',
         icon: DollarSign,
         description: 'Laporan keuangan'
       },
       {
         title: 'Pelayanan',
-        href: '/dashboard/service',
+        href: '/DummyPage',
         icon: HeartHandshake,
         description: 'Informasi pelayanan'
       }
@@ -79,145 +79,145 @@ export const adminNavigation = [
     title: 'Menu Admin',
     items: [
       {
-        title: 'Dashboard',
-        href: '/dashboard',
+        title: 'Dashboard Admin',
+        href: '/DummyPage',
         icon: Home,
-        description: 'Overview dan statistik umum'
+        description: 'Overview dan statistik admin'
       },
       {
         title: 'Konten',
-        href: '/dashboard/konten',
+        href: '/DummyPage',
         icon: FileEdit,
         description: 'Manajemen konten',
         children: [
           {
             title: 'Tentang Gereja',
-            href: '/dashboard/konten/about',
+            href: '/DummyPage',
             description: 'Informasi gereja'
           },
           {
             title: 'Sejarah',
-            href: '/dashboard/konten/history',
+            href: '/DummyPage',
             description: 'Sejarah gereja'
           },
           {
             title: 'Visi & Misi',
-            href: '/dashboard/konten/vision-mission',
+            href: '/DummyPage',
             description: 'Visi dan misi'
           },
           {
             title: 'Organisasi',
-            href: '/dashboard/konten/organization',
+            href: '/DummyPage',
             description: 'Struktur organisasi'
           }
         ]
       },
       {
         title: 'Media',
-        href: '/dashboard/media',
+        href: '/DummyPage',
         icon: Image,
         description: 'Manajemen media',
         children: [
           {
             title: 'Galeri',
-            href: '/dashboard/media/gallery',
+            href: '/DummyPage',
             description: 'Galeri foto'
           },
           {
             title: 'Video',
-            href: '/dashboard/media/videos',
+            href: '/DummyPage',
             description: 'Manajemen video'
           },
           {
             title: 'Khotbah',
-            href: '/dashboard/media/sermons',
+            href: '/DummyPage',
             description: 'Rekaman khotbah'
           }
         ]
       },
       {
         title: 'Artikel',
-        href: '/dashboard/artikel',
+        href: '/DummyPage',
         icon: FileText,
         description: 'Manajemen artikel',
         children: [
           {
             title: 'Daftar Artikel',
-            href: '/dashboard/artikel/articles',
+            href: '/DummyPage',
             description: 'Kelola artikel'
           },
           {
             title: 'Kategori',
-            href: '/dashboard/artikel/categories',
+            href: '/DummyPage',
             description: 'Kategori artikel'
           },
           {
             title: 'Tag',
-            href: '/dashboard/artikel/tags',
+            href: '/DummyPage',
             description: 'Tag artikel'
           }
         ]
       },
       {
         title: 'Alkitab',
-        href: '/dashboard/alkitab',
+        href: '/DummyPage',
         icon: BookOpen,
         description: 'Manajemen alkitab',
         children: [
           {
             title: 'Bacaan Harian',
-            href: '/dashboard/alkitab/daily-reading',
+            href: '/DummyPage',
             description: 'Bacaan alkitab harian'
           },
           {
             title: 'Renungan',
-            href: '/dashboard/alkitab/devotional',
+            href: '/DummyPage',
             description: 'Renungan harian'
           },
           {
             title: 'Pengaturan',
-            href: '/dashboard/alkitab/settings',
+            href: '/DummyPage',
             description: 'Pengaturan alkitab'
           }
         ]
       },
       {
         title: 'Master',
-        href: '/dashboard/master',
+        href: '/DummyPage',
         icon: Database,
         description: 'Data master',
         children: [
           {
             title: 'Data Majelis',
-            href: '/dashboard/master/council',
+            href: '/DummyPage',
             description: 'Manajemen majelis'
           },
           {
             title: 'Data Pengguna',
-            href: '/dashboard/master/users',
+            href: '/DummyPage',
             description: 'Manajemen pengguna'
           }
         ]
       },
       {
         title: 'Pengaturan',
-        href: '/dashboard/pengaturan',
+        href: '/DummyPage',
         icon: Settings,
         description: 'Pengaturan sistem',
         children: [
           {
             title: 'Website',
-            href: '/dashboard/pengaturan/website',
+            href: '/DummyPage',
             description: 'Pengaturan website'
           },
           {
             title: 'Email',
-            href: '/dashboard/pengaturan/email',
+            href: '/DummyPage',
             description: 'Pengaturan email'
           },
           {
             title: 'Backup',
-            href: '/dashboard/pengaturan/backup',
+            href: '/DummyPage',
             description: 'Backup data'
           }
         ]

@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { FileUpload } from "@/components/file-upload";
+import { FileUpload } from "@/components/ui/file-upload";
 
 const DOCUMENT_TYPES = [
   "Surat Baptis",

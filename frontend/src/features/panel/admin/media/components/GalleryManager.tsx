@@ -11,7 +11,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { ImageUpload } from "@/components/image-upload";
+import { ImageUpload } from "@/components/ui/image-upload";
 
 interface GalleryItem {
   id: string;

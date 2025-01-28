@@ -23,7 +23,7 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
-import { Editor } from "@/components/editor";
+import { Editor } from "@/components/ui/editor";
 
 interface Devotional {
   id: string;

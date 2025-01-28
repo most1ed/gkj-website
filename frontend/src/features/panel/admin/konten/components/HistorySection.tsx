@@ -10,7 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { ImageUpload } from "@/components/image-upload";
+import { ImageUpload } from "@/components/ui/image-upload"; // Perbaiki import ImageUpload dari lokasi yang benar
 import { Separator } from "@/components/ui/separator";
 import { Plus, Trash2 } from "lucide-react";
 

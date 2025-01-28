@@ -23,7 +23,7 @@ import {
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import { Calendar } from "@/components/ui/calendar";
-import { FileUpload } from "@/components/file-upload";
+import { FileUpload } from "@/components/ui/file-upload";
 
 interface Sermon {
   id: string;

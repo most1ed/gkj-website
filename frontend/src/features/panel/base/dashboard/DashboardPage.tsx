@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/Card";
-import { DashboardLayout } from "@/components/layout/DashboardLayout";
+import { DashboardLayout } from "@/layouts/DashboardLayout";
 
 export default function Dashboard() {
   return (

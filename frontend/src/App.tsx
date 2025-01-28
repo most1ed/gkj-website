@@ -1,8 +1,9 @@
+import React, { Suspense } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { publicRoutes } from '@/routes/public.routes';
+import { panelRoutes } from '@/routes/panel.routes';
 import LoginPage from '@/features/auth/login/LoginPage';
-import { DashboardLayout } from '@/layouts/DashboardLayout';
-import { DummyPage } from '@/components/DummyPage';
 
 // Konfigurasi router dengan public routes sebagai default
 const router = createBrowserRouter([
@@ -20,17 +21,8 @@ const router = createBrowserRouter([
     ]
   },
 
-  // Dashboard routes (protected)
-  {
-    path: "dashboard",
-    element: <DashboardLayout />,
-    children: [
-      {
-        index: true,
-        element: <DummyPage title="Dashboard" />
-      }
-    ]
-  }
+  // Panel routes (protected)
+  ...panelRoutes
 ]);
 
 function App() {

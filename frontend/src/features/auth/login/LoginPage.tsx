@@ -60,7 +60,7 @@ export default function Login() {
     setLoading(true);
     try {
       await login(selectedUser.username, password, selectedUser.role);
-      navigate('/dashboard');
+      navigate('/panel');
     } catch (error) {
       toast({
         variant: 'destructive',

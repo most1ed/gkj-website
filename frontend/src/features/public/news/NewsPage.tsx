@@ -1,9 +1,9 @@
-import { WeeklyAnnouncements } from '@/components/news/WeeklyAnnouncements';
-import { BirthdayList } from '@/components/news/BirthdayList';
-import { Devotional } from '@/components/news/Devotional';
-import { PrayerRequests } from '@/components/news/PrayerRequests';
-import { ChurchFinance } from '@/components/news/ChurchFinance';
-import { ArchiveDownload } from '@/components/news/ArchiveDownload';
+import { WeeklyAnnouncements } from '@/components/common/news/WeeklyAnnouncements';
+import { BirthdayList } from '@/components/common/news/BirthdayList';
+import { Devotional } from '@/components/common/news/Devotional';
+import { PrayerRequests } from '@/components/common/news/PrayerRequests';
+import { ChurchFinance } from '@/components/common/news/ChurchFinance';
+import { ArchiveDownload } from '@/components/common/news/ArchiveDownload';
 
 export default function News() {
   return (

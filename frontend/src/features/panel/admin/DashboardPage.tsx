@@ -1,5 +1,5 @@
 import { AdminLayout } from "@/layouts/AdminLayout";
-import { Card } from '@/components/ui/Card';
+import { Card } from '@/components/ui/card';
 import {
   UsersIcon,
   DocumentTextIcon,
