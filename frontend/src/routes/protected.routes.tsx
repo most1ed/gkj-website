@@ -1,10 +1,7 @@
 import { RouteObject } from "react-router-dom";
-
-// Temporarily disabled protected routes
-export const protectedRoutes: RouteObject[] = [];
-
-/* Will be enabled later
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { DashboardLayout } from "@/layouts/dashboard-layout";
+import { NotFoundPage } from '@/features/dashboard/base/NotFoundPage';
 
 // Base User Routes
 import { UserProfilePage } from "@/features/dashboard/base/profile/UserProfilePage";
@@ -29,7 +26,12 @@ import { PengaturanPage } from "@/features/dashboard/admin/pengaturan/Pengaturan
 export const protectedRoutes: RouteObject[] = [
   {
     path: "/dashboard",
-    element: <DashboardLayout />,
+    element: (
+      <ErrorBoundary>
+        <DashboardLayout />
+      </ErrorBoundary>
+    ),
+    errorElement: <NotFoundPage />,
     children: [
       // Base User Routes
       {
@@ -95,4 +97,3 @@ export const protectedRoutes: RouteObject[] = [
     ],
   },
 ];
-*/

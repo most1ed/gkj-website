@@ -1,19 +1,28 @@
-import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { publicRoutes } from '@/routes/public.routes';
 import LoginPage from '@/features/auth/login/LoginPage';
-import { DummyPage } from '@/components/DummyPage';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
+import { DummyPage } from '@/components/DummyPage';
 
+// Konfigurasi router dengan public routes sebagai default
 const router = createBrowserRouter([
+  // Public routes (homepage dan halaman publik lainnya)
+  ...publicRoutes,
+
+  // Auth routes
   {
-    path: "/",
-    element: <Navigate to="/auth/login" replace />
+    path: "auth",
+    children: [
+      {
+        path: "login",
+        element: <LoginPage />
+      }
+    ]
   },
+
+  // Dashboard routes (protected)
   {
-    path: "/auth/login",
-    element: <LoginPage />
-  },
-  {
-    path: "/dashboard",
+    path: "dashboard",
     element: <DashboardLayout />,
     children: [
       {
@@ -21,10 +30,6 @@ const router = createBrowserRouter([
         element: <DummyPage title="Dashboard" />
       }
     ]
-  },
-  {
-    path: "*",
-    element: <Navigate to="/auth/login" replace />
   }
 ]);
 

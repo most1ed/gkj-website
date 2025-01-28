@@ -2,6 +2,7 @@ import { RouteObject } from "react-router-dom";
 import { PublicLayout } from "@/layouts/PublicLayout";
 import { NotFoundPage } from "@/features/public/not-found/NotFoundPage";
 import { DummyPage } from "@/components/DummyPage";
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 // Import existing pages
 import { HomePage } from "@/features/public/home/HomePage";
@@ -30,7 +31,11 @@ import WartaDetailPage from "@/features/public/archive-warta/WartaDetailPage";
 export const publicRoutes: RouteObject[] = [
   {
     path: "/",
-    element: <PublicLayout />,
+    element: (
+      <ErrorBoundary>
+        <PublicLayout />
+      </ErrorBoundary>
+    ),
     errorElement: <NotFoundPage />,
     children: [
       // Main Pages
