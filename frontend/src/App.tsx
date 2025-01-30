@@ -6,6 +6,7 @@ import { panelRoutes } from '@/routes/panel.routes';
 import LoginPage from '@/features/auth/login/LoginPage';
 import { HelmetProvider } from 'react-helmet-async';
 import { ThemeProvider } from '@/components/common/theme/ThemeProvider';
+import { AuthProvider } from '@/providers/auth-provider';
 
 // Konfigurasi router dengan public routes sebagai default
 const router = createBrowserRouter([
@@ -29,11 +30,13 @@ const router = createBrowserRouter([
 
 function App() {
   return (
-    <ThemeProvider>
-      <HelmetProvider>
-        <RouterProvider router={router} />
-      </HelmetProvider>
-    </ThemeProvider>
+    <AuthProvider>
+      <ThemeProvider>
+        <HelmetProvider>
+          <RouterProvider router={router} />
+        </HelmetProvider>
+      </ThemeProvider>
+    </AuthProvider>
   );
 }
 

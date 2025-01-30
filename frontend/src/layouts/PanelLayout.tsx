@@ -1,36 +1,25 @@
 import React, { useState } from 'react';
 import { 
   Outlet, 
-  useLocation, 
-  Link, 
-  NavLink 
+  NavLink, 
+  useLocation,
+  Link 
 } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
-  HomeIcon,
-  ChevronLeftIcon, 
-  ChevronRightIcon, 
-  DocumentIcon, 
-  CogIcon, 
-  UserIcon,
-  CalendarIcon,
-  CurrencyDollarIcon,
-  UserGroupIcon,
-  ChurchIcon,
-  BanknotesIcon,
-  HandRaisedIcon,
-  BookOpenIcon,
-  NewspaperIcon,
-  DocumentTextIcon,
-  PhotoIcon,
-  AdjustmentsHorizontalIcon,
-  LanguageIcon,
-  ChevronDownIcon,
-  MagnifyingGlassIcon,
-  BellIcon
-} from '@heroicons/react/24/outline';
-
-import { ThemeToggle } from '@/components/common/theme/ThemeToggle';
+  LayoutDashboardIcon, 
+  UserIcon, 
+  FileTextIcon, 
+  CalendarIcon, 
+  UsersIcon, 
+  BookIcon, 
+  DollarSignIcon, 
+  SettingsIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  BellIcon,
+  HomeIcon
+} from 'lucide-react';
 import { 
   Tooltip, 
   TooltipContent, 
@@ -47,45 +36,10 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { PanelFooter } from '@/components/common/PanelFooter';
 import { cn } from '@/lib/utils';
-
-// Type definitions
-type SidebarItem = {
-  path: string;
-  label: string;
-  icon: React.ComponentType<{ className?: string }>;
-  children?: SidebarItem[];
-};
-
-// Sidebar configuration
-const sidebarItems: SidebarItem[] = [
-  { 
-    path: '/panel/dashboard', 
-    label: 'Dashboard', 
-    icon: HomeIcon 
-  },
-  { 
-    path: '/panel/admin', 
-    label: 'Admin', 
-    icon: CogIcon
-  },
-  { 
-    path: '/panel/management', 
-    label: 'Manajemen', 
-    icon: UserIcon
-  },
-  { 
-    path: '/panel/base', 
-    label: 'Base', 
-    icon: DocumentIcon
-  },
-  { 
-    path: '/panel/documents', 
-    label: 'Dokumen', 
-    icon: DocumentIcon
-  }
-];
+import { ThemeToggle } from '@/components/common/theme/ThemeToggle';
+import { PanelFooter } from '@/components/common/PanelFooter';
+import { useAuth } from '@/providers/auth-provider';
 
 // Breadcrumbs Component
 const Breadcrumbs: React.FC = () => {
@@ -170,115 +124,117 @@ const NotificationDropdown: React.FC = () => {
   );
 };
 
-// Language Selector Component
-const LanguageSelector: React.FC = () => {
-  const [currentLanguage, setCurrentLanguage] = useState('en');
-  
-  const languages = [
-    { code: 'en', name: 'English' },
-    { code: 'id', name: 'Bahasa Indonesia' },
-    { code: 'jv', name: 'Basa Jawa' }
-  ];
+// Profile Dropdown Component
+const ProfileDropdown: React.FC = () => {
+  const { user, logout } = useAuth();
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon">
-          <LanguageIcon className="h-5 w-5" />
+          <UserIcon className="h-5 w-5" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-48">
-        <DropdownMenuLabel>Select Language</DropdownMenuLabel>
+      <DropdownMenuContent align="end">
+        <DropdownMenuLabel>
+          <div className="flex items-center space-x-2">
+            <UserIcon className="h-5 w-5" />
+            <span>{user?.name || 'My Account'}</span>
+          </div>
+        </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        {languages.map(lang => (
-          <DropdownMenuItem 
-            key={lang.code}
-            onClick={() => setCurrentLanguage(lang.code)}
-            className={cn(
-              'cursor-pointer',
-              currentLanguage === lang.code 
-                ? 'bg-accent text-accent-foreground' 
-                : ''
-            )}
-          >
-            {lang.name}
-          </DropdownMenuItem>
-        ))}
+        <DropdownMenuItem>Profile</DropdownMenuItem>
+        <DropdownMenuItem>Settings</DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={logout}>Logout</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
 };
 
-// Sidebar Navigation Component
-const SidebarNavigation: React.FC<{
-  isCollapsed: boolean;
-  items: SidebarItem[];
-  openMenus: { [key: string]: boolean };
-  toggleMenu: (path: string) => void;
-}> = ({ isCollapsed, items, openMenus, toggleMenu }) => {
-  return (
-    <nav className="flex-1 px-2 py-4 space-y-1">
-      {items.map((item) => (
-        <div key={item.path}>
-          <NavLink
-            to={item.path}
-            className={({ isActive }) => cn(
-              'group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors duration-200',
-              isActive 
-                ? 'bg-primary text-primary-foreground' 
-                : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
-              isCollapsed ? 'justify-center' : 'justify-start'
-            )}
-          >
-            <item.icon 
-              className={cn(
-                'h-5 w-5 mr-3 transition-transform duration-200',
-                isCollapsed ? 'mr-0' : 'mr-3'
-              )} 
-            />
-            {!isCollapsed && <span>{item.label}</span>}
-            {!isCollapsed && item.children && (
-              <ChevronDownIcon 
-                className={cn(
-                  'ml-auto h-4 w-4 transform transition-transform duration-200',
-                  openMenus[item.path] ? 'rotate-180' : ''
-                )}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  toggleMenu(item.path);
-                }}
-              />
-            )}
-          </NavLink>
-          {!isCollapsed && item.children && openMenus[item.path] && (
-            <div className="ml-4 mt-1 space-y-1">
-              {item.children.map((child) => (
-                <NavLink
-                  key={child.path}
-                  to={child.path}
-                  className={({ isActive }) => cn(
-                    'group flex items-center px-2 py-1.5 text-xs font-medium rounded-md transition-colors duration-200',
-                    isActive 
-                      ? 'bg-primary text-primary-foreground' 
-                      : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
-                  )}
-                >
-                  {child.label}
-                </NavLink>
-              ))}
-            </div>
-          )}
-        </div>
-      ))}
-    </nav>
-  );
-};
+// Sidebar configuration
+const sidebarItems = [
+  {
+    label: 'Dashboard',
+    icon: LayoutDashboardIcon,
+    path: '/panel/dashboard',
+  },
+  {
+    label: 'Profil',
+    icon: UserIcon,
+    path: '/panel/profile',
+  },
+  {
+    label: 'Dokumen',
+    icon: FileTextIcon,
+    path: '/panel/documents',
+  },
+  {
+    label: 'Jadwal',
+    icon: CalendarIcon,
+    path: '/panel/events',
+  },
+  {
+    label: 'Jemaat',
+    icon: UsersIcon,
+    path: '/panel/jemaat',
+  },
+  {
+    label: 'Ibadah',
+    icon: BookIcon,
+    path: '/panel/ibadah',
+  },
+  {
+    label: 'Pelayanan',
+    icon: BookIcon,
+    path: '/panel/pelayanan',
+  },
+  {
+    label: 'Keuangan',
+    icon: DollarSignIcon,
+    path: '/panel/keuangan',
+  },
+  {
+    label: 'Admin',
+    icon: SettingsIcon,
+    path: '/panel/admin',
+    children: [
+      { 
+        label: 'Dashboard', 
+        path: '/panel/admin/dashboard' 
+      },
+      { 
+        label: 'Konten', 
+        path: '/panel/admin/konten' 
+      },
+      { 
+        label: 'Pengaturan', 
+        path: '/panel/admin/pengaturan' 
+      },
+      { 
+        label: 'Artikel', 
+        path: '/panel/admin/artikel' 
+      },
+      { 
+        label: 'Master', 
+        path: '/panel/admin/master' 
+      },
+      { 
+        label: 'Alkitab', 
+        path: '/panel/admin/alkitab' 
+      },
+      { 
+        label: 'Media', 
+        path: '/panel/admin/media' 
+      }
+    ]
+  }
+];
 
-// Main Panel Layout Component
 export const PanelLayout: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [openMenus, setOpenMenus] = useState<{[key: string]: boolean}>({});
+  const location = useLocation();
 
   const toggleMenu = (path: string) => {
     setOpenMenus(prev => ({
@@ -289,6 +245,57 @@ export const PanelLayout: React.FC = () => {
 
   const toggleSidebar = () => {
     setIsCollapsed(prev => !prev);
+  };
+
+  const renderSidebarItem = (item: any, depth = 0) => {
+    const isActive = location.pathname === item.path || 
+      (item.children && item.children.some((child: any) => location.pathname === child.path));
+    const hasChildren = item.children && item.children.length > 0;
+
+    return (
+      <div key={item.path}>
+        <NavLink
+          to={item.path}
+          className={({ isActive: linkActive }) => cn(
+            'group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors duration-200',
+            (isActive || linkActive)
+              ? 'bg-primary text-primary-foreground' 
+              : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
+            isCollapsed ? 'justify-center' : 'justify-start'
+          )}
+          onClick={() => hasChildren && toggleMenu(item.path)}
+        >
+          {item.icon && (
+            <item.icon 
+              className={cn(
+                'h-5 w-5 transition-transform duration-200',
+                isCollapsed ? 'mr-0' : 'mr-3'
+              )} 
+            />
+          )}
+          {!isCollapsed && <span>{item.label}</span>}
+        </NavLink>
+        
+        {!isCollapsed && hasChildren && openMenus[item.path] && (
+          <div className="ml-4 mt-1 space-y-1">
+            {item.children.map((child: any) => (
+              <NavLink
+                key={child.path}
+                to={child.path}
+                className={({ isActive }) => cn(
+                  'group flex items-center px-2 py-1.5 text-xs font-medium rounded-md transition-colors duration-200',
+                  isActive 
+                    ? 'bg-primary text-primary-foreground' 
+                    : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                )}
+              >
+                {child.label}
+              </NavLink>
+            ))}
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -331,13 +338,8 @@ export const PanelLayout: React.FC = () => {
         </div>
 
         {/* Sidebar Navigation */}
-        <div className="flex-1 overflow-y-auto">
-          <SidebarNavigation 
-            isCollapsed={isCollapsed}
-            items={sidebarItems}
-            openMenus={openMenus}
-            toggleMenu={toggleMenu}
-          />
+        <div className="flex-1 overflow-y-auto px-2 py-4 space-y-1">
+          {sidebarItems.map(renderSidebarItem)}
         </div>
       </div>
 
@@ -349,22 +351,7 @@ export const PanelLayout: React.FC = () => {
           <div className="flex items-center space-x-2">
             <ThemeToggle />
             <NotificationDropdown />
-            <LanguageSelector />
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <UserIcon className="h-5 w-5" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Profile</DropdownMenuItem>
-                <DropdownMenuItem>Settings</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Logout</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <ProfileDropdown />
           </div>
         </header>
 
