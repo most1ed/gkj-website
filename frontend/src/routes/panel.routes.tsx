@@ -1,17 +1,11 @@
 import { RouteObject } from 'react-router-dom';
 import { PanelLayout } from '@/layouts/PanelLayout';
-import { AuthGuard } from '@/features/auth/components/AuthGuard';
-import { ROLES } from '@/features/auth/constants/roles';
 import { DummyPage } from '@/components/DummyPage';
 
 export const panelRoutes: RouteObject[] = [
   {
     path: "panel",
-    element: (
-      <AuthGuard allowedRoles={[ROLES.USER]}>
-        <PanelLayout />
-      </AuthGuard>
-    ),
+    element: <PanelLayout />,
     children: [
       // Dashboard
       { 
