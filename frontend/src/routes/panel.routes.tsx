@@ -26,10 +26,6 @@ export const panelRoutes: RouteObject[] = [
         path: "events", 
         element: <DummyPage title="Events" /> 
       },
-      { 
-        path: "offerings", 
-        element: <DummyPage title="Offerings" /> 
-      },
 
       // Management Routes
       { 
