@@ -23,7 +23,7 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
-import { Editor } from "@/components/ui/editor";
+import { RichTextEditor } from "@/components/ui/editor";
 
 interface Devotional {
   id: string;
@@ -104,7 +104,7 @@ export function DevotionalManager() {
               <div className="col-span-2 space-y-4">
                 <div className="space-y-2">
                   <Label>Isi Renungan</Label>
-                  <Editor 
+                  <RichTextEditor 
                     value={content}
                     onChange={setContent}
                     className="min-h-[500px] border rounded-md"

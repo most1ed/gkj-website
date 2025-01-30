@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, Suspense, useTransition } from 'react';
 import { 
   Outlet, 
   NavLink, 
   useLocation,
+  useNavigate,
   Link 
 } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -18,7 +19,14 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   BellIcon,
-  HomeIcon
+  HomeIcon,
+  LayoutIcon,
+  NewspaperIcon,
+  DatabaseIcon,
+  BookOpenIcon,
+  ImageIcon,
+  CreditCardIcon,
+  KanbanIcon
 } from 'lucide-react';
 import { 
   Tooltip, 
@@ -154,6 +162,7 @@ const ProfileDropdown: React.FC = () => {
 
 // Sidebar configuration
 const sidebarItems = [
+  // Dashboard & User Features
   {
     label: 'Dashboard',
     icon: LayoutDashboardIcon,
@@ -175,6 +184,13 @@ const sidebarItems = [
     path: '/panel/events',
   },
   {
+    label: 'Persembahan',
+    icon: CreditCardIcon,
+    path: '/panel/offerings',
+  },
+
+  // Management Features
+  {
     label: 'Jemaat',
     icon: UsersIcon,
     path: '/panel/jemaat',
@@ -186,7 +202,7 @@ const sidebarItems = [
   },
   {
     label: 'Pelayanan',
-    icon: BookIcon,
+    icon: HomeIcon,
     path: '/panel/pelayanan',
   },
   {
@@ -195,39 +211,46 @@ const sidebarItems = [
     path: '/panel/keuangan',
   },
   {
-    label: 'Admin',
+    label: 'Sumber Daya',
+    icon: DatabaseIcon,
+    path: '/panel/sda',
+  },
+  {
+    label: 'Rencana Kerja',
+    icon: KanbanIcon,
+    path: '/panel/rencana',
+  },
+
+  // Admin Features
+  {
+    label: 'Konten',
+    icon: LayoutIcon,
+    path: '/panel/admin/konten',
+  },
+  {
+    label: 'Artikel',
+    icon: NewspaperIcon,
+    path: '/panel/admin/artikel',
+  },
+  {
+    label: 'Master',
+    icon: DatabaseIcon,
+    path: '/panel/admin/master',
+  },
+  {
+    label: 'Alkitab',
+    icon: BookOpenIcon,
+    path: '/panel/admin/alkitab',
+  },
+  {
+    label: 'Media',
+    icon: ImageIcon,
+    path: '/panel/admin/media',
+  },
+  {
+    label: 'Pengaturan',
     icon: SettingsIcon,
-    path: '/panel/admin',
-    children: [
-      { 
-        label: 'Dashboard', 
-        path: '/panel/admin/dashboard' 
-      },
-      { 
-        label: 'Konten', 
-        path: '/panel/admin/konten' 
-      },
-      { 
-        label: 'Pengaturan', 
-        path: '/panel/admin/pengaturan' 
-      },
-      { 
-        label: 'Artikel', 
-        path: '/panel/admin/artikel' 
-      },
-      { 
-        label: 'Master', 
-        path: '/panel/admin/master' 
-      },
-      { 
-        label: 'Alkitab', 
-        path: '/panel/admin/alkitab' 
-      },
-      { 
-        label: 'Media', 
-        path: '/panel/admin/media' 
-      }
-    ]
+    path: '/panel/admin/pengaturan',
   }
 ];
 
@@ -254,44 +277,52 @@ export const PanelLayout: React.FC = () => {
 
     return (
       <div key={item.path}>
-        <NavLink
-          to={item.path}
-          className={({ isActive: linkActive }) => cn(
-            'group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors duration-200',
-            (isActive || linkActive)
-              ? 'bg-primary text-primary-foreground' 
-              : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
-            isCollapsed ? 'justify-center' : 'justify-start'
-          )}
-          onClick={() => hasChildren && toggleMenu(item.path)}
-        >
-          {item.icon && (
-            <item.icon 
-              className={cn(
-                'h-5 w-5 transition-transform duration-200',
-                isCollapsed ? 'mr-0' : 'mr-3'
-              )} 
-            />
-          )}
-          {!isCollapsed && <span>{item.label}</span>}
-        </NavLink>
-        
-        {!isCollapsed && hasChildren && openMenus[item.path] && (
-          <div className="ml-4 mt-1 space-y-1">
-            {item.children.map((child: any) => (
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
               <NavLink
-                key={child.path}
-                to={child.path}
+                to={item.path}
                 className={({ isActive }) => cn(
-                  'group flex items-center px-2 py-1.5 text-xs font-medium rounded-md transition-colors duration-200',
-                  isActive 
+                  'group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors duration-200',
+                  isActive
                     ? 'bg-primary text-primary-foreground' 
-                    : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                    : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
+                  isCollapsed ? 'justify-center' : 'justify-start'
                 )}
+                end
               >
-                {child.label}
+                {item.icon && (
+                  <item.icon 
+                    className={cn(
+                      'h-5 w-5',
+                      isCollapsed ? 'mr-0' : 'mr-3'
+                    )}
+                  />
+                )}
+                {!isCollapsed && (
+                  <span className="truncate">{item.label}</span>
+                )}
+                {hasChildren && !isCollapsed && (
+                  <ChevronRightIcon
+                    className={cn(
+                      'ml-auto h-4 w-4 transition-transform duration-200',
+                      openMenus[item.path] ? 'rotate-90' : ''
+                    )}
+                  />
+                )}
               </NavLink>
-            ))}
+            </TooltipTrigger>
+            {isCollapsed && (
+              <TooltipContent side="right">
+                {item.label}
+              </TooltipContent>
+            )}
+          </Tooltip>
+        </TooltipProvider>
+
+        {hasChildren && openMenus[item.path] && !isCollapsed && (
+          <div className="ml-4 mt-1 space-y-1">
+            {item.children.map((child: any) => renderSidebarItem(child, depth + 1))}
           </div>
         )}
       </div>
@@ -358,7 +389,13 @@ export const PanelLayout: React.FC = () => {
         {/* Main Content */}
         <main className="flex-1 overflow-y-auto p-4 flex flex-col">
           <div className="flex-grow">
-            <Outlet />
+            <Suspense fallback={
+              <div className="flex items-center justify-center h-full">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              </div>
+            }>
+              <Outlet />
+            </Suspense>
           </div>
           
           {/* Panel Footer */}

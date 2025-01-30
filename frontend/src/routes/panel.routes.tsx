@@ -1,85 +1,174 @@
 import { RouteObject } from 'react-router-dom';
 import { PanelLayout } from '@/layouts/PanelLayout';
-import { DummyPage } from '@/components/DummyPage';
+import { lazy, Suspense } from "react";
+
+const DashboardPage = lazy(() => import("@/features/panel/admin/DashboardPage").then(module => ({ default: module.default })));
+const ProfilePage = lazy(() => import("@/features/panel/base/profile/ProfilePage"));
+const DocumentsPage = lazy(() => import("@/features/panel/base/documents/DocumentsPage"));
+const UserEventsPage = lazy(() => import("@/features/panel/base/events/UserEventsPage"));
+const UserOfferingsPage = lazy(() => import("@/features/panel/base/offerings/UserOfferingsPage"));
+const JemaatPage = lazy(() => import("@/features/panel/management/jemaat/JemaatPage"));
+const IbadahPage = lazy(() => import("@/features/panel/management/ibadah/IbadahPage"));
+const PelayananPage = lazy(() => import("@/features/panel/management/pelayanan/PelayananPage"));
+const KeuanganPage = lazy(() => import("@/features/panel/management/keuangan/KeuanganPage"));
+const SDAPage = lazy(() => import("@/features/panel/management/sda/SDAPage"));
+const RencanaKerjaPage = lazy(() => import("@/features/panel/management/rencana/RencanaKerjaPage").then(module => ({ default: module.default })));
+const KontenPage = lazy(() => import("@/features/panel/admin/konten/KontenPage"));
+const ArtikelPage = lazy(() => import("@/features/panel/admin/artikel/ArtikelPage"));
+const MasterPage = lazy(() => import("@/features/panel/admin/master/MasterPage"));
+const AlkitabPage = lazy(() => import("@/features/panel/admin/alkitab/AlkitabPage"));
+const MediaPage = lazy(() => import("@/features/panel/admin/media/MediaPage"));
+const PengaturanPage = lazy(() => import("@/features/panel/admin/pengaturan/PengaturanPage"));
 
 export const panelRoutes: RouteObject[] = [
   {
-    path: "panel",
+    path: '/panel',
     element: <PanelLayout />,
     children: [
-      // Dashboard
-      { 
-        path: "dashboard", 
-        element: <DummyPage title="Dashboard" /> 
+      {
+        path: 'dashboard',
+        element: (
+          <Suspense fallback={<div>Loading...</div>}>
+            <DashboardPage />
+          </Suspense>
+        ),
       },
-
-      // Base User Routes
-      { 
-        path: "profile", 
-        element: <DummyPage title="Profile" /> 
+      {
+        path: 'profile',
+        element: (
+          <Suspense fallback={<div>Loading...</div>}>
+            <ProfilePage />
+          </Suspense>
+        ),
       },
-      { 
-        path: "documents", 
-        element: <DummyPage title="Documents" /> 
+      {
+        path: 'documents',
+        element: (
+          <Suspense fallback={<div>Loading...</div>}>
+            <DocumentsPage />
+          </Suspense>
+        ),
       },
-      { 
-        path: "events", 
-        element: <DummyPage title="Events" /> 
+      {
+        path: 'events',
+        element: (
+          <Suspense fallback={<div>Loading...</div>}>
+            <UserEventsPage />
+          </Suspense>
+        ),
       },
-
-      // Management Routes
-      { 
-        path: "jemaat", 
-        element: <DummyPage title="Jemaat" /> 
+      {
+        path: 'offerings',
+        element: (
+          <Suspense fallback={<div>Loading...</div>}>
+            <UserOfferingsPage />
+          </Suspense>
+        ),
       },
-      { 
-        path: "ibadah", 
-        element: <DummyPage title="Ibadah" /> 
+      {
+        path: 'jemaat',
+        element: (
+          <Suspense fallback={<div>Loading...</div>}>
+            <JemaatPage />
+          </Suspense>
+        ),
       },
-      { 
-        path: "pelayanan", 
-        element: <DummyPage title="Pelayanan" /> 
+      {
+        path: 'ibadah',
+        element: (
+          <Suspense fallback={<div>Loading...</div>}>
+            <IbadahPage />
+          </Suspense>
+        ),
       },
-      { 
-        path: "keuangan", 
-        element: <DummyPage title="Keuangan" /> 
+      {
+        path: 'pelayanan',
+        element: (
+          <Suspense fallback={<div>Loading...</div>}>
+            <PelayananPage />
+          </Suspense>
+        ),
       },
-
-      // Admin Routes
-      { 
-        path: "admin/dashboard", 
-        element: <DummyPage title="Admin Dashboard" /> 
+      {
+        path: 'keuangan',
+        element: (
+          <Suspense fallback={<div>Loading...</div>}>
+            <KeuanganPage />
+          </Suspense>
+        ),
       },
-      { 
-        path: "admin/konten", 
-        element: <DummyPage title="Konten" /> 
+      {
+        path: 'sda',
+        element: (
+          <Suspense fallback={<div>Loading...</div>}>
+            <SDAPage />
+          </Suspense>
+        ),
       },
-      { 
-        path: "admin/pengaturan", 
-        element: <DummyPage title="Pengaturan" /> 
+      {
+        path: 'rencana',
+        element: (
+          <Suspense fallback={<div>Loading...</div>}>
+            <RencanaKerjaPage />
+          </Suspense>
+        ),
       },
-      { 
-        path: "admin/artikel", 
-        element: <DummyPage title="Artikel" /> 
+      {
+        path: 'admin/konten',
+        element: (
+          <Suspense fallback={<div>Loading...</div>}>
+            <KontenPage />
+          </Suspense>
+        ),
       },
-      { 
-        path: "admin/master", 
-        element: <DummyPage title="Master" /> 
+      {
+        path: 'admin/artikel',
+        element: (
+          <Suspense fallback={<div>Loading...</div>}>
+            <ArtikelPage />
+          </Suspense>
+        ),
       },
-      { 
-        path: "admin/alkitab", 
-        element: <DummyPage title="Alkitab" /> 
+      {
+        path: 'admin/master',
+        element: (
+          <Suspense fallback={<div>Loading...</div>}>
+            <MasterPage />
+          </Suspense>
+        ),
       },
-      { 
-        path: "admin/media", 
-        element: <DummyPage title="Media" /> 
+      {
+        path: 'admin/alkitab',
+        element: (
+          <Suspense fallback={<div>Loading...</div>}>
+            <AlkitabPage />
+          </Suspense>
+        ),
       },
-
-      // Default Route
-      { 
-        index: true, 
-        element: <DummyPage title="Dashboard" /> 
-      }
-    ]
-  }
+      {
+        path: 'admin/media',
+        element: (
+          <Suspense fallback={<div>Loading...</div>}>
+            <MediaPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'admin/pengaturan',
+        element: (
+          <Suspense fallback={<div>Loading...</div>}>
+            <PengaturanPage />
+          </Suspense>
+        ),
+      },
+      {
+        index: true,
+        element: (
+          <Suspense fallback={<div>Loading...</div>}>
+            <DashboardPage />
+          </Suspense>
+        ),
+      },
+    ],
+  },
 ];

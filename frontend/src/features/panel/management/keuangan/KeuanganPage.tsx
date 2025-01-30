@@ -3,6 +3,7 @@ import { PersembahanManager } from "./components/PersembahanManager";
 import { PengeluaranManager } from "./components/PengeluaranManager";
 import { LaporanKeuangan } from "./components/LaporanKeuangan";
 import { AnggaranManager } from "./components/AnggaranManager";
+import { AnggaranApproval } from "./components/AnggaranApproval";
 import { Button } from "@/components/ui/button";
 import { Plus, FileDown, Printer } from "lucide-react";
 import { useKeuanganData } from "./hooks/useKeuanganData";
@@ -19,18 +20,12 @@ export default function KeuanganPage() {
             Kelola persembahan, pengeluaran, dan laporan keuangan
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline">
-            <Printer className="mr-2 h-4 w-4" />
-            Cetak Laporan
+        <div className="flex items-center gap-4">
+          <Button variant="outline" size="icon">
+            <Printer className="h-4 w-4" />
           </Button>
-          <Button variant="outline">
-            <FileDown className="mr-2 h-4 w-4" />
-            Export
-          </Button>
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
-            Transaksi Baru
+          <Button variant="outline" size="icon">
+            <FileDown className="h-4 w-4" />
           </Button>
         </div>
       </div>
@@ -39,24 +34,24 @@ export default function KeuanganPage() {
         <TabsList>
           <TabsTrigger value="persembahan">Persembahan</TabsTrigger>
           <TabsTrigger value="pengeluaran">Pengeluaran</TabsTrigger>
-          <TabsTrigger value="laporan">Laporan</TabsTrigger>
           <TabsTrigger value="anggaran">Anggaran</TabsTrigger>
+          <TabsTrigger value="approval">Persetujuan</TabsTrigger>
+          <TabsTrigger value="laporan">Laporan</TabsTrigger>
         </TabsList>
-        
         <TabsContent value="persembahan" className="space-y-4">
-          <PersembahanManager data={data?.persembahan} />
+          <PersembahanManager />
         </TabsContent>
-        
         <TabsContent value="pengeluaran" className="space-y-4">
-          <PengeluaranManager data={data?.pengeluaran} />
+          <PengeluaranManager />
         </TabsContent>
-        
-        <TabsContent value="laporan" className="space-y-4">
-          <LaporanKeuangan data={data?.laporan} />
-        </TabsContent>
-        
         <TabsContent value="anggaran" className="space-y-4">
-          <AnggaranManager data={data?.anggaran} />
+          <AnggaranManager />
+        </TabsContent>
+        <TabsContent value="approval" className="space-y-4">
+          <AnggaranApproval />
+        </TabsContent>
+        <TabsContent value="laporan" className="space-y-4">
+          <LaporanKeuangan />
         </TabsContent>
       </Tabs>
     </div>

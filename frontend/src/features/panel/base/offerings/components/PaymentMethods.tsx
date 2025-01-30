@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CreditCard, Wallet, Bank, Plus } from "lucide-react";
+import { CreditCard, Wallet, Building, Plus } from "lucide-react";
 
 interface PaymentMethod {
   id: string;
@@ -50,7 +50,7 @@ export function PaymentMethods() {
       case "ewallet":
         return <Wallet className="h-5 w-5" />;
       case "bank":
-        return <Bank className="h-5 w-5" />;
+        return <Building className="h-5 w-5" />;
     }
   };
 

@@ -2,7 +2,7 @@ import { RouteObject } from "react-router-dom";
 import { LoginPage } from "@/features/auth/login/LoginPage";
 import { DummyPage } from "@/components/DummyPage";
 import { AuthGuard } from "@/features/auth/components/AuthGuard";
-import { AdminLayout } from "@/layouts/AdminLayout";
+import { PanelLayout } from "@/layouts/PanelLayout";
 
 export const authRoutes: RouteObject[] = [
   {
@@ -24,7 +24,7 @@ export const authRoutes: RouteObject[] = [
   },
   {
     path: "dashboard",
-    element: <AuthGuard><AdminLayout /></AuthGuard>,
+    element: <AuthGuard><PanelLayout /></AuthGuard>,
     children: [
       { 
         index: true, 

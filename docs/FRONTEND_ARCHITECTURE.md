@@ -72,7 +72,59 @@
      - Error handling
      - Placeholder components
 
-### 3. `/config/`
+### 3. `/features/`
+#### Feature-Based Architecture
+```
+/features
+├── public/
+│   ├── home/
+│   │   ├── components/
+│   │   │   ├── Hero.tsx
+│   │   │   ├── LatestNews.tsx
+│   │   │   ├── EventsHighlight.tsx
+│   │   │   └── ... (other home page components)
+│   │   ├── hooks/
+│   │   │   └── useHomeData.ts
+│   │   └── HomePage.tsx
+│   ├── about/
+│   ├── services/
+│   ├── ministries/
+│   └── ... (other public features)
+├── auth/
+├── panel/
+└── dashboard/
+```
+
+- Purpose: Organize application by domain-specific features
+- Principles:
+  - Vertical slice architecture
+  - Feature-based code organization
+  - Encapsulate feature-specific logic
+  - Modular and extensible design
+
+#### Feature Component Characteristics
+- Small, focused components
+- Single responsibility principle
+- TypeScript for type safety
+- Custom hooks for data management
+- Tailwind CSS for styling
+
+#### Home Feature Example
+Key Components:
+- `Hero`: Landing section
+- `LatestNews`: News updates
+- `EventsHighlight`: Upcoming events
+- `ArticlesSection`: Church articles
+- `ImportantAnnouncements`: Critical announcements
+- `ServicesOverview`: Church services summary
+- `WeeklyService`: Specific service details
+- `OfferingInfo`: Donation information
+- `PrayerSupport`: Prayer request section
+- `QuickInfo`: Rapid information display
+- `GallerySection`: Media gallery
+- `Features`: Site feature highlights
+
+### 4. `/config/`
 - Purpose: Application-wide configuration
 - Contents:
   - Environment configurations
@@ -82,7 +134,7 @@
   - Use environment variables
   - Separate config for different environments
 
-### 4. `/constants/`
+### 5. `/constants/`
 - Purpose: Store constant values and enums
 - Contents:
   - Route constants
@@ -93,38 +145,7 @@
   - Group related constants
   - Export as typed constants
 
-### 5. `/data/`
-- Purpose: Store static or mock data
-- Structure:
-  ```
-  /data
-  ├── mock-data/
-  └── static-data/
-  ```
-- Use Cases:
-  - Development testing
-  - Initial state population
-  - Demonstration data
-
-### 6. `/features/`
-- Purpose: Organize application by domain-specific features
-- Structure:
-  ```
-  /features
-  ├── auth/
-  ├── public/
-  ├── panel/
-  │   ├── admin/
-  │   ├── base/
-  │   └── management/
-  └── dashboard/
-  ```
-- Principles:
-  - Vertical slice architecture
-  - Feature-based code organization
-  - Encapsulate feature-specific logic
-
-### 7. `/hooks/`
+### 6. `/hooks/`
 - Purpose: Custom React hooks
 - Contents:
   - Reusable logic hooks
@@ -135,7 +156,7 @@
   - `useForm`
   - `useLocalStorage`
 
-### 8. `/layouts/`
+### 7. `/layouts/`
 - Purpose: Provide structural layouts for different app sections
 - Contents:
   - `PanelLayout.tsx`
@@ -146,7 +167,7 @@
   - Manage common layout elements
   - Handle responsive design
 
-### 9. `/lib/`
+### 8. `/lib/`
 - Purpose: Shared libraries and utility functions
 - Structure:
   ```
@@ -160,26 +181,7 @@
   - Complex utility functions
   - Shared business logic
 
-### 10. `/mocks/`
-- Purpose: Mocking utilities for testing
-- Contents:
-  - Mock data generators
-  - Test scenario simulators
-- Best Practices:
-  - Clearly separate from actual data
-  - Use for development and testing
-
-### 11. `/providers/`
-- Purpose: Context and state management
-- Contents:
-  - `AuthProvider`
-  - `ThemeProvider`
-  - Global state managers
-- Responsibilities:
-  - Manage application-wide state
-  - Provide context to components
-
-### 12. `/routes/`
+### 9. `/routes/`
 - Purpose: Define application routing
 - Contents:
   - `public.routes.tsx`
@@ -190,14 +192,14 @@
   - Authentication guards
   - Lazy loading support
 
-### 13. `/styles/`
+### 10. `/styles/`
 - Purpose: Global styling
 - Contents:
   - `global.css`
   - Global style definitions
 - Integrated with TailwindCSS
 
-### 14. `/types/`
+### 11. `/types/`
 - Purpose: TypeScript type definitions
 - Contents:
   - `user.type.ts`
@@ -207,7 +209,7 @@
   - Use interfaces and type aliases
   - Keep types minimal and focused
 
-### 15. `/utils/`
+### 12. `/utils/`
 - Purpose: Utility functions
 - Contents:
   - Formatting helpers
@@ -242,3 +244,5 @@
 - Continuous refactoring
 - Performance audits
 - Accessibility improvements
+- Advanced state management
+- Expand feature modularity
