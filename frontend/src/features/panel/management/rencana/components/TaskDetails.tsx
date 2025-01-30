@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { format } from "date-fns";
+import React, { useState, useMemo } from "react";
+import { format, formatDistance } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
 import {
   Calendar,
@@ -10,258 +10,368 @@ import {
   X,
   Clock,
   CheckSquare,
+  Edit3,
+  Trash2,
+  MoreHorizontal,
+  Save
 } from "lucide-react";
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogClose
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/Label";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
 import { useRencanaStore } from "../store/rencana-store";
+import { 
+  Task, 
+  TaskStatus, 
+  TaskPriority, 
+  Comment as CommentType 
+} from "../types/rencana.types";
+import { cn } from "@/lib/utils";
 
 interface TaskDetailsProps {
   boardId: string;
   columnId: string;
   taskId: string;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  onClose: () => void;
 }
 
 export function TaskDetails({
   boardId,
   columnId,
   taskId,
-  open,
-  onOpenChange,
+  onClose,
 }: TaskDetailsProps) {
-  const [comment, setComment] = useState("");
-  const { boards, updateTask } = useRencanaStore();
+  const { boards, updateTask, deleteTask } = useRencanaStore();
 
   const board = boards.find((b) => b.id === boardId);
   const column = board?.columns.find((c) => c.id === columnId);
   const task = column?.tasks.find((t) => t.id === taskId);
 
-  if (!task) return null;
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedTask, setEditedTask] = useState<Partial<Task>>({});
+  const [newComment, setNewComment] = useState("");
 
-  const formatDate = (date: string) => {
-    return formatInTimeZone(new Date(date), "Asia/Jakarta", "d MMMM yyyy");
+  if (!task) {
+    return null;
+  }
+
+  const handleUpdateTask = () => {
+    updateTask(boardId, columnId, taskId, editedTask);
+    setIsEditing(false);
   };
 
-  const handleCommentSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!comment.trim()) return;
+  const handleAddComment = () => {
+    if (!newComment.trim()) return;
+
+    const commentToAdd: CommentType = {
+      id: `comment_${Date.now()}`,
+      content: newComment,
+      author: 'current_user', // Replace with actual user
+      createdAt: new Date()
+    };
 
     updateTask(boardId, columnId, taskId, {
-      comments: [...(task.comments || []), {
-        id: crypto.randomUUID(),
-        content: comment,
-        author: "Admin",
-        createdAt: new Date().toISOString(),
-      }],
+      comments: [...(task.comments || []), commentToAdd]
     });
-    setComment("");
+
+    setNewComment("");
+  };
+
+  const handleDeleteTask = () => {
+    deleteTask(boardId, columnId, taskId);
+    onClose();
+  };
+
+  const renderPriorityBadge = (priority: TaskPriority) => {
+    const priorityColors = {
+      'CRITICAL': 'bg-red-500 text-white',
+      'HIGH': 'bg-orange-500 text-white',
+      'MEDIUM': 'bg-blue-500 text-white',
+      'LOW': 'bg-gray-500 text-white'
+    };
+
+    return (
+      <Badge className={priorityColors[priority]}>
+        {priority}
+      </Badge>
+    );
+  };
+
+  const renderStatusBadge = (status: TaskStatus) => {
+    const statusColors = {
+      'NOT_STARTED': 'bg-gray-500 text-white',
+      'IN_PROGRESS': 'bg-blue-500 text-white',
+      'BLOCKED': 'bg-red-500 text-white',
+      'UNDER_REVIEW': 'bg-yellow-500 text-white',
+      'COMPLETED': 'bg-green-500 text-white'
+    };
+
+    return (
+      <Badge className={statusColors[status]}>
+        {status}
+      </Badge>
+    );
   };
 
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-[400px] sm:w-[540px] overflow-y-auto">
-        <SheetHeader className="space-y-4">
-          <div className="flex justify-between items-start">
-            <SheetTitle className="text-xl">{task.title}</SheetTitle>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onOpenChange(false)}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-          <SheetDescription>
-            dalam kolom <span className="font-medium">{column?.title}</span>
-          </SheetDescription>
-        </SheetHeader>
-
-        <div className="mt-6 space-y-6">
-          {/* Description */}
-          <div className="space-y-2">
-            <Label>Deskripsi</Label>
-            <Textarea
-              value={task.description || ""}
-              onChange={(e) =>
-                updateTask(boardId, columnId, taskId, {
-                  description: e.target.value,
-                })
-              }
-              placeholder="Tambahkan deskripsi detail..."
-              className="min-h-[100px]"
-            />
-          </div>
-
-          {/* Due Date */}
-          {task.dueDate && (
-            <div className="flex items-center gap-2 text-sm">
-              <Clock className="h-4 w-4" />
-              <span>Tenggat: {formatDate(task.dueDate)}</span>
+    <Dialog open={true} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[800px]">
+        <DialogHeader>
+          <div className="flex justify-between items-center">
+            {isEditing ? (
+              <Input 
+                value={editedTask.title || task.title}
+                onChange={(e) => setEditedTask({ ...editedTask, title: e.target.value })}
+                className="text-2xl font-bold w-full"
+              />
+            ) : (
+              <DialogTitle className="text-2xl">{task.title}</DialogTitle>
+            )}
+            <div className="flex items-center gap-2">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  {isEditing ? (
+                    <>
+                      <DropdownMenuItem onClick={handleUpdateTask}>
+                        <Save className="mr-2 h-4 w-4" /> Simpan
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setIsEditing(false)}>
+                        <X className="mr-2 h-4 w-4" /> Batal
+                      </DropdownMenuItem>
+                    </>
+                  ) : (
+                    <>
+                      <DropdownMenuItem onClick={() => setIsEditing(true)}>
+                        <Edit3 className="mr-2 h-4 w-4" /> Edit
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        className="text-red-600" 
+                        onClick={handleDeleteTask}
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" /> Hapus
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
-          )}
+          </div>
+          <DialogDescription>
+            {isEditing ? (
+              <Textarea 
+                value={editedTask.description || task.description || ''}
+                onChange={(e) => setEditedTask({ ...editedTask, description: e.target.value })}
+                className="w-full min-h-[100px]"
+                placeholder="Tambahkan deskripsi tugas"
+              />
+            ) : (
+              task.description || 'Tidak ada deskripsi'
+            )}
+          </DialogDescription>
+        </DialogHeader>
 
-          {/* Labels */}
-          {task.labels && task.labels.length > 0 && (
+        <div className="grid grid-cols-3 gap-6">
+          <div className="col-span-2 space-y-4">
             <div className="space-y-2">
-              <Label className="flex items-center gap-2">
-                <Tag className="h-4 w-4" />
-                Label
-              </Label>
-              <div className="flex flex-wrap gap-2">
-                {task.labels.map((label) => (
-                  <Badge
-                    key={label.id}
-                    className={label.color}
-                    variant="secondary"
-                  >
-                    {label.name}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Assignees */}
-          {task.assignees && task.assignees.length > 0 && (
-            <div className="space-y-2">
-              <Label className="flex items-center gap-2">
-                <Users className="h-4 w-4" />
-                Penanggung Jawab
-              </Label>
-              <div className="flex flex-wrap gap-2">
-                {task.assignees.map((assignee) => (
-                  <div
-                    key={assignee}
-                    className="flex items-center gap-2 bg-secondary p-1 rounded-md"
-                  >
-                    <Avatar className="h-6 w-6">
-                      <AvatarFallback>
-                        {assignee.split(" ").map((n) => n[0]).join("")}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className="text-sm">{assignee}</span>
+              <h3 className="font-semibold">Komentar</h3>
+              <div className="space-y-2">
+                {task.comments?.map((comment) => (
+                  <div key={comment.id} className="bg-gray-100 p-3 rounded-lg">
+                    <div className="flex justify-between items-center mb-2">
+                      <div className="flex items-center gap-2">
+                        <Avatar className="h-6 w-6">
+                          <AvatarFallback>
+                            {comment.author.charAt(0).toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="font-medium">{comment.author}</span>
+                      </div>
+                      <span className="text-xs text-gray-500">
+                        {formatDistance(new Date(comment.createdAt), new Date(), { addSuffix: true })}
+                      </span>
+                    </div>
+                    <p>{comment.content}</p>
                   </div>
                 ))}
               </div>
+              <div className="flex items-center gap-2">
+                <Input 
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  placeholder="Tambahkan komentar"
+                  className="flex-grow"
+                />
+                <Button 
+                  onClick={handleAddComment}
+                  disabled={!newComment.trim()}
+                >
+                  Kirim
+                </Button>
+              </div>
             </div>
-          )}
 
-          {/* Checklist */}
-          {task.checklist && task.checklist.length > 0 && (
-            <div className="space-y-2">
-              <Label className="flex items-center gap-2">
-                <CheckSquare className="h-4 w-4" />
-                Checklist
-              </Label>
+            {task.checklist && task.checklist.length > 0 && (
               <div className="space-y-2">
+                <h3 className="font-semibold">Checklist</h3>
                 {task.checklist.map((item) => (
                   <div key={item.id} className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={item.completed}
-                      onChange={() =>
-                        updateTask(boardId, columnId, taskId, {
-                          checklist: task.checklist?.map((i) =>
-                            i.id === item.id
-                              ? { ...i, completed: !i.completed }
-                              : i
-                          ),
-                        })
-                      }
-                      className="h-4 w-4"
+                    <input 
+                      type="checkbox" 
+                      checked={item.completed} 
+                      onChange={() => {
+                        // Implement checklist item toggle
+                      }}
                     />
-                    <span className="text-sm">{item.text}</span>
+                    <span>{item.text}</span>
                   </div>
                 ))}
               </div>
-            </div>
-          )}
-
-          <Separator />
-
-          {/* Comments */}
-          <div className="space-y-4">
-            <Label className="flex items-center gap-2">
-              <MessageSquare className="h-4 w-4" />
-              Komentar
-            </Label>
-
-            <form onSubmit={handleCommentSubmit} className="space-y-2">
-              <Textarea
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                placeholder="Tambahkan komentar..."
-                className="min-h-[80px]"
-              />
-              <Button type="submit" disabled={!comment.trim()}>
-                Kirim
-              </Button>
-            </form>
-
-            <div className="space-y-4">
-              {task.comments?.map((comment) => (
-                <div key={comment.id} className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <Avatar className="h-6 w-6">
-                      <AvatarFallback>
-                        {comment.author.split(" ").map((n) => n[0]).join("")}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className="font-medium text-sm">{comment.author}</span>
-                    <span className="text-xs text-muted-foreground">
-                      {formatInTimeZone(
-                        new Date(comment.createdAt),
-                        "Asia/Jakarta",
-                        "d MMM yyyy HH:mm"
-                      )}
-                    </span>
-                  </div>
-                  <p className="text-sm pl-8">{comment.content}</p>
-                </div>
-              ))}
-            </div>
+            )}
           </div>
 
-          {/* Attachments */}
-          {task.attachments && task.attachments.length > 0 && (
+          <div className="space-y-4">
             <div className="space-y-2">
-              <Label className="flex items-center gap-2">
-                <Paperclip className="h-4 w-4" />
-                Lampiran
-              </Label>
+              <h3 className="font-semibold">Detail</h3>
               <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-gray-500" />
+                  <span>Status</span>
+                  {isEditing ? (
+                    <Select 
+                      value={editedTask.status || task.status}
+                      onValueChange={(value: TaskStatus) => setEditedTask({ ...editedTask, status: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.values(TaskStatus).map(status => (
+                          <SelectItem key={status} value={status}>
+                            {status}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    renderStatusBadge(task.status)
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Tag className="h-4 w-4 text-gray-500" />
+                  <span>Prioritas</span>
+                  {isEditing ? (
+                    <Select 
+                      value={editedTask.priority || task.priority}
+                      onValueChange={(value: TaskPriority) => setEditedTask({ ...editedTask, priority: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.values(TaskPriority).map(priority => (
+                          <SelectItem key={priority} value={priority}>
+                            {priority}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    renderPriorityBadge(task.priority)
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-gray-500" />
+                  <span>Dibuat</span>
+                  <span>{format(new Date(task.createdAt), 'dd MMMM yyyy')}</span>
+                </div>
+
+                {task.dueDate && (
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-gray-500" />
+                    <span>Jatuh Tempo</span>
+                    {isEditing ? (
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline">
+                            {task.dueDate ? format(new Date(task.dueDate), 'dd MMMM yyyy') : 'Pilih tanggal'}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent>
+                          <CalendarComponent
+                            mode="single"
+                            selected={task.dueDate ? new Date(task.dueDate) : undefined}
+                            onSelect={(date) => setEditedTask({ ...editedTask, dueDate: date })}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    ) : (
+                      <span>{format(new Date(task.dueDate), 'dd MMMM yyyy')}</span>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {task.attachments && task.attachments.length > 0 && (
+              <div className="space-y-2">
+                <h3 className="font-semibold flex items-center gap-2">
+                  <Paperclip className="h-4 w-4" /> Lampiran
+                </h3>
                 {task.attachments.map((attachment) => (
-                  <div
-                    key={attachment.id}
-                    className="flex items-center justify-between p-2 bg-secondary rounded-md"
-                  >
+                  <div key={attachment.id} className="flex items-center justify-between bg-gray-100 p-2 rounded">
                     <div className="flex items-center gap-2">
-                      <Paperclip className="h-4 w-4" />
-                      <span className="text-sm">{attachment.name}</span>
+                      <span>{attachment.name}</span>
+                      <Badge variant="secondary">{attachment.type}</Badge>
                     </div>
                     <Button variant="ghost" size="sm">
-                      Unduh
+                      Download
                     </Button>
                   </div>
                 ))}
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
-      </SheetContent>
-    </Sheet>
+      </DialogContent>
+    </Dialog>
   );
 }
