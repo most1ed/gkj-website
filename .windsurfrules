@@ -1,0 +1,119 @@
+{
+  "project_name": "GKJ Website",
+  "version": "1.0.0",
+  "architectural_principles": {
+    "modularity": true,
+    "feature_based_structure": true,
+    "type_safety": true,
+    "separation_of_concerns": true
+  },
+  "code_organization": {
+    "frontend": {
+      "primary_directories": [
+        "src/components",
+        "src/features",
+        "src/layouts",
+        "src/routes",
+        "src/lib",
+        "src/utils"
+      ],
+      "forbidden_practices": [
+        "duplicate_components",
+        "redundant_utility_files",
+        "scattered_implementations"
+      ]
+    },
+    "backend": {
+      "primary_directories": [
+        "internal",
+        "pkg",
+        "cmd"
+      ]
+    }
+  },
+  "component_rules": {
+    "reusable_components": {
+      "location": "src/components",
+      "types": [
+        "ui",
+        "common",
+        "layouts"
+      ]
+    },
+    "feature_components": {
+      "location": "src/features",
+      "structure": [
+        "public",
+        "auth",
+        "panel",
+        "dashboard"
+      ]
+    }
+  },
+  "routing_guidelines": {
+    "primary_routes": [
+      "public.routes.tsx",
+      "auth.routes.tsx",
+      "panel.routes.tsx"
+    ],
+    "forbidden_routes": [
+      "protected.routes.tsx"
+    ]
+  },
+  "utility_guidelines": {
+    "centralized_utilities": {
+      "location": "src/lib/utils.ts",
+      "required_functions": [
+        "cn",
+        "formatDate",
+        "truncateText",
+        "generateUniqueId",
+        "capitalizeFirstLetter",
+        "sortByDate",
+        "isValidEmail",
+        "debounce"
+      ]
+    }
+  },
+  "performance_optimization": {
+    "code_splitting": true,
+    "lazy_loading": true,
+    "memoization": true
+  },
+  "documentation_requirements": {
+    "architecture_doc": "docs/FRONTEND_ARCHITECTURE.md",
+    "update_frequency": "after_major_changes"
+  }
+}
+
+{
+    // ... existing content ...
+    "development_workflow": {
+      "file_management": {
+        "primary_rule": "Always search and verify existing files before creating new ones",
+        "steps_before_creation": [
+          "Use grep or find to search existing files",
+          "Check version control history",
+          "Review existing documentation",
+          "Consult team members"
+        ],
+        "creation_criteria": [
+          "Confirm no existing file serves the purpose",
+          "Ensure clear, unique purpose for new file",
+          "Document rationale for new file creation"
+        ]
+      },
+      "search_strategies": {
+        "command_line_tools": [
+          "grep -r",
+          "find",
+          "fd"
+        ],
+        "search_scope": [
+          "Current project",
+          "Shared libraries",
+          "Previous project versions"
+        ]
+      }
+    }
+  }

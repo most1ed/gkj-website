@@ -1,3 +1,4 @@
+import React from 'react';
 import { Link } from 'react-router-dom';
 
 const navigation = {
@@ -11,9 +12,10 @@ const navigation = {
     { name: 'Kebijakan Keamanan', href: '/security-policy' },
   ],
   informasi: [
-    { name: 'Warta Jemaat', href: '/announcements' },
-    { name: 'Jadwal Kegiatan', href: '/schedule' },
-    { name: 'Persembahan', href: '/offerings' },
+    { name: 'Warta Jemaat', href: '/warta-jemaat' },
+    { name: 'Arsip Warta', href: '/arsip-warta' },
+    { name: 'Jadwal Kegiatan', href: '/jadwal-kegiatan' },
+    { name: 'Persembahan', href: '/persembahan' },
   ],
   sinode: [
     { name: 'Berita Sinode', href: 'https://sinodegkj.or.id/berita/' },
@@ -56,14 +58,14 @@ const navigation = {
   ],
 };
 
-export function Footer() {
+export function PublicFrontpageFooter() {
   return (
     <footer className="bg-background border-t">
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* GKJ Grogol Jakarta */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">GKJ Grogol Jakarta</h3>
+            <h3 className="text-lg font-semibold">Gereja Kristen Jawa</h3>
             <p className="text-sm text-muted-foreground">
               Melayani dengan kasih, bertumbuh dalam iman, dan menjadi berkat bagi sesama.
             </p>
@@ -152,7 +154,7 @@ export function Footer() {
               ))}
             </div>
             <p className="text-sm text-center text-muted-foreground">
-              {new Date().getFullYear()} GKJ Grogol Jakarta. Semua Hak Dilindungi.
+              {new Date().getFullYear()} Gereja Kristen Jawa. Semua Hak Dilindungi.
             </p>
           </div>
         </div>

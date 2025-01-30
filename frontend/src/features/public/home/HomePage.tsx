@@ -1,7 +1,7 @@
 import { Hero } from "./components/Hero";
 import { Features } from "./components/Features";
 import { LatestNews } from "./components/LatestNews";
-import { UpcomingEvents } from "./components/UpcomingEvents";
+import { UpcomingEvents } from "@/features/panel/base/events/components/UpcomingEvents";
 import { ArticlesSection } from "./components/ArticlesSection";
 import { GallerySection } from "./components/GallerySection";
 import { OfferingInfo } from "./components/OfferingInfo";
@@ -67,7 +67,8 @@ export function HomePage() {
       
       <ScrollAnimatedSection>
         <div className="container mx-auto px-4">
-          <LatestNews news={data?.news} />
+          {/* Temporarily hidden: Latest News Section */}
+          {/* <LatestNews news={data?.news} /> */}
         </div>
       </ScrollAnimatedSection>
       

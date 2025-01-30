@@ -27,6 +27,7 @@ import AnnouncementsPage from "@/features/public/announcements/AnnouncementsPage
 // Import the new ArchiveWartaPage
 import ArchiveWartaPage from "@/features/public/archive-warta/ArchiveWartaPage";
 import WartaDetailPage from "@/features/public/archive-warta/WartaDetailPage";
+import ServicesPage from "@/features/public/services/ServicesPage";
 
 export const publicRoutes: RouteObject[] = [
   {
@@ -126,10 +127,6 @@ export const publicRoutes: RouteObject[] = [
         element: <OrganizationStructurePage /> 
       },
       { 
-        path: "financial-report", 
-        element: <FinancialReportPage /> 
-      },
-      { 
         path: "financial-reports", 
         element: <FinancialReportPage /> 
       },
@@ -186,6 +183,20 @@ export const publicRoutes: RouteObject[] = [
       { 
         path: "home/weekly-service", 
         element: <DummyPage title="Weekly Service" /> 
+      },
+      
+      // Additional Information Pages
+      { 
+        path: "warta-jemaat", 
+        element: <AnnouncementsPage /> 
+      },
+      { 
+        path: "jadwal-kegiatan", 
+        element: <ServicesPage /> 
+      },
+      { 
+        path: "persembahan", 
+        element: <Offerings /> 
       },
     ],
   },
