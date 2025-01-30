@@ -4,12 +4,10 @@ import {
   User, 
   FileText, 
   Calendar, 
-  Wallet, 
   Users, 
   BookOpen, 
-  Newspaper, 
-  Settings, 
-  Folder 
+  DollarSign, 
+  Settings 
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -24,12 +22,6 @@ const menuItems = [
     label: 'Profil',
     icon: User,
     href: '/panel/profile',
-    children: [
-      { 
-        label: 'Profil Saya', 
-        href: '/panel/profile' 
-      }
-    ]
   },
   {
     label: 'Dokumen',
@@ -37,36 +29,29 @@ const menuItems = [
     href: '/panel/documents',
   },
   {
-    label: 'Kegiatan',
+    label: 'Jadwal',
     icon: Calendar,
     href: '/panel/events',
   },
   {
-    label: 'Persembahan',
-    icon: Wallet,
-    href: '/panel/offerings',
+    label: 'Jemaat',
+    icon: Users,
+    href: '/panel/jemaat',
   },
   {
-    label: 'Manajemen',
-    icon: Users,
-    children: [
-      { 
-        label: 'Jemaat', 
-        href: '/panel/jemaat' 
-      },
-      { 
-        label: 'Ibadah', 
-        href: '/panel/ibadah' 
-      },
-      { 
-        label: 'Pelayanan', 
-        href: '/panel/pelayanan' 
-      },
-      { 
-        label: 'Keuangan', 
-        href: '/panel/keuangan' 
-      }
-    ]
+    label: 'Ibadah',
+    icon: BookOpen,
+    href: '/panel/ibadah',
+  },
+  {
+    label: 'Pelayanan',
+    icon: BookOpen,
+    href: '/panel/pelayanan',
+  },
+  {
+    label: 'Keuangan',
+    icon: DollarSign,
+    href: '/panel/keuangan',
   },
   {
     label: 'Admin',
