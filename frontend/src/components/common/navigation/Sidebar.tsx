@@ -1,137 +1,161 @@
-import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React from 'react';
 import { 
-  Home, 
+  LayoutDashboard, 
   User, 
-  Settings, 
   FileText, 
+  Calendar, 
+  Wallet, 
+  Users, 
   BookOpen, 
-  DollarSign,
-  ChevronsLeft,
-  ChevronsRight 
+  Newspaper, 
+  Settings, 
+  Folder 
 } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { 
-  Tooltip, 
-  TooltipContent, 
-  TooltipProvider, 
-  TooltipTrigger 
-} from '@/components/ui/tooltip';
-import { Button } from '@/components/ui/button';
 
-interface NavItem {
-  label: string;
-  icon: React.ComponentType;
-  path: string;
-}
-
-const navItems: NavItem[] = [
-  { 
-    label: 'Dashboard', 
-    icon: Home, 
-    path: '/panel' 
+const menuItems = [
+  {
+    label: 'Dashboard',
+    icon: LayoutDashboard,
+    href: '/panel/dashboard',
   },
-  { 
-    label: 'Profil', 
-    icon: User, 
-    path: '/panel/profile' 
+  {
+    label: 'Profil',
+    icon: User,
+    href: '/panel/profile',
+    children: [
+      { 
+        label: 'Profil Saya', 
+        href: '/panel/profile' 
+      }
+    ]
   },
-  { 
-    label: 'Administrasi', 
-    icon: FileText, 
-    path: '/panel/administrasi' 
+  {
+    label: 'Dokumen',
+    icon: FileText,
+    href: '/panel/documents',
   },
-  { 
-    label: 'Alkitab', 
-    icon: BookOpen, 
-    path: '/panel/alkitab' 
+  {
+    label: 'Kegiatan',
+    icon: Calendar,
+    href: '/panel/events',
   },
-  { 
-    label: 'Keuangan', 
-    icon: DollarSign, 
-    path: '/panel/keuangan' 
+  {
+    label: 'Persembahan',
+    icon: Wallet,
+    href: '/panel/offerings',
   },
-  { 
-    label: 'Pengaturan', 
-    icon: Settings, 
-    path: '/panel/pengaturan' 
+  {
+    label: 'Manajemen',
+    icon: Users,
+    children: [
+      { 
+        label: 'Jemaat', 
+        href: '/panel/jemaat' 
+      },
+      { 
+        label: 'Ibadah', 
+        href: '/panel/ibadah' 
+      },
+      { 
+        label: 'Pelayanan', 
+        href: '/panel/pelayanan' 
+      },
+      { 
+        label: 'Keuangan', 
+        href: '/panel/keuangan' 
+      }
+    ]
+  },
+  {
+    label: 'Admin',
+    icon: Settings,
+    children: [
+      { 
+        label: 'Dashboard', 
+        href: '/panel/admin/dashboard' 
+      },
+      { 
+        label: 'Konten', 
+        href: '/panel/admin/konten' 
+      },
+      { 
+        label: 'Pengaturan', 
+        href: '/panel/admin/pengaturan' 
+      },
+      { 
+        label: 'Artikel', 
+        href: '/panel/admin/artikel' 
+      },
+      { 
+        label: 'Master', 
+        href: '/panel/admin/master' 
+      },
+      { 
+        label: 'Alkitab', 
+        href: '/panel/admin/alkitab' 
+      },
+      { 
+        label: 'Media', 
+        href: '/panel/admin/media' 
+      }
+    ]
   }
 ];
 
-export const Sidebar: React.FC = () => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+export function Sidebar() {
   const location = useLocation();
+  const [expandedMenus, setExpandedMenus] = React.useState<{ [key: string]: boolean }>({});
 
-  const toggleSidebar = () => {
-    setIsCollapsed(!isCollapsed);
+  const toggleMenu = (label: string) => {
+    setExpandedMenus(prev => ({
+      ...prev,
+      [label]: !prev[label]
+    }));
+  };
+
+  const renderMenuItem = (item: any, depth = 0) => {
+    const isActive = location.pathname === item.href;
+    const hasChildren = item.children && item.children.length > 0;
+
+    return (
+      <div key={item.label}>
+        <Link 
+          to={item.href || '#'}
+          className={cn(
+            'flex items-center px-4 py-2 text-sm transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-700',
+            isActive ? 'bg-gray-200 dark:bg-gray-800 font-semibold' : '',
+            depth > 0 ? 'pl-8' : ''
+          )}
+          onClick={() => hasChildren && toggleMenu(item.label)}
+        >
+          {item.icon && <item.icon className="mr-3 h-5 w-5" />}
+          {item.label}
+          {hasChildren && (
+            <span className="ml-auto">
+              {expandedMenus[item.label] ? '▼' : '►'}
+            </span>
+          )}
+        </Link>
+        
+        {hasChildren && expandedMenus[item.label] && (
+          <div className="pl-4">
+            {item.children.map((child: any) => renderMenuItem(child, depth + 1))}
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
-    <TooltipProvider>
-      <aside 
-        className={cn(
-          "fixed left-0 top-0 z-40 h-screen bg-gray-100 dark:bg-gray-800 transition-all duration-300 ease-in-out",
-          isCollapsed ? "w-16" : "w-64"
-        )}
-      >
-        <div className="h-full flex flex-col">
-          {/* Sidebar Header */}
-          <div className={cn(
-            "flex items-center p-4 border-b",
-            isCollapsed ? "justify-center" : "justify-between"
-          )}>
-            {!isCollapsed && (
-              <h2 className="text-xl font-bold">GKJ Panel</h2>
-            )}
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={toggleSidebar}
-            >
-              {isCollapsed ? <ChevronsRight /> : <ChevronsLeft />}
-            </Button>
-          </div>
-
-          {/* Navigation Items */}
-          <nav className="flex-1 overflow-y-auto">
-            <div className="space-y-1 p-2">
-              {navItems.map((item) => (
-                <Tooltip key={item.path} delayDuration={0}>
-                  <TooltipTrigger asChild>
-                    <Link
-                      to={item.path}
-                      className={cn(
-                        "flex items-center p-2 rounded-lg group transition-colors duration-200",
-                        location.pathname === item.path 
-                          ? "bg-primary text-primary-foreground" 
-                          : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
-                        isCollapsed ? "justify-center" : ""
-                      )}
-                    >
-                      <item.icon className="w-5 h-5" />
-                      {!isCollapsed && (
-                        <span className="ml-3 truncate">
-                          {item.label}
-                        </span>
-                      )}
-                    </Link>
-                  </TooltipTrigger>
-                  {isCollapsed && (
-                    <TooltipContent side="right">
-                      {item.label}
-                    </TooltipContent>
-                  )}
-                </Tooltip>
-              ))}
-            </div>
-          </nav>
-        </div>
-      </aside>
-    </TooltipProvider>
-import React from 'react';
-
-export const Sidebar: React.FC = () => {
-  return null;
-};
-
-export default Sidebar;
+    <div className="w-64 bg-white dark:bg-gray-900 border-r dark:border-gray-700 h-full overflow-y-auto">
+      <div className="p-4 border-b dark:border-gray-700">
+        <h2 className="text-lg font-bold">GKJ Panel</h2>
+      </div>
+      <nav className="py-4">
+        {menuItems.map(renderMenuItem)}
+      </nav>
+    </div>
+  );
+}
