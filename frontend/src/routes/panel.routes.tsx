@@ -20,6 +20,7 @@ const AlkitabPage = lazy(() => import("@/features/panel/admin/alkitab/AlkitabPag
 const MediaPage = lazy(() => import("@/features/panel/admin/media/MediaPage"));
 const PengaturanPage = lazy(() => import("@/features/panel/admin/pengaturan/PengaturanPage"));
 const DashboardPage = lazy(() => import('@/features/panel/dashboard/DashboardPage'));
+const ChartTestPage = lazy(() => import('@/features/panel/dashboard/pages/ChartTestPage'));
 
 export const panelRoutes: RouteObject[] = [
   {
@@ -37,6 +38,14 @@ export const panelRoutes: RouteObject[] = [
             <DashboardPage />
           </Suspense>
         ),
+      },
+      {
+        path: 'chart-test',
+        element: (
+          <Suspense fallback={<div>Loading...</div>}>
+            <ChartTestPage />
+          </Suspense>
+        )
       },
       {
         path: 'profile',
