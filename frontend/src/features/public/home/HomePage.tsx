@@ -32,9 +32,11 @@ const ScrollAnimatedSection = ({ children }: { children: React.ReactNode }) => {
         scale, 
         y 
       }}
-      className="will-change-transform"
+      className="will-change-transform relative"
     >
-      {children}
+      <div className="relative">
+        {children}
+      </div>
     </motion.div>
   );
 };
