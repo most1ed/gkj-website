@@ -4,7 +4,10 @@ import {
   Widget, 
   chartTemplates, 
   CHART_CONFIGURATIONS, 
-  ChartType 
+  ChartType,
+  convertStatistikJemaatToChartData,
+  convertFinancialToChartData,
+  convertServiceToChartData
 } from '../types/chart-types';
 
 export const ChartTestPage: React.FC = () => {
@@ -36,7 +39,7 @@ export const ChartTestPage: React.FC = () => {
       ...(template.type !== 'pie' ? [createWidgetFromTemplate(template, index, 'pie')] : [])
     ]),
 
-    // Contoh data kompleks
+    // Contoh data kompleks dengan konversi eksplisit
     {
       id: 'kompleks-statistik-jemaat',
       type: 'chart',
@@ -46,10 +49,10 @@ export const ChartTestPage: React.FC = () => {
       y: 8,
       w: 4,
       h: 3,
-      data: {
+      data: convertStatistikJemaatToChartData({
         ageGroups: ['Anak', 'Remaja', 'Pemuda', 'Dewasa', 'Lansia'],
         ageDistribution: [100, 150, 200, 350, 50]
-      }
+      })
     },
     {
       id: 'kompleks-keuangan',
@@ -60,13 +63,13 @@ export const ChartTestPage: React.FC = () => {
       y: 8,
       w: 4,
       h: 3,
-      data: {
+      data: convertFinancialToChartData({
         months: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
         contributions: [
           5000000, 6200000, 5800000, 7100000, 6500000, 7300000,
           8000000, 7600000, 7200000, 7900000, 8500000, 9000000
         ]
-      }
+      })
     },
     {
       id: 'kompleks-pelayanan',
@@ -77,7 +80,7 @@ export const ChartTestPage: React.FC = () => {
       y: 8,
       w: 4,
       h: 3,
-      data: {
+      data: convertServiceToChartData({
         services: [
           'Musik Worship', 
           'Multimedia', 
@@ -86,7 +89,7 @@ export const ChartTestPage: React.FC = () => {
           'Usher', 
           'Pelayanan Anak'
         ]
-      }
+      })
     }
   ];
 
