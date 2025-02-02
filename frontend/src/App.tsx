@@ -1,6 +1,6 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, startTransition } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, useNavigate, useNavigation } from 'react-router-dom';
 import { publicRoutes } from '@/routes/public.routes';
 import { panelRoutes } from '@/routes/panel.routes';
 import LoginPage from '@/features/auth/login/LoginPage';
@@ -26,7 +26,12 @@ const router = createBrowserRouter([
 
   // Panel routes (protected)
   ...panelRoutes
-]);
+], {
+  future: {
+    v7_startTransition: true,
+    v7_relativeSplatPath: true
+  }
+});
 
 function App() {
   return (

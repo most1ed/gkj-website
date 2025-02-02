@@ -56,8 +56,10 @@ export function ThemeProvider({
   };
 
   return (
-    <ThemeProviderContext.Provider {...props} value={value}>
-      {children}
+    <ThemeProviderContext.Provider value={value}>
+      <div className="relative">
+        {children}
+      </div>
     </ThemeProviderContext.Provider>
   );
 }

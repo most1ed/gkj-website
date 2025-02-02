@@ -49,42 +49,41 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }, []);
 
-  const login = useCallback(async (email: string, password: string) => {
-    try {
-      const response = await axios.post("/api/auth/login", { email, password });
-      const { token, user } = response.data;
-      localStorage.setItem("token", token);
-      setUser(user);
-    } catch (error) {
-      throw error;
-    }
-  }, []);
-
-  const logout = useCallback(async () => {
-    try {
-      await axios.post("/api/auth/logout");
-      localStorage.removeItem("token");
-      setUser(null);
-    } catch (error) {
-      console.error("Logout failed", error);
-    }
-  }, []);
-
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
+
+  const login = useCallback(async (email: string, password: string) => {
+    try {
+      setIsLoading(true);
+      const response = await axios.post("/api/auth/login", { email, password });
+      localStorage.setItem("token", response.data.token);
+      await checkAuth();
+    } catch (error) {
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  }, [checkAuth]);
+
+  const logout = useCallback(async () => {
+    localStorage.removeItem("token");
+    setUser(null);
+  }, []);
 
   const value = useMemo(() => ({
     user,
     isAuthenticated: !!user,
     isLoading,
     login,
-    logout
+    logout,
   }), [user, isLoading, login, logout]);
 
   return (
     <AuthContext.Provider value={value}>
-      {children}
+      <div className="relative">
+        {children}
+      </div>
     </AuthContext.Provider>
   );
 }
