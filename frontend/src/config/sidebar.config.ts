@@ -38,7 +38,7 @@ export const sidebarConfig = {
   baseMenu: [
     {
       title: 'Dashboard',
-      href: '/panel',
+      href: '/panel/flexdash',
       icon: Home
     }
   ],
@@ -161,6 +161,18 @@ export const sidebarConfig = {
 
   // Menu untuk Admin
   adminMenu: [
+    {
+      title: 'Dashboard',
+      href: '/panel/flexdash',
+      icon: Home,
+      children: [
+        {
+          title: 'Flex Dashboard',
+          href: '/panel/flexdash',
+          icon: PieChart
+        }
+      ]
+    },
     {
       title: 'Manajemen Konten',
       href: '/panel/konten',

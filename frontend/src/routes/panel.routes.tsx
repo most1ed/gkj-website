@@ -22,6 +22,7 @@ const MediaPage = lazy(() => import("@/features/panel/admin/media/MediaPage"));
 const PengaturanPage = lazy(() => import("@/features/panel/admin/pengaturan/PengaturanPage"));
 const DashboardPage = lazy(() => import('@/features/panel/dashboard/DashboardPage'));
 const ChartTestPage = lazy(() => import('@/features/panel/dashboard/pages/ChartTestPage'));
+const FlexDashboardPage = lazy(() => import('@/features/panel/flexdash/pages/FlexDashboardPage'));
 
 export const panelRoutes: RouteObject[] = [
   {
@@ -30,15 +31,19 @@ export const panelRoutes: RouteObject[] = [
     children: [
       {
         index: true,
-        element: <Navigate to="dashboard" replace />
+        element: <Navigate to="flexdash" replace />
+      },
+      {
+        path: 'flexdash',
+        element: (
+          <Suspense fallback={<div>Loading...</div>}>
+            <FlexDashboardPage />
+          </Suspense>
+        ),
       },
       {
         path: 'dashboard',
-        element: (
-          <Suspense fallback={<div>Loading...</div>}>
-            <DashboardPage />
-          </Suspense>
-        ),
+        element: <Navigate to="/panel/flexdash" replace />
       },
       {
         path: 'chart-test',
@@ -46,11 +51,15 @@ export const panelRoutes: RouteObject[] = [
           <Suspense fallback={<div>Loading...</div>}>
             <ChartTestPage />
           </Suspense>
-        )
+        ),
       },
       {
         path: 'profile',
-        element: protectedRoute(ProfilePage)
+        element: (
+          <Suspense fallback={<div>Loading...</div>}>
+            <ProfilePage />
+          </Suspense>
+        ),
       },
       {
         path: 'documents',
@@ -58,7 +67,7 @@ export const panelRoutes: RouteObject[] = [
           <Suspense fallback={<div>Loading...</div>}>
             <DocumentsPage />
           </Suspense>
-        )
+        ),
       },
       {
         path: 'events',
@@ -66,7 +75,7 @@ export const panelRoutes: RouteObject[] = [
           <Suspense fallback={<div>Loading...</div>}>
             <UserEventsPage />
           </Suspense>
-        )
+        ),
       },
       {
         path: 'offerings',
@@ -74,55 +83,7 @@ export const panelRoutes: RouteObject[] = [
           <Suspense fallback={<div>Loading...</div>}>
             <UserOfferingsPage />
           </Suspense>
-        )
-      },
-      {
-        path: 'jemaat',
-        element: <Navigate to="/panel/management/jemaat" replace />
-      },
-      {
-        path: 'ibadah',
-        element: <Navigate to="/panel/management/ibadah" replace />
-      },
-      {
-        path: 'keuangan',
-        element: <Navigate to="/panel/management/keuangan" replace />
-      },
-      {
-        path: 'pelayanan',
-        element: <Navigate to="/panel/management/pelayanan" replace />
-      },
-      {
-        path: 'rencana',
-        element: <Navigate to="/panel/management/rencana" replace />
-      },
-      {
-        path: 'sda',
-        element: <Navigate to="/panel/management/sda" replace />
-      },
-      {
-        path: 'konten',
-        element: <Navigate to="/panel/admin/konten" replace />
-      },
-      {
-        path: 'media',
-        element: <Navigate to="/panel/admin/media" replace />
-      },
-      {
-        path: 'alkitab',
-        element: <Navigate to="/panel/admin/alkitab" replace />
-      },
-      {
-        path: 'artikel',
-        element: <Navigate to="/panel/admin/artikel" replace />
-      },
-      {
-        path: 'master',
-        element: <Navigate to="/panel/admin/master" replace />
-      },
-      {
-        path: 'pengaturan',
-        element: <Navigate to="/panel/admin/pengaturan" replace />
+        ),
       },
       {
         path: 'management',
@@ -133,7 +94,7 @@ export const panelRoutes: RouteObject[] = [
               <Suspense fallback={<div>Loading...</div>}>
                 <JemaatPage />
               </Suspense>
-            )
+            ),
           },
           {
             path: 'ibadah',
@@ -141,7 +102,7 @@ export const panelRoutes: RouteObject[] = [
               <Suspense fallback={<div>Loading...</div>}>
                 <IbadahPage />
               </Suspense>
-            )
+            ),
           },
           {
             path: 'pelayanan',
@@ -149,7 +110,7 @@ export const panelRoutes: RouteObject[] = [
               <Suspense fallback={<div>Loading...</div>}>
                 <PelayananPage />
               </Suspense>
-            )
+            ),
           },
           {
             path: 'keuangan',
@@ -157,7 +118,7 @@ export const panelRoutes: RouteObject[] = [
               <Suspense fallback={<div>Loading...</div>}>
                 <KeuanganPage />
               </Suspense>
-            )
+            ),
           },
           {
             path: 'sda',
@@ -165,16 +126,16 @@ export const panelRoutes: RouteObject[] = [
               <Suspense fallback={<div>Loading...</div>}>
                 <SDAPage />
               </Suspense>
-            )
+            ),
           },
           {
-            path: 'rencana',
+            path: 'rencana-kerja',
             element: (
               <Suspense fallback={<div>Loading...</div>}>
                 <RencanaKerjaPage />
               </Suspense>
-            )
-          }
+            ),
+          },
         ]
       },
       {
@@ -186,7 +147,7 @@ export const panelRoutes: RouteObject[] = [
               <Suspense fallback={<div>Loading...</div>}>
                 <KontenPage />
               </Suspense>
-            )
+            ),
           },
           {
             path: 'artikel',
@@ -194,7 +155,7 @@ export const panelRoutes: RouteObject[] = [
               <Suspense fallback={<div>Loading...</div>}>
                 <ArtikelPage />
               </Suspense>
-            )
+            ),
           },
           {
             path: 'master',
@@ -202,7 +163,7 @@ export const panelRoutes: RouteObject[] = [
               <Suspense fallback={<div>Loading...</div>}>
                 <MasterPage />
               </Suspense>
-            )
+            ),
           },
           {
             path: 'alkitab',
@@ -210,7 +171,7 @@ export const panelRoutes: RouteObject[] = [
               <Suspense fallback={<div>Loading...</div>}>
                 <AlkitabPage />
               </Suspense>
-            )
+            ),
           },
           {
             path: 'media',
@@ -218,7 +179,7 @@ export const panelRoutes: RouteObject[] = [
               <Suspense fallback={<div>Loading...</div>}>
                 <MediaPage />
               </Suspense>
-            )
+            ),
           },
           {
             path: 'pengaturan',
@@ -226,10 +187,10 @@ export const panelRoutes: RouteObject[] = [
               <Suspense fallback={<div>Loading...</div>}>
                 <PengaturanPage />
               </Suspense>
-            )
+            ),
           }
         ]
-      }
+      },
     ]
   }
 ];

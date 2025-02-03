@@ -6,7 +6,6 @@ import {
   Devotional 
 } from '@/types/services';
 import { BaseEntity } from '@/types/common';
-import { useToast } from './useToast';
 
 // Centralized error logging and tracking
 export const logError = (context: string, error: unknown) => {
@@ -91,5 +90,4 @@ if (typeof window !== 'undefined') {
 }
 
 // Export other hooks
-export { useToast } from './useToast';
 export { useAuth } from './auth';

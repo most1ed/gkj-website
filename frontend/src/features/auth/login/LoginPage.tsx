@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, User, ChevronDown } from 'lucide-react';
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { useAuth, useToast } from "@/hooks";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useAuth } from "@/hooks/auth";
+import { useToast } from "@/components/ui/use-toast"; // Update useToast import to use hooks index
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger
-} from "@/components/ui/Collapsible";
+} from "@/components/ui/collapsible";
 
 const savedCredentials = [
   { 
@@ -24,8 +25,8 @@ const savedCredentials = [
     description: 'Akses ke manajemen pelayanan dan data jemaat'
   },
   { 
-    username: 'warga', 
-    password: 'warga123',
+    username: 'user', 
+    password: 'user123',
     role: 'Warga Gereja',
     description: 'Akses ke informasi umum dan kegiatan gereja'
   }
@@ -58,7 +59,7 @@ export default function Login() {
     
     setLoading(true);
     try {
-      await login(selectedUser.username, password, selectedUser.role);
+      await login(selectedUser.username, password);
       navigate('/panel');
     } catch (error) {
       toast({

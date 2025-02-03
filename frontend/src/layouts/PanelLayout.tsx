@@ -47,7 +47,8 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from '@/components/common/theme/ThemeToggle';
 import { PanelFooter } from '@/components/common/PanelFooter';
-import { useAuth } from '@/providers/auth-provider';
+import { useAuth } from '@/hooks/auth';
+import { Toaster } from '@/components/ui/toaster';
 
 // Breadcrumbs Component
 const Breadcrumbs: React.FC = () => {
@@ -330,78 +331,81 @@ export const PanelLayout: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      {/* Sidebar */}
-      <div 
-        className={cn(
-          'bg-background border-r transition-all duration-300 ease-in-out',
-          isCollapsed ? 'w-16' : 'w-64',
-          'flex flex-col h-full relative overflow-hidden'
-        )}
-      >
-        {/* Sidebar Header */}
-        <div className="p-2 flex items-center justify-between">
-          {!isCollapsed && (
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="font-bold text-lg"
-            >
-              GKJ Panel
-            </motion.div>
+    <div className={cn(
+      "flex h-screen w-full overflow-hidden",
+      "bg-background text-foreground"
+    )}>
+      <TooltipProvider>
+        <div 
+          className={cn(
+            'bg-background border-r transition-all duration-300 ease-in-out',
+            isCollapsed ? 'w-16' : 'w-64',
+            'flex flex-col h-full relative overflow-hidden'
           )}
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  onClick={toggleSidebar}
-                >
-                  {isCollapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="right">
-                {isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
+        >
+          {/* Sidebar Header */}
+          <div className="p-2 flex items-center justify-between">
+            {!isCollapsed && (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="font-bold text-lg"
+              >
+                GKJ Panel
+              </motion.div>
+            )}
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    onClick={toggleSidebar}
+                  >
+                    {isCollapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="right">
+                  {isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
 
-        {/* Sidebar Navigation */}
-        <div className="flex-1 overflow-y-auto px-2 py-4 space-y-1">
-          {sidebarItems.map(renderSidebarItem)}
+          {/* Sidebar Navigation */}
+          <div className="flex-1 overflow-y-auto px-2 py-4 space-y-1">
+            {sidebarItems.map(renderSidebarItem)}
+          </div>
         </div>
-      </div>
+      </TooltipProvider>
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
-        <header className="bg-background border-b px-4 py-2 flex items-center justify-between">
-          <Breadcrumbs />
-          <div className="flex items-center space-x-2">
-            <ThemeToggle />
-            <NotificationDropdown />
-            <ProfileDropdown />
+      <div className={cn(
+        "flex flex-col w-full transition-all duration-300 ease-in-out",
+        isCollapsed ? "ml-16" : "ml-64"
+      )}>
+        <header className="sticky top-0 z-40 w-full border-b bg-background">
+          <div className="flex h-16 items-center justify-between px-4">
+            <Breadcrumbs />
+            <div className="flex items-center space-x-4">
+              <ThemeToggle />
+              <NotificationDropdown />
+              <ProfileDropdown />
+            </div>
           </div>
         </header>
 
-        {/* Main Content */}
-        <main className="flex-1 overflow-y-auto p-4 flex flex-col">
-          <div className="flex-grow">
-            <Suspense fallback={
-              <div className="flex items-center justify-center h-full">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-              </div>
-            }>
-              <Outlet />
-            </Suspense>
-          </div>
-          
-          {/* Panel Footer */}
+        <main className="flex-1 overflow-y-auto p-4">
+          <Suspense fallback={
+            <div className="flex items-center justify-center h-full">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+          }>
+            <Outlet />
+          </Suspense>
           <PanelFooter className="mt-4 border-t pt-2" />
         </main>
       </div>
+      <Toaster />
     </div>
   );
 };
