@@ -17,6 +17,13 @@ export default defineConfig({
     host: true, // Listen on all addresses
   },
   optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom']
+    include: ['react', 'react-dom', 'react-router-dom', 'date-fns'],
+    exclude: ['@vitejs/plugin-react'],
+    esbuildOptions: {
+      target: 'es2020'
+    }
+  },
+  build: {
+    target: 'es2020'
   }
 })

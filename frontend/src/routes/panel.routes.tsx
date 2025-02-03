@@ -2,8 +2,9 @@ import { RouteObject } from 'react-router-dom';
 import { PanelLayout } from '@/layouts/PanelLayout';
 import { lazy, Suspense } from "react";
 import { Navigate } from 'react-router-dom';
+import { protectedRoute } from './route-utils';
 
-const ProfilePage = lazy(() => import("@/features/panel/base/profile/ProfilePage"));
+const ProfilePage = lazy(() => import('@/features/panel/base/profile/ProfilePage'));
 const DocumentsPage = lazy(() => import("@/features/panel/base/documents/DocumentsPage"));
 const UserEventsPage = lazy(() => import("@/features/panel/base/events/UserEventsPage"));
 const UserOfferingsPage = lazy(() => import("@/features/panel/base/offerings/UserOfferingsPage"));
@@ -49,20 +50,7 @@ export const panelRoutes: RouteObject[] = [
       },
       {
         path: 'profile',
-        children: [
-          {
-            index: true,
-            element: <Navigate to="personal" replace />
-          },
-          {
-            path: 'personal',
-            element: (
-              <Suspense fallback={<div>Loading...</div>}>
-                <ProfilePage />
-              </Suspense>
-            )
-          }
-        ]
+        element: protectedRoute(ProfilePage)
       },
       {
         path: 'documents',

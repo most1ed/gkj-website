@@ -1,9 +1,36 @@
-import { Link } from 'react-router-dom';
+import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/Button";
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuLabel, 
+  DropdownMenuSeparator, 
+  DropdownMenuTrigger 
+} from '@/components/ui/dropdown-menu';
+import { useAuth } from '@/hooks/useAuth';
+import { UserIcon, LogOutIcon, HomeIcon, SettingsIcon } from 'lucide-react';
 import { ThemeToggle } from '@/components/common/theme/ThemeToggle';
 import { Home, Menu, LogIn, BookOpen } from "lucide-react";
 
 export function Navbar() {
+  const { user, logout, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
+  const handleProfile = () => {
+    navigate('/profile');
+  };
+
+  const handleHome = () => {
+    navigate('/');
+  };
+
   return (
     <nav className="fixed top-0 w-full bg-background border-b z-50">
       <div className="container mx-auto px-4">
@@ -41,9 +68,38 @@ export function Navbar() {
             </Link>
             <div className="ml-4 border-l pl-4 flex items-center space-x-4">
               <ThemeToggle />
-              <Link to="/auth/login" className="text-sm font-medium hover:text-primary">
-                <LogIn className="h-5 w-5" />
-              </Link>
+              {isAuthenticated ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="icon">
+                      <UserIcon className="h-5 w-5" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>
+                      {user?.username || 'My Account'}
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleHome}>
+                      <HomeIcon className="mr-2 h-4 w-4" />
+                      Home
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleProfile}>
+                      <SettingsIcon className="mr-2 h-4 w-4" />
+                      Profile
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout}>
+                      <LogOutIcon className="mr-2 h-4 w-4" />
+                      Logout
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Link to="/auth/login" className="text-sm font-medium hover:text-primary">
+                  <LogIn className="h-5 w-5" />
+                </Link>
+              )}
             </div>
           </div>
 

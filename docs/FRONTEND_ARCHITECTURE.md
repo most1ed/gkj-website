@@ -1,248 +1,130 @@
 # Frontend Architecture Documentation
 
-## Project Structure Overview
+## Project Overview
+- **Version**: 1.0.0
+- **Technology Stack**:
+  - Framework: React 18
+  - Language: TypeScript
+  - Build Tool: Vite
+  - Styling: Tailwind CSS
+  - State Management: Zustand, React Query
+  - Routing: React Router v6
+
+## Architectural Principles
+1. **Modularity**: Components designed for maximum reusability
+2. **Feature-Based Structure**: Organize code by domain and functionality
+3. **Type Safety**: Strict TypeScript configuration
+4. **Separation of Concerns**: Clear boundaries between components and features
+
+## Project Structure
 
 ### Root Directory Layout
 ```
 /frontend
 ├── src/
-│   ├── assets/
-│   ├── components/
-│   ├── config/
-│   ├── constants/
-│   ├── data/
-│   ├── features/
-│   ├── hooks/
-│   ├── layouts/
-│   ├── lib/
-│   ├── mocks/
-│   ├── providers/
-│   ├── routes/
-│   ├── styles/
-│   ├── types/
-│   ├── utils/
-│   ├── App.tsx
-│   ├── main.tsx
-│   └── index.css
+│   ├── components/       # Reusable UI components
+│   ├── features/         # Domain-specific feature modules
+│   ├── layouts/          # Page layout components
+│   ├── routes/           # Application routing configuration
+│   ├── lib/              # Shared libraries and utilities
+│   └── ... (other directories)
 ├── public/
 ├── node_modules/
 ├── package.json
-├── tsconfig.json
 └── vite.config.ts
 ```
 
-## Detailed Directory Breakdown
+## Components Architecture
 
-### 1. `/assets/`
-- Purpose: Store static resources like images, icons, and fonts
-- Contents: Non-code static files used across the application
-- Best Practices:
-  - Organize by type (images, icons, etc.)
-  - Use meaningful, descriptive filenames
-  - Optimize assets for web performance
+### Types of Components
+1. **UI Components** (`/components/ui/`)
+   - Primitive elements (Button, Input, Card)
+   - Complex UI components
+   - Follows Atomic Design methodology
 
-### 2. `/components/`
-#### Structure
-```
-/components
-├── common/
-│   ├── Footer.tsx
-│   ├── auth/
-│   ├── navigation/
-│   ├── pdf/
-│   └── theme/
-├── ui/
-│   ├── Button.tsx
-│   ├── Input.tsx
-│   ├── Card.tsx
-│   └── ... (other UI components)
-├── DummyPage.tsx
-└── ErrorBoundary.tsx
-```
+2. **Feature Components** (`/features/`)
+   - Organized by domain: public, auth, panel
+   - Each feature contains:
+     - Components
+     - Hooks
+     - Page-level components
 
-- Purpose: Store reusable UI components
-- Types of Components:
-  1. **Common Components**: 
-     - Site-wide utility components
-     - Shared across multiple features
-  2. **UI Components**: 
-     - Atomic design approach
-     - Primitive and complex UI elements
-  3. **Utility Components**: 
-     - Error handling
-     - Placeholder components
+3. **Layout Components** (`/layouts/`)
+   - Provide consistent page structures
+   - Support different application sections (Public, Panel)
 
-### 3. `/features/`
-#### Feature-Based Architecture
-```
-/features
-├── public/
-│   ├── home/
-│   │   ├── components/
-│   │   │   ├── Hero.tsx
-│   │   │   ├── LatestNews.tsx
-│   │   │   ├── EventsHighlight.tsx
-│   │   │   └── ... (other home page components)
-│   │   ├── hooks/
-│   │   │   └── useHomeData.ts
-│   │   └── HomePage.tsx
-│   ├── about/
-│   ├── services/
-│   ├── ministries/
-│   └── ... (other public features)
-├── auth/
-├── panel/
-└── dashboard/
-```
+## Routing Strategy
 
-- Purpose: Organize application by domain-specific features
-- Principles:
-  - Vertical slice architecture
-  - Feature-based code organization
-  - Encapsulate feature-specific logic
-  - Modular and extensible design
+### Route Configuration
+- Uses React Router v6 with `createBrowserRouter`
+- Supports lazy loading and code splitting
+- Implements route-based authentication
 
-#### Feature Component Characteristics
-- Small, focused components
-- Single responsibility principle
-- TypeScript for type safety
-- Custom hooks for data management
-- Tailwind CSS for styling
+### Primary Route Files
+- `public.routes.tsx`: Public-facing routes
+- `auth.routes.tsx`: Authentication-related routes
+- `panel.routes.tsx`: Panel and dashboard routes
 
-#### Home Feature Example
-Key Components:
-- `Hero`: Landing section
-- `LatestNews`: News updates
-- `EventsHighlight`: Upcoming events
-- `ArticlesSection`: Church articles
-- `ImportantAnnouncements`: Critical announcements
-- `ServicesOverview`: Church services summary
-- `WeeklyService`: Specific service details
-- `OfferingInfo`: Donation information
-- `PrayerSupport`: Prayer request section
-- `QuickInfo`: Rapid information display
-- `GallerySection`: Media gallery
-- `Features`: Site feature highlights
+### Routing Features
+- Lazy loading of route components
+- Suspense for loading states
+- Error boundary integration
+- Role-based access control
 
-### 4. `/config/`
-- Purpose: Application-wide configuration
-- Contents:
-  - Environment configurations
-  - App-level settings
-  - Route configurations
-- Best Practices:
-  - Use environment variables
-  - Separate config for different environments
+## State Management
+- **Global State**: Zustand
+- **Data Fetching**: React Query
+- **Context**: React Context API for theme and authentication
 
-### 5. `/constants/`
-- Purpose: Store constant values and enums
-- Contents:
-  - Route constants
-  - Theme constants
-  - Static configuration values
-- Best Practices:
-  - Use UPPER_SNAKE_CASE for constant names
-  - Group related constants
-  - Export as typed constants
+## Performance Optimization
+- Code splitting
+- Lazy loading
+- Memoization techniques
+- Efficient state management
 
-### 6. `/hooks/`
-- Purpose: Custom React hooks
-- Contents:
-  - Reusable logic hooks
-  - State management hooks
-  - Side effect management
-- Examples:
-  - `useAuth`
-  - `useForm`
-  - `useLocalStorage`
+## Utility Functions
+Located in `/lib/utils.ts`:
+- `cn()`: Tailwind class name merging utility
+- `formatDate()`: Localized date formatting with error handling
+- `truncateText()`: Text truncation with configurable ellipsis
+- `generateUniqueId()`: Cryptographically secure unique ID generation
+- `capitalizeFirstLetter()`: String capitalization with null safety
+- `sortByDate()`: Date sorting utility
+- `isValidEmail()`: Robust email validation
+- `debounce()`: Function debouncing with configurable delay
+- `safeJsonParse()`: Safe JSON parsing with fallback
+- `safeNumber()`: Safe number conversion with fallback
 
-### 7. `/layouts/`
-- Purpose: Provide structural layouts for different app sections
-- Contents:
-  - `PanelLayout.tsx`
-  - `PublicLayout.tsx`
-  - `AdminLayout.tsx`
-- Responsibilities:
-  - Define page structure
-  - Manage common layout elements
-  - Handle responsive design
+### Utility Function Characteristics
+- Comprehensive error handling
+- Type-safe implementations
+- Configurable with sensible defaults
+- Minimal side effects
+- Performance-optimized
 
-### 8. `/lib/`
-- Purpose: Shared libraries and utility functions
-- Structure:
-  ```
-  /lib
-  ├── api/
-  ├── utils/
-  └── helpers/
-  ```
-- Contents:
-  - API interaction logic
-  - Complex utility functions
-  - Shared business logic
+## Development Guidelines
+- Use TypeScript strict mode
+- Follow feature-based implementation
+- Maintain clear, descriptive naming conventions
+- Prioritize code reusability
+- Implement comprehensive error handling
 
-### 9. `/routes/`
-- Purpose: Define application routing
-- Contents:
-  - `public.routes.tsx`
-  - `auth.routes.tsx`
-  - `panel.routes.tsx`
-- Features:
-  - Route configuration
-  - Authentication guards
-  - Lazy loading support
-
-### 10. `/styles/`
-- Purpose: Global styling
-- Contents:
-  - `global.css`
-  - Global style definitions
-- Integrated with TailwindCSS
-
-### 11. `/types/`
-- Purpose: TypeScript type definitions
-- Contents:
-  - `user.type.ts`
-  - `auth.type.ts`
-  - Shared type definitions
-- Best Practices:
-  - Use interfaces and type aliases
-  - Keep types minimal and focused
-
-### 12. `/utils/`
-- Purpose: Utility functions
-- Contents:
-  - Formatting helpers
-  - Validation functions
-  - Generic utility methods
-
-## Architectural Principles
-1. Modular Design
-2. Feature-Based Organization
-3. Type Safety
-4. Separation of Concerns
-5. Reusability
-6. Performance Optimization
-
-## Recommended Workflow
-- Keep components small and focused
+## Best Practices
+- Avoid prop drilling
 - Use composition over inheritance
-- Implement strict typing
-- Follow atomic design principles
-- Optimize for performance and maintainability
-
-## Performance Considerations
-- Use code splitting
 - Implement lazy loading
-- Minimize re-renders
-- Use memoization techniques
-- Optimize asset loading
+- Minimize unnecessary re-renders
+- Maintain consistent styling
 
 ## Future Improvements
-- Implement more comprehensive testing
-- Enhance type safety
-- Continuous refactoring
-- Performance audits
-- Accessibility improvements
-- Advanced state management
-- Expand feature modularity
+- Enhanced modularization
+- More granular feature components
+- Advanced performance monitoring
+- Comprehensive testing strategy
+- Continued optimization of utility functions
+
+## Deployment Considerations
+- Server-side rendering support
+- Code splitting for faster initial load
+- Optimized bundle size
+- Environment-specific configurations
