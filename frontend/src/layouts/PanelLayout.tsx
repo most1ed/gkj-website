@@ -167,7 +167,7 @@ const sidebarItems = [
   {
     label: 'Dashboard',
     icon: LayoutDashboardIcon,
-    path: '/panel/dashboard',
+    path: '/panel/flexdash',
   },
   {
     label: 'Profil',
@@ -194,32 +194,32 @@ const sidebarItems = [
   {
     label: 'Jemaat',
     icon: UsersIcon,
-    path: '/panel/jemaat',
+    path: '/panel/management/jemaat',
   },
   {
     label: 'Ibadah',
     icon: BookIcon,
-    path: '/panel/ibadah',
+    path: '/panel/management/ibadah',
   },
   {
     label: 'Pelayanan',
     icon: HomeIcon,
-    path: '/panel/pelayanan',
+    path: '/panel/management/pelayanan',
   },
   {
     label: 'Keuangan',
     icon: DollarSignIcon,
-    path: '/panel/keuangan',
+    path: '/panel/management/keuangan',
   },
   {
     label: 'Sumber Daya',
     icon: DatabaseIcon,
-    path: '/panel/sda',
+    path: '/panel/management/sda',
   },
   {
     label: 'Rencana Kerja',
     icon: KanbanIcon,
-    path: '/panel/rencana',
+    path: '/panel/management/rencana',
   },
 
   // Admin Features

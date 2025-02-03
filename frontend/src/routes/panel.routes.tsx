@@ -13,15 +13,13 @@ const IbadahPage = lazy(() => import("@/features/panel/management/ibadah/IbadahP
 const PelayananPage = lazy(() => import("@/features/panel/management/pelayanan/PelayananPage"));
 const KeuanganPage = lazy(() => import("@/features/panel/management/keuangan/KeuanganPage"));
 const SDAPage = lazy(() => import("@/features/panel/management/sda/SDAPage"));
-const RencanaKerjaPage = lazy(() => import("@/features/panel/management/rencana/RencanaKerjaPage").then(module => ({ default: module.default })));
+const RencanaKerjaPage = lazy(() => import("@/features/panel/management/rencana/RencanaKerjaPage"));
 const KontenPage = lazy(() => import("@/features/panel/admin/konten/KontenPage"));
 const ArtikelPage = lazy(() => import("@/features/panel/admin/artikel/ArtikelPage"));
 const MasterPage = lazy(() => import("@/features/panel/admin/master/MasterPage"));
 const AlkitabPage = lazy(() => import("@/features/panel/admin/alkitab/AlkitabPage"));
 const MediaPage = lazy(() => import("@/features/panel/admin/media/MediaPage"));
 const PengaturanPage = lazy(() => import("@/features/panel/admin/pengaturan/PengaturanPage"));
-const DashboardPage = lazy(() => import('@/features/panel/dashboard/DashboardPage'));
-const ChartTestPage = lazy(() => import('@/features/panel/dashboard/pages/ChartTestPage'));
 const FlexDashboardPage = lazy(() => import('@/features/panel/flexdash/pages/FlexDashboardPage'));
 
 export const panelRoutes: RouteObject[] = [
@@ -38,18 +36,6 @@ export const panelRoutes: RouteObject[] = [
         element: (
           <Suspense fallback={<div>Loading...</div>}>
             <FlexDashboardPage />
-          </Suspense>
-        ),
-      },
-      {
-        path: 'dashboard',
-        element: <Navigate to="/panel/flexdash" replace />
-      },
-      {
-        path: 'chart-test',
-        element: (
-          <Suspense fallback={<div>Loading...</div>}>
-            <ChartTestPage />
           </Suspense>
         ),
       },
@@ -129,7 +115,7 @@ export const panelRoutes: RouteObject[] = [
             ),
           },
           {
-            path: 'rencana-kerja',
+            path: 'rencana',
             element: (
               <Suspense fallback={<div>Loading...</div>}>
                 <RencanaKerjaPage />

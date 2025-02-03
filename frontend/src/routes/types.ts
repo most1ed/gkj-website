@@ -35,11 +35,17 @@ export interface NavigationItem {
 
 // Route permissions mapping
 export const ROUTE_PERMISSIONS: Record<string, UserRole[]> = {
-  '/panel/dashboard': [UserRole.ADMIN, UserRole.STAFF],
+  '/panel/flexdash': [UserRole.ADMIN, UserRole.STAFF],
   '/panel/services': [UserRole.ADMIN, UserRole.STAFF],
   '/panel/members': [UserRole.ADMIN, UserRole.STAFF],
   '/panel/events': [UserRole.USER, UserRole.STAFF, UserRole.ADMIN],
-  '/panel/profile': [UserRole.USER, UserRole.STAFF, UserRole.ADMIN]
+  '/panel/profile': [UserRole.USER, UserRole.STAFF, UserRole.ADMIN],
+  '/panel/management/jemaat': [UserRole.ADMIN, UserRole.STAFF],
+  '/panel/management/ibadah': [UserRole.ADMIN, UserRole.STAFF],
+  '/panel/management/pelayanan': [UserRole.ADMIN, UserRole.STAFF],
+  '/panel/management/keuangan': [UserRole.ADMIN, UserRole.STAFF],
+  '/panel/management/sda': [UserRole.ADMIN, UserRole.STAFF],
+  '/panel/management/rencana': [UserRole.ADMIN, UserRole.STAFF],
 };
 
 // Utility to check route access
@@ -55,7 +61,7 @@ export function generateNavigationMenu(userRole: UserRole): NavigationItem[] {
   const baseMenu: NavigationItem[] = [
     { 
       label: 'Dashboard', 
-      path: '/panel/dashboard', 
+      path: '/panel/flexdash', 
       roles: [UserRole.ADMIN, UserRole.STAFF] 
     },
     { 
