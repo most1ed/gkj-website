@@ -103,13 +103,6 @@ const FinancialWidget: React.FC<{ data: any; onDelete?: () => void }> = ({ data,
       >
         <Trash2 className="h-4 w-4" />
       </Button>
-      <Button 
-        variant="ghost" 
-        size="icon" 
-        className="text-primary hover:bg-primary/10"
-      >
-        <Maximize2 className="h-4 w-4" />
-      </Button>
     </div>
     <div className="p-4 bg-white rounded-lg shadow-md h-full w-full flex flex-col overflow-hidden">
       <div className="flex items-center justify-between mb-4">
@@ -154,13 +147,6 @@ const MembershipWidget: React.FC<{ data: any; onDelete?: () => void }> = ({ data
         onClick={onDelete}
       >
         <Trash2 className="h-4 w-4" />
-      </Button>
-      <Button 
-        variant="ghost" 
-        size="icon" 
-        className="text-primary hover:bg-primary/10"
-      >
-        <Maximize2 className="h-4 w-4" />
       </Button>
     </div>
     <div className="p-4 bg-white rounded-lg shadow-md h-full w-full flex flex-col overflow-hidden">
@@ -219,13 +205,6 @@ const MinistryWidget: React.FC<{ data: any; onDelete?: () => void }> = ({ data, 
       >
         <Trash2 className="h-4 w-4" />
       </Button>
-      <Button 
-        variant="ghost" 
-        size="icon" 
-        className="text-primary hover:bg-primary/10"
-      >
-        <Maximize2 className="h-4 w-4" />
-      </Button>
     </div>
     <div className="p-4 bg-white rounded-lg shadow-md h-full w-full flex flex-col overflow-hidden">
       <div className="flex items-center justify-between mb-4">
@@ -267,13 +246,6 @@ const EventWidget: React.FC<{ data: any; onDelete?: () => void }> = ({ data, onD
           onClick={onDelete}
         >
           <Trash2 className="h-4 w-4" />
-        </Button>
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className="text-primary hover:bg-primary/10"
-        >
-          <Maximize2 className="h-4 w-4" />
         </Button>
       </div>
       <div className="p-4 bg-white rounded-lg shadow-md h-full w-full flex flex-col overflow-hidden">
@@ -323,13 +295,6 @@ const OverviewWidget: React.FC<{ data: any; onDelete?: () => void }> = ({ data, 
         onClick={onDelete}
       >
         <Trash2 className="h-4 w-4" />
-      </Button>
-      <Button 
-        variant="ghost" 
-        size="icon" 
-        className="text-primary hover:bg-primary/10"
-      >
-        <Maximize2 className="h-4 w-4" />
       </Button>
     </div>
     <div className="p-4 bg-white rounded-lg shadow-md h-full w-full">
@@ -478,7 +443,10 @@ const FlexDashboardPage: React.FC = () => {
   };
 
   const handleRemoveWidget = (widgetId: string) => {
-    removeWidget(widgetId);
+    setWidgets(currentWidgets => 
+      currentWidgets.filter(w => w.id !== widgetId)
+    );
+    
     toast({
       title: "Widget Dihapus",
       description: "Widget berhasil dihapus dari dashboard.",
@@ -488,59 +456,27 @@ const FlexDashboardPage: React.FC = () => {
   const renderWidget = (widget: BaseWidget) => {
     const WidgetComponent = WIDGET_COMPONENTS[widget.category];
     
-    // Sample data - replace with actual data fetching logic
-    const widgetData = {
-      [WidgetCategory.OVERVIEW]: {
-        title: widget.title,
-        content: 'Ringkasan informasi dashboard',
-        category: widget.category,
-        lastUpdated: new Date().toLocaleDateString()
-      },
-      [WidgetCategory.FINANCIAL]: {
-        title: widget.title,
-        totalCash: 'Rp 500,000,000',
-        expenses: 'Rp 50,000,000'
-      },
-      [WidgetCategory.MEMBERSHIP]: {
-        title: widget.title,
-        totalMembers: 1500,
-        newMembers: 25
-      },
-      [WidgetCategory.EVENTS]: {
-        title: widget.title,
-        upcomingEvents: [
-          { name: 'Kebaktian Minggu', date: '10 Feb 2024' },
-          { name: 'Pertemuan Pemuda', date: '15 Feb 2024' }
-        ]
-      },
-      [WidgetCategory.MINISTRY]: {
-        title: widget.title,
-        ministries: [
-          { name: 'Musik', members: 20 },
-          { name: 'Doa', members: 15 }
-        ]
-      }
-    }[widget.category];
-
-    const handleRemoveWidget = () => {
-      removeWidget(widget.id);
-      toast({
-        title: "Widget Dihapus",
-        description: `Widget "${widget.title}" berhasil dihapus dari dashboard.`,
-      });
-    };
-
     return (
-      <div key={widget.id} className="h-full">
+      <div className="h-full w-full relative group/widget">
+        {/* Hover-specific widget actions */}
+        <div className="absolute top-2 right-2 z-10 flex space-x-2 opacity-0 group-hover/widget:opacity-100 transition-opacity duration-300">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="text-destructive hover:bg-destructive/10"
+            onClick={() => handleRemoveWidget(widget.id)}
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
+
         {WidgetComponent ? (
           <WidgetComponent 
-            data={widgetData} 
-            onDelete={handleRemoveWidget} 
+            data={widget} 
+            onDelete={() => handleRemoveWidget(widget.id)} 
           />
         ) : (
-          <div className="p-4 bg-white rounded-lg shadow-md h-full flex items-center justify-center">
-            <p className="text-gray-500">Widget tidak tersedia</p>
-          </div>
+          <p className="text-gray-500">Widget tidak tersedia</p>
         )}
       </div>
     );
@@ -567,90 +503,109 @@ const FlexDashboardPage: React.FC = () => {
     );
   }
 
+  const resizeHandleStyles = `
+    .react-resizable-handle {
+      opacity: 0;
+      transition: opacity 0.3s ease-in-out;
+    }
+    .react-grid-item:hover .react-resizable-handle {
+      opacity: 1;
+    }
+    .react-resizable-handle-se { cursor: se-resize; }
+    .react-resizable-handle-sw { cursor: sw-resize; }
+    .react-resizable-handle-ne { cursor: ne-resize; }
+    .react-resizable-handle-nw { cursor: nw-resize; }
+  `;
+
   return (
-    <div className="p-4 space-y-4">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Dashboard Fleksibel</h1>
-        <Button 
-          variant="outline" 
-          onClick={() => setIsAddWidgetDialogOpen(true)}
-          className="flex items-center"
+    <>
+      <style>{resizeHandleStyles}</style>
+      <div className="p-4 space-y-4">
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-2xl font-bold">Dashboard Fleksibel</h1>
+          <Button 
+            variant="outline" 
+            onClick={() => setIsAddWidgetDialogOpen(true)}
+            className="flex items-center"
+          >
+            <PlusCircle className="mr-2 h-4 w-4" /> Tambah Widget
+          </Button>
+        </div>
+
+        {/* Responsive Grid Layout */}
+        <ResponsiveGridLayout
+          className="layout"
+          layouts={{ lg: gridLayout }}
+          breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480 }}
+          cols={{ lg: 12, md: 10, sm: 6, xs: 4 }}
+          rowHeight={60}
+          onLayoutChange={(layout) => {
+            // Optionally save layout changes
+            setGridLayout(layout);
+          }}
+          compactType="vertical"
+          preventCollision={false}
+          isDraggable={true}
+          isResizable={true}
+          resizeHandles={['se', 'sw', 'ne', 'nw']}
+          margin={[10, 10]}
+          containerPadding={[10, 10]}
         >
-          <PlusCircle className="mr-2 h-4 w-4" /> Tambah Widget
-        </Button>
-      </div>
-
-      {/* Responsive Grid Layout */}
-      <ResponsiveGridLayout
-        className="layout"
-        layouts={{ lg: gridLayout }}
-        breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480 }}
-        cols={{ lg: 12, md: 10, sm: 6, xs: 4 }}
-        rowHeight={60}
-        onLayoutChange={(layout) => {
-          // Optionally save layout changes
-          setGridLayout(layout);
-        }}
-        compactType="vertical"
-        preventCollision={false}
-        isDraggable={true}
-        isResizable={true}
-        draggableHandle=".drag-handle"
-        resizeHandles={['se', 'sw', 'ne', 'nw']}
-        margin={[10, 10]}
-        containerPadding={[10, 10]}
-      >
-        {widgets.map(widget => (
-          <div key={widget.id} className="group">
-            {/* Drag Handle */}
+          {widgets.map(widget => (
             <div 
-              className="drag-handle absolute top-0 left-0 w-full h-8 cursor-move opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
+              key={widget.id} 
+              className="group"
             >
-              <Move className="h-4 w-4 text-gray-500 mx-auto mt-2" />
-            </div>
-            {renderWidget(widget)}
-          </div>
-        ))}
-      </ResponsiveGridLayout>
-
-      {/* Add Widget Dialog */}
-      <Dialog 
-        open={isAddWidgetDialogOpen} 
-        onOpenChange={setIsAddWidgetDialogOpen}
-      >
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Pilih Widget</DialogTitle>
-          </DialogHeader>
-          <div className="grid grid-cols-2 gap-4">
-            {availableWidgets.map(widget => (
-              <Card 
-                key={widget.id} 
-                className="hover:border-primary cursor-pointer transition-all"
-                onClick={() => handleAddWidget(widget)}
+              {/* Drag Handle */}
+              <div 
+                className="drag-handle absolute top-0 left-0 w-full h-8 cursor-move opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
               >
-                <CardHeader>
-                  <CardTitle>{widget.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-gray-500 mb-2">{widget.description}</p>
-                  <div className="flex justify-between items-center">
-                    <Badge variant="secondary">{widget.category}</Badge>
-                    <Button 
-                      size="sm" 
-                      variant={widget.isCustomizable ? 'default' : 'ghost'}
-                      disabled={!widget.isCustomizable}
-                    >
-                      {widget.isCustomizable ? 'Tambah' : 'Tidak Tersedia'}
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </DialogContent>
-      </Dialog>
-    </div>
+                <Move className="h-4 w-4 text-gray-500 mx-auto mt-2" />
+              </div>
+              {renderWidget(widget)}
+            </div>
+          ))}
+        </ResponsiveGridLayout>
+
+        {/* Add Widget Dialog */}
+        <Dialog 
+          open={isAddWidgetDialogOpen} 
+          onOpenChange={setIsAddWidgetDialogOpen}
+        >
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Pilih Widget</DialogTitle>
+            </DialogHeader>
+            <div className="grid grid-cols-2 gap-4">
+              {availableWidgets.map(widget => (
+                <Card 
+                  key={widget.id} 
+                  className="hover:border-primary cursor-pointer transition-all"
+                  onClick={() => handleAddWidget(widget)}
+                >
+                  <CardHeader>
+                    <CardTitle>{widget.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-gray-500 mb-2">{widget.description}</p>
+                    <div className="flex justify-between items-center">
+                      <Badge variant="secondary">{widget.category}</Badge>
+                      <Button 
+                        size="sm" 
+                        variant={widget.isCustomizable ? 'default' : 'ghost'}
+                        disabled={!widget.isCustomizable}
+                      >
+                        {widget.isCustomizable ? 'Tambah' : 'Tidak Tersedia'}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+    </>
   );
 };
 
