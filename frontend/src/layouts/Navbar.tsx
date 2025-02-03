@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/hooks';
 import { UserIcon, LogOutIcon, HomeIcon, SettingsIcon } from 'lucide-react';
 import { ThemeToggle } from '@/components/common/theme/ThemeToggle';
 import { Home, Menu, LogIn, BookOpen } from "lucide-react";

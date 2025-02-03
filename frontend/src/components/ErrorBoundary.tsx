@@ -1,24 +1,30 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { mockApi } from '@/lib/mock';
 
-interface Props {
+interface ErrorBoundaryProps {
   children: ReactNode;
   fallback?: ReactNode;
+  onError?: (error: Error, errorInfo: ErrorInfo) => void;
 }
 
-interface State {
+interface ErrorBoundaryState {
   hasError: boolean;
-  error?: Error;
+  error: Error | null;
+  errorInfo: ErrorInfo | null;
 }
 
-export class ErrorBoundary extends Component<Props, State> {
-  constructor(props: Props) {
+export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { 
-      hasError: false 
+      hasError: false, 
+      error: null, 
+      errorInfo: null 
     };
   }
 
-  static getDerivedStateFromError(error: Error): State {
+  static getDerivedStateFromError(error: Error) {
+    // Update state so the next render will show the fallback UI.
     return { 
       hasError: true,
       error 
@@ -26,29 +32,41 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error("Uncaught error:", error, errorInfo);
+    // Log the error using mock API error logger
+    const mockError = mockApi.errors.createMockApiError(
+      mockApi.errors.MockApiErrorType.SERVER_ERROR,
+      error.message,
+      { 
+        componentStack: errorInfo.componentStack 
+      }
+    );
+
+    mockApi.errors.MockApiErrorLogger.log(mockError);
+
+    // Optional custom error handling
+    if (this.props.onError) {
+      this.props.onError(error, errorInfo);
+    }
+
+    // You could potentially send error to a logging service here
+    this.setState({ 
+      hasError: true, 
+      error, 
+      errorInfo 
+    });
   }
 
   render() {
     if (this.state.hasError) {
+      // Render fallback UI
       return this.props.fallback || (
-        <div className="min-h-screen flex items-center justify-center bg-red-50 p-4">
-          <div className="bg-white shadow-md rounded-lg p-8 max-w-md w-full">
-            <h1 className="text-2xl font-bold text-red-600 mb-4">Something went wrong</h1>
-            <p className="text-gray-700 mb-4">
-              An unexpected error occurred. Please try refreshing the page.
-            </p>
-            <details className="text-sm text-gray-500 border rounded p-2">
-              <summary>Error Details</summary>
-              <pre>{this.state.error?.toString()}</pre>
-            </details>
-            <button 
-              onClick={() => window.location.reload()}
-              className="mt-4 w-full bg-red-500 text-white py-2 rounded hover:bg-red-600 transition"
-            >
-              Reload Page
-            </button>
-          </div>
+        <div className="error-boundary">
+          <h2>Something went wrong</h2>
+          <details style={{ whiteSpace: 'pre-wrap' }}>
+            {this.state.error && this.state.error.toString()}
+            <br />
+            {this.state.errorInfo?.componentStack}
+          </details>
         </div>
       );
     }
@@ -56,3 +74,39 @@ export class ErrorBoundary extends Component<Props, State> {
     return this.props.children;
   }
 }
+
+// Higher-order component for error boundary
+export function withErrorBoundary<P extends object>(
+  WrappedComponent: React.ComponentType<P>, 
+  fallback?: ReactNode
+) {
+  return (props: P) => (
+    <ErrorBoundary fallback={fallback}>
+      <WrappedComponent {...props} />
+    </ErrorBoundary>
+  );
+}
+
+// Async error handler for hooks and async functions
+export const handleAsyncError = async (
+  asyncFn: () => Promise<any>, 
+  errorHandler?: (error: Error) => void
+) => {
+  try {
+    return await asyncFn();
+  } catch (error) {
+    if (error instanceof Error) {
+      const mockError = mockApi.errors.createMockApiError(
+        mockApi.errors.MockApiErrorType.SERVER_ERROR,
+        error.message
+      );
+
+      mockApi.errors.MockApiErrorLogger.log(mockError);
+
+      if (errorHandler) {
+        errorHandler(mockError);
+      }
+    }
+    throw error;
+  }
+};

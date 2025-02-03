@@ -3,8 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, User, ChevronDown } from 'lucide-react';
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { useAuth } from "@/hooks/useAuth";
-import { useToast } from "@/hooks/useToast";
+import { useAuth, useToast } from "@/hooks";
 import {
   Collapsible,
   CollapsibleContent,

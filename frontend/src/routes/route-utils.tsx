@@ -1,6 +1,6 @@
 import React, { Suspense } from 'react';
 import { Navigate } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/hooks';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 
 export const protectedRoute = (Component: React.ComponentType) => {

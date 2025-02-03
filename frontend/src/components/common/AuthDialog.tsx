@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Label } from "@/components/ui/Label";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth, useToast } from '@/hooks';
 import { cn } from "@/lib/utils";
 
 export interface AuthDialogProps {
