@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { Widget } from '../types/dashboard.types';
+import { FlexWidget } from '../types/dashboard.types';
 import { WidgetRegistry } from '../utils/widgetRegistry';
 
 export const useWidgetManager = () => {
-  const [widgets, setWidgets] = useState<Widget[]>(WidgetRegistry.getAllWidgets());
+  const [widgets, setWidgets] = useState<FlexWidget[]>(WidgetRegistry.getAllWidgets());
 
-  const addWidget = (widget: Widget) => {
+  const addWidget = (widget: FlexWidget) => {
     WidgetRegistry.registerWidget(widget);
     setWidgets(WidgetRegistry.getAllWidgets());
   };
@@ -15,14 +15,14 @@ export const useWidgetManager = () => {
     setWidgets(WidgetRegistry.getAllWidgets());
   };
 
-  const getWidgetsByType = (type: string) => {
-    return widgets.filter(widget => widget.type === type);
+  const getWidgetsByCategory = (category: string) => {
+    return widgets.filter(widget => widget.category.toString() === category);
   };
 
   return {
     widgets,
     addWidget,
     removeWidget,
-    getWidgetsByType
+    getWidgetsByCategory
   };
 };

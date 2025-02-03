@@ -9,7 +9,8 @@ import {
   Trash2,
   Move,
   X,
-  Maximize2 
+  Maximize2,
+  Plus 
 } from 'lucide-react';
 
 // Charting Library
@@ -53,6 +54,15 @@ import {
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue,
+  SelectGroup,
+  SelectLabel
+} from '@/components/ui/select';
 
 // Types
 import { 
@@ -319,6 +329,157 @@ const WIDGET_COMPONENTS = {
   [WidgetCategory.MINISTRY]: MinistryWidget
 };
 
+// Comprehensive widget size configuration
+const WIDGET_SIZE_CONFIG = {
+  [WidgetCategory.OVERVIEW]: {
+    hasChart: false,
+    size: { w: 3, h: 3 },
+    minSize: { w: 3, h: 3 }
+  },
+  [WidgetCategory.FINANCIAL]: {
+    hasChart: true,
+    size: { w: 4, h: 4 },
+    minSize: { w: 4, h: 4 }
+  },
+  [WidgetCategory.MEMBERSHIP]: {
+    hasChart: true,
+    size: { w: 4, h: 4 },
+    minSize: { w: 4, h: 4 }
+  },
+  [WidgetCategory.MINISTRY]: {
+    hasChart: true,
+    size: { w: 4, h: 4 },
+    minSize: { w: 4, h: 4 }
+  },
+  [WidgetCategory.EVENTS]: {
+    hasChart: true,
+    size: { w: 3, h: 4 },
+    minSize: { w: 3, h: 3 }
+  },
+  default: {
+    hasChart: false,
+    size: { w: 3, h: 3 },
+    minSize: { w: 3, h: 3 }
+  }
+};
+
+// Preset Dashboard Configurations
+const DASHBOARD_PRESETS = {
+  [UserRole.ADMIN]: {
+    name: 'Admin Dashboard',
+    widgets: [
+      { 
+        category: WidgetCategory.OVERVIEW, 
+        title: 'System Overview',
+        data: {} // Placeholder for system-wide metrics
+      },
+      { 
+        category: WidgetCategory.FINANCIAL, 
+        title: 'Financial Summary',
+        data: {} // Placeholder for financial data
+      },
+      { 
+        category: WidgetCategory.MEMBERSHIP, 
+        title: 'Membership Insights',
+        data: {} // Placeholder for membership data
+      },
+      { 
+        category: WidgetCategory.MINISTRY, 
+        title: 'Ministry Performance',
+        data: {} // Placeholder for ministry data
+      },
+      { 
+        category: WidgetCategory.EVENTS, 
+        title: 'Upcoming Events',
+        data: {} // Placeholder for events data
+      }
+    ]
+  },
+  [UserRole.TREASURER]: {
+    name: 'Financial Dashboard',
+    widgets: [
+      { 
+        category: WidgetCategory.FINANCIAL, 
+        title: 'Income Overview',
+        data: {} // Specific financial widgets
+      },
+      { 
+        category: WidgetCategory.FINANCIAL, 
+        title: 'Expense Tracking',
+        data: {} // Different financial widget
+      },
+      { 
+        category: WidgetCategory.OVERVIEW, 
+        title: 'Financial Health',
+        data: {} // Summary widget
+      }
+    ]
+  },
+  [UserRole.MINISTRY_LEADER]: {
+    name: 'Ministry Dashboard',
+    widgets: [
+      { 
+        category: WidgetCategory.MINISTRY, 
+        title: 'Ministry Attendance',
+        data: {} // Ministry-specific widget
+      },
+      { 
+        category: WidgetCategory.EVENTS, 
+        title: 'Ministry Events',
+        data: {} // Events related to ministry
+      },
+      { 
+        category: WidgetCategory.OVERVIEW, 
+        title: 'Ministry Summary',
+        data: {} // Overview of ministry metrics
+      }
+    ]
+  },
+  default: {
+    name: 'Default Dashboard',
+    widgets: [
+      { 
+        category: WidgetCategory.OVERVIEW, 
+        title: 'Welcome Dashboard',
+        data: {} // Basic overview for all users
+      }
+    ]
+  }
+};
+
+// Dynamic widget size calculation
+const calculateWidgetSize = (widget: BaseWidget) => {
+  // Determine widget configuration
+  const widgetConfig = WIDGET_SIZE_CONFIG[widget.category] || WIDGET_SIZE_CONFIG.default;
+  
+  // Check if the widget has a chart component
+  const WidgetComponent = WIDGET_COMPONENTS[widget.category];
+  const hasChartComponent = WidgetComponent && widgetConfig.hasChart;
+  
+  // Return appropriate size based on chart presence
+  return hasChartComponent 
+    ? widgetConfig.size 
+    : widgetConfig.minSize;
+};
+
+// Function to generate a unique ID for widgets
+const generateWidgetId = () => `widget_${Math.random().toString(36).substr(2, 9)}`;
+
+// Function to load dashboard preset based on user role
+const loadDashboardPreset = (userRole: UserRole) => {
+  // Select preset based on user role, fallback to default
+  const preset = DASHBOARD_PRESETS[userRole] || DASHBOARD_PRESETS.default;
+  
+  // Transform preset widgets into full widget objects
+  return preset.widgets.map(presetWidget => ({
+    id: generateWidgetId(),
+    category: presetWidget.category,
+    title: presetWidget.title,
+    data: presetWidget.data,
+    lastUpdated: new Date().toISOString()
+  }));
+};
+
 const FlexDashboardPage: React.FC = () => {
   const { user, isLoading } = useAuth();
   const { toast } = useToast();
@@ -332,48 +493,83 @@ const FlexDashboardPage: React.FC = () => {
   const [isAddWidgetDialogOpen, setIsAddWidgetDialogOpen] = useState(false);
   const [availableWidgets, setAvailableWidgets] = useState<WidgetTemplate[]>([]);
   const [gridLayout, setGridLayout] = useState<any[]>([]);
+  const [widgetSizes, setWidgetSizes] = useState<{[key: string]: { w: number, h: number }}>({});
 
-  // Convert widgets to grid layout format with dynamic sizing
+  // Initialize dashboard with preset when user changes
   useEffect(() => {
-    const layout = widgets.map((widget, index) => {
-      let height = 4; // Default height
-      let width = 4;  // Default width
+    if (user && user.role) {
+      // Load preset widgets for the user's role
+      const presetWidgets = loadDashboardPreset(user.role);
+      
+      // Update widgets in the store
+      setWidgetsForRole(user.role, presetWidgets);
+    }
+  }, [user]);
 
-      // Dynamically adjust height based on widget category
-      switch (widget.category) {
-        case WidgetCategory.FINANCIAL:
-        case WidgetCategory.MEMBERSHIP:
-          height = 5; // Slightly taller for charts
-          width = 5;
-          break;
-        case WidgetCategory.EVENTS:
-          height = 6; // Taller for events with list and chart
-          width = 5;
-          break;
-        case WidgetCategory.MINISTRY:
-          height = 4;
-          width = 4;
-          break;
-        case WidgetCategory.OVERVIEW:
-        default:
-          height = 3;
-          width = 4;
-      }
-
-      return {
-        i: widget.id,
-        x: (index % 3) * 4,
-        y: Math.floor(index / 3) * height,
-        w: width,
-        h: height,
-        minW: 3,   // Minimum width
-        minH: 3,   // Minimum height
-        maxW: 6,   // Maximum width
-        maxH: 7    // Maximum height
-      };
+  // Add a method to load a specific dashboard preset
+  const loadPresetDashboard = (presetRole: UserRole) => {
+    const presetWidgets = loadDashboardPreset(presetRole);
+    
+    // Clear existing widgets and add preset widgets
+    setWidgetsForRole(presetRole, presetWidgets);
+    
+    // Optional: Show a toast notification
+    toast({
+      title: `Loaded ${DASHBOARD_PRESETS[presetRole]?.name || 'Dashboard Preset'}`,
+      description: 'Dashboard has been updated with role-specific widgets.'
     });
-    setGridLayout(layout);
-  }, [widgets]);
+  };
+
+  // Render preset dropdown and widget addition UI
+  const renderDashboardControls = () => {
+    // Determine available presets based on user role
+    const availablePresets = Object.entries(DASHBOARD_PRESETS)
+      .filter(([role]) => role !== 'default')
+      .map(([role, preset]) => ({
+        value: role,
+        label: preset.name
+      }));
+
+    return (
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold">Dashboard Fleksibel</h1>
+        <div className="flex items-center space-x-2">
+          {/* Preset Dashboard Dropdown */}
+          <Select 
+            onValueChange={(selectedRole) => {
+              loadPresetDashboard(selectedRole as UserRole);
+            }}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Pilih Preset Dashboard" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Preset Dashboard</SelectLabel>
+                {availablePresets.map((preset) => (
+                  <SelectItem 
+                    key={preset.value} 
+                    value={preset.value}
+                  >
+                    {preset.label}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+
+          {/* Add Widget Button */}
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => setIsAddWidgetDialogOpen(true)}
+          >
+            <Plus className="mr-2 h-4 w-4" /> Widget
+          </Button>
+        </div>
+      </div>
+    );
+  };
 
   useEffect(() => {
     if (user) {
@@ -482,6 +678,81 @@ const FlexDashboardPage: React.FC = () => {
     );
   };
 
+  useEffect(() => {
+    const layout = widgets.map((widget, index) => {
+      // Check if widget has a manually set size
+      const manualSize = widgetSizes[widget.id];
+      
+      // If manually sized, use those dimensions
+      if (manualSize) {
+        return {
+          i: widget.id,
+          x: (index % 3) * 4,
+          y: Math.floor(index / 3) * 4,
+          w: manualSize.w,
+          h: manualSize.h,
+          minW: 3,
+          minH: 3
+        };
+      }
+      
+      // Otherwise, use dynamic calculation
+      const { w, h } = calculateWidgetSize(widget);
+      
+      return {
+        i: widget.id,
+        x: (index % 3) * 4,
+        y: Math.floor(index / 3) * 4,
+        w,
+        h,
+        minW: 3,
+        minH: 3
+      };
+    });
+
+    setGridLayout(layout);
+  }, [widgets, widgetSizes]);
+
+  useEffect(() => {
+    if (user) {
+      // Provide a default set of widgets for all users
+      const defaultWidgets = [
+        {
+          id: 'user-overview',
+          title: `Selamat Datang, ${user.name}`,
+          description: 'Ringkasan informasi untuk semua pengguna',
+          category: WidgetCategory.OVERVIEW,
+          content: `Anda login sebagai ${user.role}`,
+          roles: Object.values(UserRole),
+          size: WidgetSize.LARGE,
+          icon: 'home',
+          isCustomizable: true
+        },
+        {
+          id: 'profile-summary',
+          title: 'Profil Pengguna',
+          description: 'Informasi dasar akun Anda',
+          category: WidgetCategory.OVERVIEW,
+          content: `Email: ${user.email}`,
+          roles: Object.values(UserRole),
+          size: WidgetSize.MEDIUM,
+          icon: 'user',
+          isCustomizable: true
+        }
+      ];
+
+      // Set widgets based on user's role, with fallback to default
+      const roleWidgets = WidgetManager.getWidgetsForRole(user.role as UserRole);
+      setWidgetsForRole(user.role as UserRole);
+      
+      // Combine role-specific and default widgets
+      setAvailableWidgets([
+        ...defaultWidgets,
+        ...roleWidgets
+      ]);
+    }
+  }, [user]);
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-full">
@@ -521,27 +792,50 @@ const FlexDashboardPage: React.FC = () => {
     <>
       <style>{resizeHandleStyles}</style>
       <div className="p-4 space-y-4">
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold">Dashboard Fleksibel</h1>
-          <Button 
-            variant="outline" 
-            onClick={() => setIsAddWidgetDialogOpen(true)}
-            className="flex items-center"
-          >
-            <PlusCircle className="mr-2 h-4 w-4" /> Tambah Widget
-          </Button>
-        </div>
-
-        {/* Responsive Grid Layout */}
+        {renderDashboardControls()}
         <ResponsiveGridLayout
           className="layout"
           layouts={{ lg: gridLayout }}
           breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480 }}
           cols={{ lg: 12, md: 10, sm: 6, xs: 4 }}
-          rowHeight={60}
+          rowHeight={70}
           onLayoutChange={(layout) => {
-            // Optionally save layout changes
-            setGridLayout(layout);
+            // Dynamically adjust widget sizes
+            const constrainedLayout = layout.map(item => {
+              const widget = widgets.find(w => w.id === item.i);
+              const manualSize = widgetSizes[item.i];
+              
+              // If manually sized, maintain those dimensions
+              if (manualSize) {
+                return {
+                  ...item,
+                  w: manualSize.w,
+                  h: manualSize.h,
+                  minW: 3,
+                  minH: 3
+                };
+              }
+              
+              // Otherwise, use dynamic calculation
+              const { w, h } = calculateWidgetSize(widget);
+              
+              return {
+                ...item,
+                w,
+                h,
+                minW: 3,
+                minH: 3
+              };
+            });
+            
+            setGridLayout(constrainedLayout);
+          }}
+          onResizeStop={(layout, oldItem, newItem) => {
+            // Preserve manually resized dimensions
+            setWidgetSizes((prevSizes) => ({
+              ...prevSizes,
+              [newItem.i]: { w: newItem.w, h: newItem.h }
+            }));
           }}
           compactType="vertical"
           preventCollision={false}
@@ -555,13 +849,8 @@ const FlexDashboardPage: React.FC = () => {
             <div 
               key={widget.id} 
               className="group"
+              data-widget-category={widget.category}
             >
-              {/* Drag Handle */}
-              <div 
-                className="drag-handle absolute top-0 left-0 w-full h-8 cursor-move opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"
-              >
-                <Move className="h-4 w-4 text-gray-500 mx-auto mt-2" />
-              </div>
               {renderWidget(widget)}
             </div>
           ))}
