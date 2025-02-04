@@ -1,4 +1,4 @@
-import React, { useState, Suspense, useTransition, useCallback } from 'react';
+import React, { useState, Suspense, useTransition, useCallback, useEffect } from 'react';
 import { 
   Outlet, 
   NavLink, 
@@ -161,6 +161,60 @@ const ProfileDropdown: React.FC = () => {
   );
 };
 
+// Custom hook for responsive sidebar
+const useResponsiveSidebar = () => {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    const checkMobileView = () => {
+      const mobileBreakpoint = 768; // Tailwind's md breakpoint
+      const currentIsMobile = window.innerWidth < mobileBreakpoint;
+      
+      setIsMobile(currentIsMobile);
+      
+      // Automatically collapse sidebar in mobile view
+      if (currentIsMobile) {
+        setIsCollapsed(true);
+        setIsMobileSidebarOpen(false);
+      }
+    };
+
+    // Check initial mobile state
+    checkMobileView();
+
+    // Add event listener for window resize
+    window.addEventListener('resize', checkMobileView);
+
+    // Cleanup event listener
+    return () => {
+      window.removeEventListener('resize', checkMobileView);
+    };
+  }, []);
+
+  const toggleCollapse = useCallback(() => {
+    // Only allow manual toggle if not in mobile view
+    if (!isMobile) {
+      setIsCollapsed(prev => !prev);
+    }
+  }, [isMobile]);
+
+  const toggleMobileSidebar = useCallback(() => {
+    if (isMobile) {
+      setIsMobileSidebarOpen(prev => !prev);
+    }
+  }, [isMobile]);
+
+  return { 
+    isCollapsed, 
+    isMobile, 
+    isMobileSidebarOpen,
+    toggleCollapse,
+    toggleMobileSidebar
+  };
+};
+
 // Sidebar configuration
 const sidebarItems = [
   // Dashboard & User Features
@@ -256,22 +310,17 @@ const sidebarItems = [
 ];
 
 export const PanelLayout: React.FC = () => {
+  // Use the responsive sidebar hook
+  const { 
+    isCollapsed, 
+    isMobile, 
+    isMobileSidebarOpen,
+    toggleCollapse,
+    toggleMobileSidebar 
+  } = useResponsiveSidebar();
+
   // Use useCallback to memoize functions
   const location = useLocation();
-  const [isCollapsed, setIsCollapsed] = useState(false);
-
-  // Memoized menu toggle function
-  const toggleMenu = useCallback((path: string) => {
-    setOpenMenus(prev => ({
-      ...prev,
-      [path]: !prev[path]
-    }));
-  }, []);
-
-  // Memoized sidebar toggle function
-  const toggleSidebar = useCallback(() => {
-    setIsCollapsed(prev => !prev);
-  }, []);
 
   // Safely initialize openMenus with a function that returns an object
   const [openMenus, setOpenMenus] = useState<{[key: string]: boolean}>(() => {
@@ -294,111 +343,108 @@ export const PanelLayout: React.FC = () => {
     return initialState;
   });
 
+  // Memoized menu toggle function
+  const toggleMenu = useCallback((path: string) => {
+    setOpenMenus(prev => ({
+      ...prev,
+      [path]: !prev[path]
+    }));
+  }, []);
+
   // Memoized sidebar item rendering
-  const renderSidebarItem = useCallback((item: any, depth = 0) => {
-    const isActive = location.pathname === item.path || 
-      (item.children && item.children.some((child: any) => location.pathname === child.path));
-    const hasChildren = item.children && item.children.length > 0;
+  const renderSidebarItem = useCallback((item: {
+    label: string;
+    icon: React.ComponentType<{ className?: string }>;
+    path: string;
+    children?: { label: string; path: string }[];
+  }) => {
+    const Icon = item.icon;
+    const isActive = location.pathname.startsWith(item.path);
 
+    // Render with tooltip when collapsed or in mobile view
+    if (isCollapsed || isMobile) {
+      return (
+        <Tooltip key={item.path}>
+          <TooltipTrigger asChild>
+            <NavLink
+              to={item.path}
+              className={cn(
+                "flex items-center justify-center p-2 rounded-md transition-colors duration-200",
+                isActive 
+                  ? "bg-primary/10 text-primary" 
+                  : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+              )}
+            >
+              <Icon className="h-5 w-5" />
+            </NavLink>
+          </TooltipTrigger>
+          <TooltipContent side="right">
+            {item.label}
+          </TooltipContent>
+        </Tooltip>
+      );
+    }
+
+    // Regular rendering when expanded
     return (
-      <div key={item.path} className="w-full">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div 
-                className={cn(
-                  'group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors duration-200 cursor-pointer',
-                  isActive
-                    ? 'bg-primary text-primary-foreground' 
-                    : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
-                  isCollapsed ? 'justify-center' : 'justify-start'
-                )}
-                onClick={() => hasChildren && toggleMenu(item.path)}
-              >
-                <NavLink 
-                  to={item.path} 
-                  className="flex items-center w-full"
-                  end
-                >
-                  {item.icon && (
-                    <item.icon 
-                      className={cn(
-                        'h-5 w-5',
-                        isCollapsed ? 'mr-0' : 'mr-3'
-                      )}
-                    />
-                  )}
-                  {!isCollapsed && (
-                    <span className="truncate flex-grow">{item.label}</span>
-                  )}
-                  {hasChildren && !isCollapsed && (
-                    <ChevronRightIcon
-                      className={cn(
-                        'ml-auto h-4 w-4 transition-transform duration-200',
-                        openMenus[item.path] ? 'rotate-90' : ''
-                      )}
-                    />
-                  )}
-                </NavLink>
-              </div>
-            </TooltipTrigger>
-            {isCollapsed && (
-              <TooltipContent side="right">
-                {item.label}
-              </TooltipContent>
-            )}
-          </Tooltip>
-        </TooltipProvider>
-
-        {hasChildren && openMenus[item.path] && !isCollapsed && (
-          <div className="ml-4 mt-1 space-y-1">
-            {item.children.map((child: any) => renderSidebarItem(child, depth + 1))}
-          </div>
+      <NavLink
+        key={item.path}
+        to={item.path}
+        className={cn(
+          "flex items-center gap-3 p-2 rounded-md transition-colors duration-200",
+          isActive 
+            ? "bg-primary/10 text-primary" 
+            : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
         )}
-      </div>
+      >
+        <Icon className="h-5 w-5" />
+        <span className="text-sm">{item.label}</span>
+      </NavLink>
     );
-  }, [isCollapsed, openMenus, location.pathname, toggleMenu]);
+  }, [location.pathname, isCollapsed, isMobile]);
 
   return (
-    <div className={cn(
-      "flex h-screen w-full overflow-hidden",
-      "bg-background text-foreground"
-    )}>
-      <TooltipProvider>
+    <TooltipProvider>
+      <div className={cn(
+        "flex h-screen w-full overflow-hidden",
+        "bg-background text-foreground"
+      )}>
         <div 
           className={cn(
-            'bg-background border-r transition-all duration-300 ease-in-out',
+            'bg-background border-r transition-all duration-300 ease-in-out fixed md:static z-50 h-full',
             isCollapsed ? 'w-16' : 'w-64',
-            'flex flex-col h-full relative overflow-hidden'
+            isMobile && isCollapsed ? 'hidden' : 'block'
           )}
         >
           {/* Sidebar Header */}
-          <div className="p-2 flex items-center justify-between">
+          <div className="flex items-center justify-between p-4 border-b">
             {!isCollapsed && (
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="font-bold text-lg"
+              <Link 
+                to="/panel/flexdash" 
+                className="flex items-center gap-2 text-lg font-semibold"
               >
-                GKJ Panel
-              </motion.div>
+                <LayoutIcon className="h-6 w-6" />
+                <span>GKJ Panel</span>
+              </Link>
             )}
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    onClick={toggleSidebar}
-                  >
-                    {isCollapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="right">
-                  {isCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'}
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            {!isMobile && (
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={toggleCollapse}
+              >
+                {isCollapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+              </Button>
+            )}
+            {isMobile && (
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={toggleMobileSidebar}
+              >
+                {isMobileSidebarOpen ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+              </Button>
+            )}
           </div>
 
           {/* Sidebar Navigation */}
@@ -406,35 +452,74 @@ export const PanelLayout: React.FC = () => {
             {sidebarItems.map(renderSidebarItem)}
           </div>
         </div>
-      </TooltipProvider>
 
-      <div className={cn(
-        "flex flex-col w-full transition-all duration-300 ease-in-out",
-        isCollapsed ? "ml-5" : "ml-47"
-      )}>
-        <header className="sticky top-0 z-40 w-full border-b bg-background">
-          <div className="flex h-16 items-center justify-between px-4">
-            <Breadcrumbs />
-            <div className="flex items-center space-x-4">
-              <ThemeToggle />
-              <NotificationDropdown />
-              <ProfileDropdown />
+        <div className={cn(
+          "flex flex-col w-full transition-all duration-300 ease-in-out",
+          isMobile 
+            ? "ml-0" 
+            : isCollapsed 
+              ? "ml-16" 
+              : "ml-64"
+        )}>
+          <header className="sticky top-0 z-40 w-full border-b bg-background">
+            <div className="flex h-16 items-center justify-between px-4">
+              {isMobile && (
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={toggleMobileSidebar}
+                  className="mr-2"
+                >
+                  <LayoutIcon className="h-5 w-5" />
+                </Button>
+              )}
+              <Breadcrumbs />
+              <div className="flex items-center space-x-4">
+                <ThemeToggle />
+                <NotificationDropdown />
+                <ProfileDropdown />
+              </div>
+            </div>
+          </header>
+
+          <main className="flex-1 overflow-y-auto p-4">
+            <Suspense fallback={
+              <div className="flex items-center justify-center h-full">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              </div>
+            }>
+              <Outlet />
+            </Suspense>
+            <PanelFooter className="mt-4 border-t pt-2" />
+          </main>
+        </div>
+        {isMobile && isMobileSidebarOpen && (
+          <div 
+            className="fixed top-0 left-0 z-50 h-screen w-full bg-background p-4"
+          >
+            <div className="flex items-center justify-between">
+              <Link 
+                to="/panel/flexdash" 
+                className="flex items-center gap-2 text-lg font-semibold"
+              >
+                <LayoutIcon className="h-6 w-6" />
+                <span>GKJ Panel</span>
+              </Link>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={toggleMobileSidebar}
+              >
+                <ChevronLeftIcon />
+              </Button>
+            </div>
+            <div className="flex-1 overflow-y-auto py-4 space-y-1">
+              {sidebarItems.map(renderSidebarItem)}
             </div>
           </div>
-        </header>
-
-        <main className="flex-1 overflow-y-auto p-4">
-          <Suspense fallback={
-            <div className="flex items-center justify-center h-full">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            </div>
-          }>
-            <Outlet />
-          </Suspense>
-          <PanelFooter className="mt-4 border-t pt-2" />
-        </main>
+        )}
+        <Toaster />
       </div>
-      <Toaster />
-    </div>
+    </TooltipProvider>
   );
 };
