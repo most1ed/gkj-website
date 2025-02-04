@@ -8,7 +8,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { HomePage } from "@/features/public/home/HomePage";
 import Offerings from "@/features/public/offerings/OfferingsPage";
 import Media from "@/features/public/media/MediaPage";
-import Services from "@/features/public/services/ServicesPage";
+import ServicesPage from "@/features/public/services/ServicesPage";
 import AboutPage from "@/features/public/about/AboutPage";
 import Bible from "@/features/public/bible/BiblePage";
 import Ministries from "@/features/public/ministries/MinistriesPage";
@@ -27,7 +27,6 @@ import AnnouncementsPage from "@/features/public/announcements/AnnouncementsPage
 // Import the new ArchiveWartaPage
 import ArchiveWartaPage from "@/features/public/archive-warta/ArchiveWartaPage";
 import WartaDetailPage from "@/features/public/archive-warta/WartaDetailPage";
-import ServicesPage from "@/features/public/services/ServicesPage";
 
 export const publicRoutes: RouteObject[] = [
   {
@@ -50,7 +49,7 @@ export const publicRoutes: RouteObject[] = [
       },
       { 
         path: "services", 
-        element: <Services /> 
+        element: <ServicesPage /> 
       },
       { 
         path: "ministries", 
