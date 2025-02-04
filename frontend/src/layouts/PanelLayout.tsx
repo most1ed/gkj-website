@@ -1,4 +1,4 @@
-import React, { useState, Suspense, useTransition } from 'react';
+import React, { useState, Suspense, useTransition, useCallback } from 'react';
 import { 
   Outlet, 
   NavLink, 
@@ -256,62 +256,91 @@ const sidebarItems = [
 ];
 
 export const PanelLayout: React.FC = () => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const [openMenus, setOpenMenus] = useState<{[key: string]: boolean}>({});
+  // Use useCallback to memoize functions
   const location = useLocation();
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
-  const toggleMenu = (path: string) => {
+  // Memoized menu toggle function
+  const toggleMenu = useCallback((path: string) => {
     setOpenMenus(prev => ({
       ...prev,
       [path]: !prev[path]
     }));
-  };
+  }, []);
 
-  const toggleSidebar = () => {
+  // Memoized sidebar toggle function
+  const toggleSidebar = useCallback(() => {
     setIsCollapsed(prev => !prev);
-  };
+  }, []);
 
-  const renderSidebarItem = (item: any, depth = 0) => {
+  // Safely initialize openMenus with a function that returns an object
+  const [openMenus, setOpenMenus] = useState<{[key: string]: boolean}>(() => {
+    const currentPath = location.pathname;
+    const initialState: {[key: string]: boolean} = {};
+
+    // Define menu groups with their base paths
+    const menuGroups = [
+      '/panel/management',
+      '/panel/admin'
+    ];
+
+    // Open menu groups based on current path
+    menuGroups.forEach(group => {
+      if (currentPath.startsWith(group)) {
+        initialState[group] = true;
+      }
+    });
+
+    return initialState;
+  });
+
+  // Memoized sidebar item rendering
+  const renderSidebarItem = useCallback((item: any, depth = 0) => {
     const isActive = location.pathname === item.path || 
       (item.children && item.children.some((child: any) => location.pathname === child.path));
     const hasChildren = item.children && item.children.length > 0;
 
     return (
-      <div key={item.path}>
+      <div key={item.path} className="w-full">
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <NavLink
-                to={item.path}
-                className={({ isActive }) => cn(
-                  'group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors duration-200',
+              <div 
+                className={cn(
+                  'group flex items-center px-2 py-2 text-sm font-medium rounded-md transition-colors duration-200 cursor-pointer',
                   isActive
                     ? 'bg-primary text-primary-foreground' 
                     : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
                   isCollapsed ? 'justify-center' : 'justify-start'
                 )}
-                end
+                onClick={() => hasChildren && toggleMenu(item.path)}
               >
-                {item.icon && (
-                  <item.icon 
-                    className={cn(
-                      'h-5 w-5',
-                      isCollapsed ? 'mr-0' : 'mr-3'
-                    )}
-                  />
-                )}
-                {!isCollapsed && (
-                  <span className="truncate">{item.label}</span>
-                )}
-                {hasChildren && !isCollapsed && (
-                  <ChevronRightIcon
-                    className={cn(
-                      'ml-auto h-4 w-4 transition-transform duration-200',
-                      openMenus[item.path] ? 'rotate-90' : ''
-                    )}
-                  />
-                )}
-              </NavLink>
+                <NavLink 
+                  to={item.path} 
+                  className="flex items-center w-full"
+                  end
+                >
+                  {item.icon && (
+                    <item.icon 
+                      className={cn(
+                        'h-5 w-5',
+                        isCollapsed ? 'mr-0' : 'mr-3'
+                      )}
+                    />
+                  )}
+                  {!isCollapsed && (
+                    <span className="truncate flex-grow">{item.label}</span>
+                  )}
+                  {hasChildren && !isCollapsed && (
+                    <ChevronRightIcon
+                      className={cn(
+                        'ml-auto h-4 w-4 transition-transform duration-200',
+                        openMenus[item.path] ? 'rotate-90' : ''
+                      )}
+                    />
+                  )}
+                </NavLink>
+              </div>
             </TooltipTrigger>
             {isCollapsed && (
               <TooltipContent side="right">
@@ -328,7 +357,7 @@ export const PanelLayout: React.FC = () => {
         )}
       </div>
     );
-  };
+  }, [isCollapsed, openMenus, location.pathname, toggleMenu]);
 
   return (
     <div className={cn(
@@ -381,7 +410,7 @@ export const PanelLayout: React.FC = () => {
 
       <div className={cn(
         "flex flex-col w-full transition-all duration-300 ease-in-out",
-        isCollapsed ? "ml-16" : "ml-64"
+        isCollapsed ? "ml-5" : "ml-47"
       )}>
         <header className="sticky top-0 z-40 w-full border-b bg-background">
           <div className="flex h-16 items-center justify-between px-4">

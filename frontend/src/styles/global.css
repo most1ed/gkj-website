@@ -1,0 +1,1052 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  --background: 0 0% 100%;
+  --foreground: 222 47% 11%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 47% 11%;
+  --primary: 229 84% 54%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 210 40% 96.1%;
+  --secondary-foreground: 222 47% 11.2%;
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 229 84% 54%;
+  --accent-foreground: 222 47% 11.2%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 229 84% 54%;
+  --radius: 0.75rem;
+}
+
+.dark {
+  --background: 222 47% 11%;
+  --foreground: 210 40% 98%;
+  --card: 222 47% 11%;
+  --card-foreground: 210 40% 98%;
+  --popover: 222 47% 11%;
+  --popover-foreground: 210 40% 98%;
+  --primary: 229 84% 54%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 217.2 32.6% 17.5%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+  --accent: 229 84% 54%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 217.2 32.6% 17.5%;
+  --input: 217.2 32.6% 17.5%;
+  --ring: 224.3 76.3% 48%;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+  @apply bg-background text-foreground;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Non-redundant Tailwind base layer styles from globals.css */
+  h2 {
+    @apply scroll-m-20 text-3xl font-semibold tracking-tight first:mt-0;
+  }
+  h3 {
+    @apply scroll-m-20 text-2xl font-semibold tracking-tight;
+  }
+  h4 {
+    @apply scroll-m-20 text-xl font-semibold tracking-tight;
+  }
+
+  h1 {
+    @apply scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl;
+  }
+
+  p {
+    @apply leading-7 [&:not(:first-child)]:mt-6;
+  }
+
+  blockquote {
+    @apply mt-6 border-l-2 border-primary pl-6 italic;
+  }
+
+  ul {
+    @apply my-6 ml-6 list-disc [&>li]:mt-2;
+  }
+
+  code {
+    @apply relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold;
+  }
+
+  small {
+    @apply text-sm font-medium leading-none;
+  }
+
+  table {
+    @apply w-full;
+  }
+
+  tr {
+    @apply m-0 border-t p-0 even:bg-muted;
+  }
+
+  th {
+    @apply border px-4 py-2 text-left font-bold [&[align=center]]:text-center [&[align=right]]:text-right;
+  }
+
+  td {
+    @apply border px-4 py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right;
+  }
+
+  img {
+    @apply rounded-lg border;
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    @apply w-2;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-muted;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-primary/50 rounded-full hover:bg-primary/70;
+  }
+
+  /* Global Background and Text Colors */
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  /* Dark Mode Background Gradients */
+  .dark-gradient {
+    @apply bg-gradient-to-br from-gray-900 via-gray-800 to-black;
+  }
+
+  /* Universal Card Styles with Dark Mode Support */
+  .card {
+    @apply bg-white dark:bg-gray-900 rounded-xl shadow-lg p-6 
+           transition-all duration-300 
+           border border-gray-100 dark:border-gray-800;
+  }
+
+  .card-hover {
+    @apply hover:shadow-xl hover:-translate-y-1 
+           dark:hover:border-gray-700 
+           dark:hover:bg-gray-800;
+  }
+
+  /* Typography Enhancements */
+  .heading-primary {
+    @apply text-4xl font-bold text-gray-900 dark:text-gray-100 
+           tracking-tight mb-4;
+  }
+
+  .heading-secondary {
+    @apply text-3xl font-semibold text-gray-800 dark:text-gray-200 
+           tracking-tight mb-4;
+  }
+
+  .text-body {
+    @apply text-gray-600 dark:text-gray-300 
+           leading-relaxed;
+  }
+
+  /* Button Variations with Dark Mode */
+  .btn-outline {
+    @apply border border-primary text-primary 
+           hover:bg-primary hover:text-primary-foreground 
+           dark:border-primary-foreground dark:text-primary-foreground 
+           dark:hover:bg-primary-foreground dark:hover:text-primary 
+           transition-colors;
+  }
+
+  /* Background Utilities */
+  .bg-page {
+    @apply min-h-screen bg-gray-50 dark:bg-gray-950 
+           transition-colors duration-300;
+  }
+
+  .bg-section {
+    @apply bg-white dark:bg-gray-900 
+           shadow-sm dark:shadow-none 
+           border border-gray-100 dark:border-gray-800;
+  }
+
+  /* Text Color Utilities */
+  .text-primary-dark {
+    @apply text-primary dark:text-primary-foreground;
+  }
+
+  .text-muted-dark {
+    @apply text-muted-foreground dark:text-gray-400;
+  }
+
+  /* Gradient Text */
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary to-accent 
+           text-transparent bg-clip-text;
+  }
+
+  /* Responsive Typography */
+  @screen sm {
+    .heading-primary {
+      @apply text-3xl;
+    }
+    .heading-secondary {
+      @apply text-2xl;
+    }
+  }
+
+  @screen lg {
+    .heading-primary {
+      @apply text-4xl;
+    }
+    .heading-secondary {
+      @apply text-3xl;
+    }
+  }
+}
+
+/* Utility Classes for Consistent Styling */
+.full-page-container {
+  @apply container-custom max-w-6xl px-4 sm:px-6 lg:px-8 
+         mx-auto py-12 space-y-12 
+         min-h-screen flex flex-col items-center justify-center;
+}
+
+/* Panel Layout Utility Classes */
+.panel-page-container {
+  @apply w-full h-full min-h-screen overflow-y-auto;
+}
+
+.panel-content-wrapper {
+  @apply w-full h-full flex-grow p-4 sm:p-6 lg:p-8;
+}
+
+.panel-full-height {
+  @apply min-h-screen flex flex-col;
+}
+
+/* Ensure that the main panel content takes full height */
+#panel-main-content {
+  @apply flex-grow w-full;
+}
+
+/* Comprehensive Panel Layout Utility Classes */
+html, body {
+  @apply h-full min-h-screen w-full;
+}
+
+#root {
+  @apply h-full min-h-screen w-full;
+}
+
+.panel-layout {
+  @apply w-full min-h-screen flex flex-col;
+}
+
+.panel-content {
+  @apply flex-grow w-full h-full min-h-screen 
+         px-4 sm:px-6 lg:px-8 
+         py-6 
+         overflow-y-auto;
+}
+
+.panel-page {
+  @apply w-full h-full min-h-screen flex flex-col;
+}
+
+.panel-page-content {
+  @apply flex-grow w-full;
+}
+
+/* Ensure consistent scrolling and sizing */
+.panel-scrollable {
+  @apply w-full h-full overflow-y-auto;
+}
+
+/* Prevent layout shifts */
+.panel-fixed {
+  @apply w-full h-full fixed top-0 left-0 overflow-hidden;
+}
+
+/* Enhanced Animations */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out;
+}
+
+/* Global Transition */
+* {
+  @apply transition-colors duration-200 ease-in-out;
+}
+
+/* Animations */
+@keyframes fade-in {
+  from { 
+    opacity: 0; 
+  }
+  to { 
+    opacity: 1; 
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out;
+}
+
+.animate-fade-up {
+  animation: fade-up 0.5s ease-out;
+}
+
+/* Typography */
+.prose {
+  @apply max-w-none;
+}
+
+.prose a {
+  @apply text-primary hover:text-primary/80 transition-colors no-underline;
+}
+
+.prose strong {
+  @apply font-bold text-foreground;
+}
+
+.prose blockquote {
+  @apply border-l-4 border-primary/50 pl-4 italic text-muted-foreground;
+}
+
+/* Card Hover Effects */
+.hover-card {
+  @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+}
+
+/* Button Styles */
+.btn-primary {
+  @apply inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-primary text-primary-foreground hover:bg-primary/90 h-10 py-2 px-4;
+}
+
+.btn-secondary {
+  @apply inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-secondary text-secondary-foreground hover:bg-secondary/80 h-10 py-2 px-4;
+}
+
+/* Form Elements */
+.input-primary {
+  @apply flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+/* Custom Container */
+.container-custom {
+  @apply container mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+/* Login Page Specific Styles */
+.login-container {
+  @apply min-h-screen flex items-center justify-center bg-background;
+}
+
+.login-card {
+  @apply w-full max-w-md p-6 space-y-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg;
+}
+
+.login-header {
+  @apply flex flex-col items-center space-y-2 text-center;
+}
+
+.login-title {
+  @apply text-2xl font-semibold tracking-tight text-foreground;
+}
+
+.login-subtitle {
+  @apply text-sm text-muted-foreground;
+}
+
+.login-form {
+  @apply space-y-4;
+}
+
+.login-input-group {
+  @apply space-y-2;
+}
+
+.login-input {
+  @apply w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary;
+}
+
+.login-button {
+  @apply w-full py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors;
+}
+
+.login-button-disabled {
+  @apply opacity-50 cursor-not-allowed;
+}
+
+.login-user-select {
+  @apply w-full flex items-center justify-between p-3 border rounded-md cursor-pointer hover:bg-muted/10 transition-colors;
+}
+
+.login-user-icon {
+  @apply flex h-6 w-6 items-center justify-center rounded-full bg-primary/10;
+}
+
+.login-user-details {
+  @apply flex flex-col items-start;
+}
+
+.login-user-role {
+  @apply text-sm font-medium text-foreground;
+}
+
+.login-user-description {
+  @apply text-xs text-muted-foreground;
+}
+
+.login-password-toggle {
+  @apply absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-muted-foreground hover:text-foreground;
+}
+
+/* Dark mode adjustments */
+.dark .login-card {
+  @apply bg-gray-900 border border-gray-700;
+}
+
+/* Animations */
+@keyframes login-fade-in {
+  from { 
+    opacity: 0; 
+    transform: translateY(20px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+.login-animate {
+  animation: login-fade-in 0.5s ease-out;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .login-card {
+    @apply w-11/12 p-4;
+  }
+}
+
+/* FlexDash Widget Styles */
+.widget-container {
+  @apply relative h-full w-full;
+}
+
+.widget-base {
+  @apply p-4 bg-card rounded-lg shadow-md h-full w-full flex flex-col overflow-hidden dark:bg-card dark:text-card-foreground
+    border-2 border-border/50 hover:border-primary/50 transition-all duration-200
+    hover:shadow-lg hover:shadow-primary/5;
+}
+
+.widget-header {
+  @apply flex items-center justify-between mb-4 pb-3 border-b border-border/30;
+}
+
+.widget-icon {
+  @apply text-primary h-6 w-6;
+}
+
+.widget-title {
+  @apply text-lg font-semibold flex-grow text-right;
+}
+
+.widget-actions {
+  @apply absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex space-x-2 z-10
+    bg-background/80 backdrop-blur-sm rounded-md p-1;
+}
+
+.widget-content {
+  @apply flex-grow min-h-[150px] max-h-[250px] relative
+    after:absolute after:inset-0 after:rounded-md after:shadow-[inset_0_0_6px_rgba(0,0,0,0.05)] after:pointer-events-none;
+}
+
+.widget-stats {
+  @apply grid grid-cols-2 gap-4 mb-4 p-2 rounded-md bg-muted/30;
+}
+
+.widget-stat-label {
+  @apply text-sm text-muted-foreground font-medium;
+}
+
+.widget-stat-value {
+  @apply font-bold text-lg;
+}
+
+.widget-stat-value-positive {
+  @apply text-green-600 dark:text-green-500;
+}
+
+.widget-stat-value-negative {
+  @apply text-red-600 dark:text-red-500;
+}
+
+.widget-stat-value-neutral {
+  @apply text-blue-600 dark:text-blue-500;
+}
+
+/* FlexDash Chart Customization */
+.recharts-default-tooltip {
+  @apply rounded-lg border-2 bg-background p-2 shadow-md !important;
+}
+
+.recharts-tooltip-label {
+  @apply text-sm font-medium text-foreground border-b pb-1 mb-1 !important;
+}
+
+.recharts-tooltip-item {
+  @apply text-xs font-medium !important;
+}
+
+/* FlexDash Grid Layout */
+.react-grid-item {
+  @apply transition-all duration-300;
+}
+
+.react-grid-item.react-grid-placeholder {
+  @apply bg-primary/20 rounded-lg border-2 border-primary/30 
+    dark:bg-primary/10 dark:border-primary/20;
+}
+
+.react-resizable-handle {
+  @apply after:border-primary/30 after:w-[10px] after:h-[10px] 
+    after:hover:border-primary/70 after:transition-colors
+    dark:after:border-primary/40 dark:after:hover:border-primary/80;
+}
+
+.react-resizable-handle:hover::after {
+  @apply border-primary dark:border-primary/90;
+}
+
+.react-resizable-handle-se {
+  @apply hover:bg-primary/5 rounded-bl-lg transition-colors
+    dark:hover:bg-primary/10;
+}
+
+.react-resizable-handle-se::after {
+  @apply dark:shadow-[0_0_3px_rgba(255,255,255,0.1)];
+}
+
+/* FlexDash Selection Dialog */
+.widget-selection-header {
+  @apply text-xl font-bold mb-4 pb-2 border-b;
+}
+
+.widget-selection-categories {
+  @apply flex space-x-2 mb-4 p-2 bg-muted/30 rounded-md;
+}
+
+.widget-selection-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4;
+}
+
+.widget-selection-card {
+  @apply hover:border-primary transition-colors border-2 border-border/50;
+}
+
+.widget-selection-card-header {
+  @apply flex items-center border-b pb-2;
+}
+
+.widget-selection-card-icon {
+  @apply mr-2 h-5 w-5 text-primary;
+}
+
+.widget-selection-empty {
+  @apply text-center text-muted-foreground mt-4 p-4 border-2 border-dashed rounded-md;
+}
+
+/* Rencana Management Styles */
+.rencana-board {
+  @apply p-6 h-full overflow-auto;
+}
+
+.rencana-column {
+  @apply bg-muted/30 rounded-lg p-4 min-h-[500px] w-[300px] flex flex-col;
+}
+
+.rencana-column-header {
+  @apply flex items-center justify-between mb-4 sticky top-0 bg-muted/30 p-2 rounded-md;
+}
+
+.rencana-column-title {
+  @apply font-semibold text-sm flex items-center gap-2;
+}
+
+.rencana-task-count {
+  @apply text-xs text-muted-foreground bg-background/80 px-2 py-1 rounded-full;
+}
+
+.rencana-task-card {
+  @apply bg-card p-3 rounded-lg shadow-sm mb-2 cursor-pointer
+    border border-border hover:border-primary/50 transition-all
+    hover:shadow-md hover:scale-[1.02];
+}
+
+.rencana-task-header {
+  @apply flex items-start justify-between gap-2 mb-2;
+}
+
+.rencana-task-title {
+  @apply font-medium text-sm;
+}
+
+.rencana-task-priority {
+  @apply text-xs px-2 py-0.5 rounded-full;
+}
+
+.rencana-task-priority-high {
+  @apply bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400;
+}
+
+.rencana-task-priority-medium {
+  @apply bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400;
+}
+
+.rencana-task-priority-low {
+  @apply bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400;
+}
+
+.rencana-task-meta {
+  @apply flex items-center gap-2 text-xs text-muted-foreground mt-2;
+}
+
+.rencana-task-due {
+  @apply flex items-center gap-1;
+}
+
+.rencana-task-comments {
+  @apply flex items-center gap-1;
+}
+
+.rencana-dragging {
+  @apply opacity-50 rotate-2 scale-105;
+}
+
+.rencana-drag-over {
+  @apply bg-primary/5 border-primary/20;
+}
+
+/* Rencana Board List */
+.rencana-board-grid {
+  @apply grid gap-4 md:grid-cols-2 lg:grid-cols-3;
+}
+
+.rencana-board-card {
+  @apply cursor-pointer hover:bg-accent/50 transition-colors;
+}
+
+.rencana-board-stats {
+  @apply flex justify-between text-sm text-muted-foreground;
+}
+
+/* Rencana Task Details */
+.rencana-task-details {
+  @apply space-y-6;
+}
+
+.rencana-task-section {
+  @apply space-y-2;
+}
+
+.rencana-task-section-title {
+  @apply text-sm font-medium;
+}
+
+.rencana-comment-list {
+  @apply space-y-4 mt-4;
+}
+
+.rencana-comment {
+  @apply flex gap-3 text-sm;
+}
+
+.rencana-comment-content {
+  @apply flex-1 space-y-1;
+}
+
+.rencana-comment-header {
+  @apply flex items-center gap-2;
+}
+
+.rencana-comment-author {
+  @apply font-medium;
+}
+
+.rencana-comment-time {
+  @apply text-xs text-muted-foreground;
+}
+
+/* Rencana Filters and Actions */
+.rencana-filters {
+  @apply flex items-center gap-2 mb-4;
+}
+
+.rencana-filter-button {
+  @apply flex items-center gap-2 text-sm;
+}
+
+.rencana-actions {
+  @apply flex items-center gap-2;
+}
+
+/* Rencana Animations */
+.rencana-fade-in {
+  @apply animate-in fade-in duration-200;
+}
+
+.rencana-slide-in {
+  @apply animate-in slide-in-from-right duration-300;
+}
+
+/* Panel Page Content Styles */
+.panel-page {
+  @apply max-w-full h-full;
+}
+
+.panel-page-container {
+  @apply w-full min-h-full p-6 space-y-4;
+}
+
+.panel-content-wrapper {
+  @apply w-full max-w-full;
+}
+
+.panel-page-header {
+  @apply mb-6;
+}
+
+.panel-page-header-title {
+  @apply text-3xl font-bold tracking-tight;
+}
+
+.panel-page-header-description {
+  @apply text-muted-foreground mt-1;
+}
+
+.panel-page-content {
+  @apply flex-1;
+}
+
+/* Panel Settings Styles */
+.panel-settings {
+  @apply h-full flex flex-col w-full;
+}
+
+.panel-settings-content {
+  @apply flex-1 w-full h-full;
+}
+
+.panel-settings-section {
+  @apply w-full h-full flex flex-col bg-card rounded-lg border p-6 lg:p-8;
+}
+
+.panel-settings-section-header {
+  @apply mb-6;
+}
+
+.panel-settings-section-title {
+  @apply text-lg font-semibold;
+}
+
+.panel-settings-section-description {
+  @apply text-sm text-muted-foreground mt-1;
+}
+
+.panel-settings-form {
+  @apply flex-1 w-full;
+}
+
+.panel-settings-form-group {
+  @apply space-y-2 mb-6;
+}
+
+.panel-settings-form-group:last-child {
+  @apply mb-0;
+}
+
+.panel-settings-form-group input,
+.panel-settings-form-group textarea {
+  @apply w-full;
+}
+
+/* Panel Tabs */
+.panel-tabs {
+  @apply w-full h-full flex flex-col;
+}
+
+.panel-tabs-list {
+  @apply w-full flex bg-muted rounded-lg p-1 mb-6;
+}
+
+.panel-tabs-trigger {
+  @apply flex-1 flex items-center justify-center text-sm font-medium px-3 py-2 rounded-md data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow;
+}
+
+.panel-tabs-content {
+  @apply flex-1;
+}
+
+/* Route Container Styles */
+[role="tabpanel"] {
+  @apply h-full flex flex-col;
+}
+
+/* Panel Layout */
+.panel-layout {
+  @apply h-screen w-full grid lg:grid-cols-[280px_1fr];
+}
+
+.panel-sidebar {
+  @apply hidden lg:flex h-full border-r bg-background;
+}
+
+.panel-sidebar-header {
+  @apply flex h-14 items-center border-b px-6;
+}
+
+.panel-sidebar-content {
+  @apply flex flex-col h-[calc(100%-3.5rem)] space-y-4 py-4 overflow-y-auto;
+}
+
+.panel-main {
+  @apply flex flex-col h-full;
+}
+
+.panel-header {
+  @apply flex h-14 lg:h-[60px] items-center gap-4 border-b bg-background px-6;
+}
+
+/* Panel Content Max Width Variants */
+.panel-content-default {
+  @apply max-w-[1400px] mx-auto w-full;
+}
+
+.panel-content-narrow {
+  @apply max-w-[1000px] mx-auto w-full;
+}
+
+.panel-content-wide {
+  @apply max-w-[1800px] mx-auto w-full;
+}
+
+/* Panel Content Header */
+.panel-content-header {
+  @apply mb-8 flex items-start justify-between gap-4 flex-col sm:flex-row;
+}
+
+.panel-content-header-left {
+  @apply flex-1 space-y-1;
+}
+
+.panel-content-header-title {
+  @apply text-2xl sm:text-3xl font-bold tracking-tight;
+}
+
+.panel-content-header-description {
+  @apply text-muted-foreground text-base sm:text-lg;
+}
+
+.panel-content-header-actions {
+  @apply flex items-center gap-3 mt-4 sm:mt-0;
+}
+
+.panel-content-body {
+  @apply w-full h-full;
+}
+
+/* Public Layout Styles */
+.public-container {
+  @apply min-h-screen flex flex-col;
+}
+
+.public-header {
+  @apply w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60;
+}
+
+.public-header-content {
+  @apply container flex h-14 max-w-screen-2xl items-center;
+}
+
+.public-main {
+  @apply flex-1;
+}
+
+.public-section {
+  @apply container py-8 md:py-12 lg:py-24;
+}
+
+.public-hero {
+  @apply relative overflow-hidden min-h-[600px] flex items-center justify-center text-center;
+  background: linear-gradient(83.21deg, #3245FF 0%, #BC52EE 100%);
+}
+
+.public-hero-content {
+  @apply container flex flex-col items-center gap-4 text-white;
+}
+
+.public-hero-title {
+  @apply text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter;
+}
+
+.public-hero-description {
+  @apply max-w-[42rem] leading-normal text-white/90 sm:text-xl sm:leading-8;
+}
+
+.public-hero-actions {
+  @apply flex gap-4 mt-4;
+}
+
+/* Base Layout */
+.layout-min-height {
+  @apply min-h-screen flex flex-col;
+}
+
+.layout-flex-grow {
+  @apply flex-1;
+}
+
+/* Container */
+.container {
+  @apply mx-auto px-4 w-full max-w-screen-2xl;
+}
+
+/* Section */
+.section {
+  @apply py-12 md:py-16 lg:py-24 w-full;
+}
+
+/* Hero Section */
+.hero-section {
+  @apply relative h-screen w-full flex items-center justify-center bg-gradient-to-r from-primary to-primary-foreground text-white;
+}
+
+.hero-content {
+  @apply container text-center;
+}
+
+.hero-title {
+  @apply text-5xl font-bold mb-6;
+}
+
+.hero-description {
+  @apply text-xl mb-8 max-w-2xl mx-auto;
+}
+
+.hero-actions {
+  @apply space-x-4;
+}
+
+/* Suspense Styles */
+.suspense-container {
+  @apply flex flex-col items-center justify-center h-full;
+}
+
+.suspense-message {
+  @apply text-lg font-bold text-muted-foreground;
+}
+
+.suspense-spinner {
+  @apply border-4 border-primary/50 border-t-primary/90 rounded-full w-12 h-12 animate-spin;
+}

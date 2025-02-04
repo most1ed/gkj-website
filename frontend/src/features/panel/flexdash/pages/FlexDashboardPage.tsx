@@ -1,16 +1,42 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { 
+  useState, 
+  useEffect, 
+  useMemo, 
+  createElement, 
+  useCallback 
+} from 'react';
 import { 
+  // Navigation and UI Icons
   Home, 
   DollarSign, 
   Users, 
   Calendar, 
-  Church, 
-  PlusCircle, 
-  Trash2,
-  Move,
+  BarChart2, 
+  PieChart, 
+  Briefcase, 
+  Gift, 
+  UserCheck, 
+  Users2, 
+  Trash2, 
+  Plus,
+  PlusCircle,
   X,
+  
+  // Additional Contextual Icons
+  TrendingUp,
+  TrendingDown,
+  Activity,
+  BookOpen,
+  CreditCard,
+  Globe,
+  HeartPulse,
+  Layers,
+  Megaphone,
+  Target,
+  Church, 
+  Move,
   Maximize2,
-  Plus 
+  BookPlus
 } from 'lucide-react';
 
 // Charting Library
@@ -22,7 +48,7 @@ import {
   CartesianGrid, 
   Tooltip, 
   Legend, 
-  PieChart, 
+  PieChart as RechartsPieChart, 
   Pie, 
   Cell, 
   LineChart, 
@@ -35,9 +61,8 @@ import { Responsive, WidthProvider } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 
-// Zustand Store and Utilities
-import { useFlexDashboardStore } from '../store/flexDashboardStore';
-import { WidgetManager } from '../utils/widgetHelpers';
+// Date Formatting
+import { format } from 'date-fns';
 
 // Authentication and Routing
 import { useAuth } from '@/hooks/auth';
@@ -50,27 +75,45 @@ import {
   Dialog, 
   DialogContent, 
   DialogHeader, 
-  DialogTitle 
+  DialogTitle, 
+  DialogDescription, 
+  DialogFooter 
 } from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
-import { useToast } from '@/components/ui/use-toast';
 import { 
   Select, 
   SelectContent, 
   SelectItem, 
   SelectTrigger, 
-  SelectValue,
-  SelectGroup,
-  SelectLabel
+  SelectValue 
 } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { useToast } from '@/components/ui/use-toast';
+import { WidgetConfigForm } from '../components/WidgetConfigForm';
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger 
+} from '@/components/ui/dropdown-menu';
 
 // Types
 import { 
   BaseWidget, 
+  CreateWidgetDTO, 
+  WidgetLayout, 
+  WidgetSize,
   WidgetTemplate, 
-  WidgetCategory, 
-  WidgetSize 
-} from '../types/widget.types';
+  WidgetCategory 
+} from '@/features/panel/flexdash/types/widget.types';
+
+// Zustand Store and Utilities
+import { useFlexDashboardStore } from '@/features/panel/flexdash/store/flexDashboardStore';
+import { WidgetManager } from '@/features/panel/flexdash/utils/widgetHelpers';
+
+// API Mock
+import { widgetMockApi } from '@/features/panel/flexdash/api/widgetMockApi';
 
 // Responsive Grid Layout with Width Provider
 const ResponsiveGridLayout = WidthProvider(Responsive);
@@ -101,35 +144,57 @@ const MINISTRY_CHART_DATA = [
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
+// Additional Sample Data
+const ATTENDANCE_TREND_DATA = [
+  { week: 'Minggu 1', ibadahPagi: 450, ibadahSore: 200, ibadahPemuda: 120 },
+  { week: 'Minggu 2', ibadahPagi: 480, ibadahSore: 220, ibadahPemuda: 140 },
+  { week: 'Minggu 3', ibadahPagi: 420, ibadahSore: 180, ibadahPemuda: 100 },
+  { week: 'Minggu 4', ibadahPagi: 500, ibadahSore: 250, ibadahPemuda: 150 }
+];
+
+const DONATION_DISTRIBUTION_DATA = [
+  { name: 'Pembangunan', value: 4000 },
+  { name: 'Diakonia', value: 3000 },
+  { name: 'Misi', value: 2000 },
+  { name: 'Operasional', value: 2780 },
+  { name: 'Pendidikan', value: 1890 }
+];
+
+const AGE_DISTRIBUTION_DATA = [
+  { age: '0-12', count: 120 },
+  { age: '13-17', count: 80 },
+  { age: '18-25', count: 150 },
+  { age: '26-40', count: 200 },
+  { age: '41-60', count: 180 },
+  { age: '60+', count: 90 }
+];
+
+const GENDER_DISTRIBUTION_DATA = [
+  { name: 'Pria', value: 540 },
+  { name: 'Wanita', value: 620 }
+];
+
+const COLORS_EXTENDED = [...COLORS, '#8884D8', '#82CA9D'];
+
 // Financial Widget with Chart
 const FinancialWidget: React.FC<{ data: any; onDelete?: () => void }> = ({ data, onDelete }) => (
-  <div className="relative group h-full w-full">
-    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex space-x-2 z-10">
-      <Button 
-        variant="ghost" 
-        size="icon" 
-        className="text-destructive hover:bg-destructive/10"
-        onClick={onDelete}
-      >
-        <Trash2 className="h-4 w-4" />
-      </Button>
-    </div>
-    <div className="p-4 bg-white rounded-lg shadow-md h-full w-full flex flex-col overflow-hidden">
-      <div className="flex items-center justify-between mb-4">
-        <DollarSign className="text-primary h-6 w-6" />
-        <h3 className="text-lg font-semibold flex-grow text-right">{data.title}</h3>
+  <div className="widget-container group">
+    <div className="widget-base">
+      <div className="widget-header">
+        <DollarSign className="widget-icon" />
+        <h3 className="widget-title">{data.title}</h3>
       </div>
-      <div className="grid grid-cols-2 gap-2 mb-4">
+      <div className="widget-stats">
         <div>
-          <p className="text-sm text-gray-500">Total Kas</p>
-          <p className="font-bold text-green-600">{data.totalCash}</p>
+          <p className="widget-stat-label">Total Kas</p>
+          <p className="widget-stat-value widget-stat-value-positive">{data.totalCash}</p>
         </div>
         <div>
-          <p className="text-sm text-gray-500">Pengeluaran</p>
-          <p className="font-bold text-red-600">{data.expenses}</p>
+          <p className="widget-stat-label">Pengeluaran</p>
+          <p className="widget-stat-value widget-stat-value-negative">{data.expenses}</p>
         </div>
       </div>
-      <div className="flex-grow min-h-[150px] max-h-[250px]">
+      <div className="widget-content">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={FINANCIAL_CHART_DATA}>
             <CartesianGrid strokeDasharray="3 3" />
@@ -148,35 +213,25 @@ const FinancialWidget: React.FC<{ data: any; onDelete?: () => void }> = ({ data,
 
 // Membership Widget with Pie Chart
 const MembershipWidget: React.FC<{ data: any; onDelete?: () => void }> = ({ data, onDelete }) => (
-  <div className="relative group h-full w-full">
-    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex space-x-2 z-10">
-      <Button 
-        variant="ghost" 
-        size="icon" 
-        className="text-destructive hover:bg-destructive/10"
-        onClick={onDelete}
-      >
-        <Trash2 className="h-4 w-4" />
-      </Button>
-    </div>
-    <div className="p-4 bg-white rounded-lg shadow-md h-full w-full flex flex-col overflow-hidden">
-      <div className="flex items-center justify-between mb-4">
-        <Users className="text-primary h-6 w-6" />
-        <h3 className="text-lg font-semibold flex-grow text-right">{data.title}</h3>
+  <div className="widget-container group">
+    <div className="widget-base">
+      <div className="widget-header">
+        <Users className="widget-icon" />
+        <h3 className="widget-title">{data.title}</h3>
       </div>
-      <div className="grid grid-cols-2 gap-2 mb-4">
+      <div className="widget-stats">
         <div>
-          <p className="text-sm text-gray-500">Total Anggota</p>
-          <p className="font-bold">{data.totalMembers}</p>
+          <p className="widget-stat-label">Total Anggota</p>
+          <p className="widget-stat-value">{data.totalMembers}</p>
         </div>
         <div>
-          <p className="text-sm text-gray-500">Anggota Baru</p>
-          <p className="font-bold text-blue-600">{data.newMembers}</p>
+          <p className="widget-stat-label">Anggota Baru</p>
+          <p className="widget-stat-value widget-stat-value-positive">{data.newMembers}</p>
         </div>
       </div>
-      <div className="flex-grow min-h-[150px] max-h-[250px]">
+      <div className="widget-content">
         <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
+          <RechartsPieChart>
             <Pie
               data={MEMBERSHIP_CHART_DATA}
               cx="50%"
@@ -196,7 +251,7 @@ const MembershipWidget: React.FC<{ data: any; onDelete?: () => void }> = ({ data
               verticalAlign="bottom" 
               align="center"
             />
-          </PieChart>
+          </RechartsPieChart>
         </ResponsiveContainer>
       </div>
     </div>
@@ -205,23 +260,13 @@ const MembershipWidget: React.FC<{ data: any; onDelete?: () => void }> = ({ data
 
 // Ministry Widget with Bar Chart
 const MinistryWidget: React.FC<{ data: any; onDelete?: () => void }> = ({ data, onDelete }) => (
-  <div className="relative group h-full w-full">
-    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex space-x-2 z-10">
-      <Button 
-        variant="ghost" 
-        size="icon" 
-        className="text-destructive hover:bg-destructive/10"
-        onClick={onDelete}
-      >
-        <Trash2 className="h-4 w-4" />
-      </Button>
-    </div>
-    <div className="p-4 bg-white rounded-lg shadow-md h-full w-full flex flex-col overflow-hidden">
-      <div className="flex items-center justify-between mb-4">
-        <Church className="text-primary h-6 w-6" />
-        <h3 className="text-lg font-semibold flex-grow text-right">{data.title}</h3>
+  <div className="widget-container group">
+    <div className="widget-base">
+      <div className="widget-header">
+        <Church className="widget-icon" />
+        <h3 className="widget-title">{data.title}</h3>
       </div>
-      <div className="flex-grow min-h-[150px] max-h-[250px]">
+      <div className="widget-content">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={MINISTRY_CHART_DATA}>
             <CartesianGrid strokeDasharray="3 3" />
@@ -238,78 +283,82 @@ const MinistryWidget: React.FC<{ data: any; onDelete?: () => void }> = ({ data, 
 
 // Event Widget with Line Chart
 const EventWidget: React.FC<{ data: any; onDelete?: () => void }> = ({ data, onDelete }) => {
-  // Sample event participation data
-  const EVENT_PARTICIPATION_DATA = [
-    { event: 'Kebaktian Minggu', peserta: 200 },
-    { event: 'Pertemuan Pemuda', peserta: 150 },
-    { event: 'Pelayanan Sosial', peserta: 100 },
-    { event: 'Seminar Rohani', peserta: 180 }
-  ];
+  // Ensure data and upcomingEvents exist
+  const upcomingEvents = data?.upcomingEvents || [];
+  
+  // Render placeholder or empty state if no events
+  if (!upcomingEvents || upcomingEvents.length === 0) {
+    return (
+      <div className="p-4 text-center text-gray-500">
+        <Calendar className="mx-auto mb-2 h-8 w-8 text-gray-400" />
+        <p>Tidak ada acara yang akan datang</p>
+        {onDelete && (
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={onDelete} 
+            className="mt-2"
+          >
+            <Trash2 className="mr-2 h-4 w-4" /> Hapus Widget
+          </Button>
+        )}
+      </div>
+    );
+  }
 
   return (
-    <div className="relative group h-full w-full">
-      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex space-x-2 z-10">
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className="text-destructive hover:bg-destructive/10"
-          onClick={onDelete}
-        >
-          <Trash2 className="h-4 w-4" />
-        </Button>
+    <div className="p-4">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-lg font-semibold">Acara Mendatang</h3>
+        {onDelete && (
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={onDelete}
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        )}
       </div>
-      <div className="p-4 bg-white rounded-lg shadow-md h-full w-full flex flex-col overflow-hidden">
-        <div className="flex items-center justify-between mb-4">
-          <Calendar className="text-primary h-6 w-6" />
-          <h3 className="text-lg font-semibold flex-grow text-right">{data.title}</h3>
-        </div>
-        <div className="flex-grow min-h-[150px] max-h-[250px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={EVENT_PARTICIPATION_DATA}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="event" />
-              <YAxis />
-              <Tooltip />
-              <Line 
-                type="monotone" 
-                dataKey="peserta" 
-                stroke="#8884d8" 
-                strokeWidth={2}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-        <div className="mt-2">
-          <ul className="space-y-2">
-            {data.upcomingEvents.map((event: any, index: number) => (
-              <li key={index} className="flex justify-between items-center">
-                <span className="text-sm">{event.name}</span>
-                <Badge variant="outline">{event.date}</Badge>
-              </li>
-            ))}
-          </ul>
-        </div>
+      
+      <div className="space-y-2">
+        {upcomingEvents.slice(0, 5).map((event, index) => (
+          <div 
+            key={event.id || index} 
+            className="flex items-center justify-between border-b pb-2 last:border-b-0"
+          >
+            <div>
+              <p className="font-medium">{event.title || 'Acara Tanpa Judul'}</p>
+              <p className="text-sm text-gray-500">
+                {event.date 
+                  ? format(new Date(event.date), 'dd MMM yyyy') 
+                  : 'Tanggal Tidak Tersedia'}
+              </p>
+            </div>
+            <Badge variant="secondary">
+              {event.type || 'Acara Umum'}
+            </Badge>
+          </div>
+        ))}
       </div>
+
+      {upcomingEvents.length > 5 && (
+        <div className="text-center mt-2">
+          <Button variant="link" size="sm">
+            Lihat Semua Acara
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
 
 // Overview Widget
 const OverviewWidget: React.FC<{ data: any; onDelete?: () => void }> = ({ data, onDelete }) => (
-  <div className="relative group h-full w-full">
-    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex space-x-2 z-10">
-      <Button 
-        variant="ghost" 
-        size="icon" 
-        className="text-destructive hover:bg-destructive/10"
-        onClick={onDelete}
-      >
-        <Trash2 className="h-4 w-4" />
-      </Button>
-    </div>
-    <div className="p-4 bg-white rounded-lg shadow-md h-full w-full">
-      <div className="flex items-center justify-between mb-2">
-        <h3 className="text-lg font-semibold">{data.title}</h3>
+  <div className="widget-container group">
+    <div className="widget-base">
+      <div className="widget-header">
+        <h3 className="widget-title">{data.title}</h3>
       </div>
       <p className="text-gray-600">{data.content}</p>
       <div className="mt-4 flex justify-between items-center">
@@ -320,13 +369,139 @@ const OverviewWidget: React.FC<{ data: any; onDelete?: () => void }> = ({ data, 
   </div>
 );
 
-// Update WIDGET_COMPONENTS to include new chart-based widgets
+// New Chart Widgets
+function AttendanceTrendWidget({ data, onDelete }) {
+  return (
+    <Card className="h-full">
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <CardTitle className="text-base font-medium">
+          Trend Kehadiran Ibadah
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart data={ATTENDANCE_TREND_DATA}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="week" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Line type="monotone" dataKey="ibadahPagi" stroke="#0088FE" name="Ibadah Pagi" />
+            <Line type="monotone" dataKey="ibadahSore" stroke="#00C49F" name="Ibadah Sore" />
+            <Line type="monotone" dataKey="ibadahPemuda" stroke="#FFBB28" name="Ibadah Pemuda" />
+          </LineChart>
+        </ResponsiveContainer>
+      </CardContent>
+    </Card>
+  );
+}
+
+function DonationDistributionWidget({ data, onDelete }) {
+  return (
+    <Card className="h-full">
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <CardTitle className="text-base font-medium">
+          Distribusi Persembahan
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <ResponsiveContainer width="100%" height={300}>
+          <RechartsPieChart>
+            <Pie
+              data={DONATION_DISTRIBUTION_DATA}
+              cx="50%"
+              cy="50%"
+              labelLine={false}
+              label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+              outerRadius={80}
+              fill="#8884d8"
+              dataKey="value"
+            >
+              {DONATION_DISTRIBUTION_DATA.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={COLORS_EXTENDED[index % COLORS_EXTENDED.length]} />
+              ))}
+            </Pie>
+            <Tooltip />
+            <Legend />
+          </RechartsPieChart>
+        </ResponsiveContainer>
+      </CardContent>
+    </Card>
+  );
+}
+
+function AgeDistributionWidget({ data, onDelete }) {
+  return (
+    <Card className="h-full">
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <CardTitle className="text-base font-medium">
+          Distribusi Usia Jemaat
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={AGE_DISTRIBUTION_DATA}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="age" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="count" fill="#8884d8" name="Jumlah Jemaat">
+              {AGE_DISTRIBUTION_DATA.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={COLORS_EXTENDED[index % COLORS_EXTENDED.length]} />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </CardContent>
+    </Card>
+  );
+}
+
+function GenderDistributionWidget({ data, onDelete }) {
+  return (
+    <Card className="h-full">
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <CardTitle className="text-base font-medium">
+          Distribusi Gender
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="flex items-center justify-center">
+        <ResponsiveContainer width="100%" height={300}>
+          <RechartsPieChart>
+            <Pie
+              data={GENDER_DISTRIBUTION_DATA}
+              cx="50%"
+              cy="50%"
+              labelLine={false}
+              label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+              outerRadius={80}
+              fill="#8884d8"
+              dataKey="value"
+            >
+              <Cell fill="#0088FE" />
+              <Cell fill="#00C49F" />
+            </Pie>
+            <Tooltip />
+            <Legend />
+          </RechartsPieChart>
+        </ResponsiveContainer>
+      </CardContent>
+    </Card>
+  );
+}
+
+// Update WIDGET_COMPONENTS to include new chart widgets
 const WIDGET_COMPONENTS = {
   [WidgetCategory.OVERVIEW]: OverviewWidget,
   [WidgetCategory.FINANCIAL]: FinancialWidget,
   [WidgetCategory.MEMBERSHIP]: MembershipWidget,
-  [WidgetCategory.EVENTS]: EventWidget,
-  [WidgetCategory.MINISTRY]: MinistryWidget
+  [WidgetCategory.MINISTRY]: MinistryWidget,
+  [WidgetCategory.EVENT]: EventWidget,
+  'ATTENDANCE_TREND': AttendanceTrendWidget,
+  'DONATION_DISTRIBUTION': DonationDistributionWidget,
+  'AGE_DISTRIBUTION': AgeDistributionWidget,
+  'GENDER_DISTRIBUTION': GenderDistributionWidget,
 };
 
 // Comprehensive widget size configuration
@@ -351,9 +526,29 @@ const WIDGET_SIZE_CONFIG = {
     size: { w: 4, h: 4 },
     minSize: { w: 4, h: 4 }
   },
-  [WidgetCategory.EVENTS]: {
+  [WidgetCategory.EVENT]: {
     hasChart: true,
     size: { w: 3, h: 4 },
+    minSize: { w: 3, h: 3 }
+  },
+  'ATTENDANCE_TREND': {
+    hasChart: true,
+    size: { w: 4, h: 4 },
+    minSize: { w: 4, h: 4 }
+  },
+  'DONATION_DISTRIBUTION': {
+    hasChart: true,
+    size: { w: 4, h: 4 },
+    minSize: { w: 4, h: 4 }
+  },
+  'AGE_DISTRIBUTION': {
+    hasChart: true,
+    size: { w: 4, h: 4 },
+    minSize: { w: 4, h: 4 }
+  },
+  'GENDER_DISTRIBUTION': {
+    hasChart: true,
+    size: { w: 3, h: 3 },
     minSize: { w: 3, h: 3 }
   },
   default: {
@@ -389,7 +584,7 @@ const DASHBOARD_PRESETS = {
         data: {} // Placeholder for ministry data
       },
       { 
-        category: WidgetCategory.EVENTS, 
+        category: WidgetCategory.EVENT, 
         title: 'Upcoming Events',
         data: {} // Placeholder for events data
       }
@@ -424,7 +619,7 @@ const DASHBOARD_PRESETS = {
         data: {} // Ministry-specific widget
       },
       { 
-        category: WidgetCategory.EVENTS, 
+        category: WidgetCategory.EVENT, 
         title: 'Ministry Events',
         data: {} // Events related to ministry
       },
@@ -494,15 +689,135 @@ const FlexDashboardPage: React.FC = () => {
   const [availableWidgets, setAvailableWidgets] = useState<WidgetTemplate[]>([]);
   const [gridLayout, setGridLayout] = useState<any[]>([]);
   const [widgetSizes, setWidgetSizes] = useState<{[key: string]: { w: number, h: number }}>({});
+  const [isWidgetConfigOpen, setIsWidgetConfigOpen] = useState(false);
 
-  // Initialize dashboard with preset when user changes
-  useEffect(() => {
-    if (user && user.role) {
-      // Load preset widgets for the user's role
-      const presetWidgets = loadDashboardPreset(user.role);
+  // State for preset management
+  const [isPresetDialogOpen, setIsPresetDialogOpen] = useState(false);
+  const [newPreset, setNewPreset] = useState<Partial<WidgetPreset>>({
+    name: '',
+    description: '',
+    category: WidgetCategory.OVERVIEW,
+    defaultConfig: {}
+  });
+
+  // Handler for creating a new preset
+  const handleCreatePreset = async () => {
+    try {
+      const createdPreset = await widgetPresetApi.createPreset({
+        name: newPreset.name || 'Preset Baru',
+        description: newPreset.description || 'Preset widget kustom',
+        category: newPreset.category || WidgetCategory.OVERVIEW,
+        defaultConfig: newPreset.defaultConfig || {}
+      });
+
+      // Optional: Add toast or notification
+      toast({
+        title: 'Preset Berhasil Dibuat',
+        description: `Preset "${createdPreset.name}" telah ditambahkan`,
+        variant: 'default'
+      });
+
+      // Close dialog and reset form
+      setIsPresetDialogOpen(false);
+      setNewPreset({
+        name: '',
+        description: '',
+        category: WidgetCategory.OVERVIEW,
+        defaultConfig: {}
+      });
+    } catch (error) {
+      // Error handling
+      toast({
+        title: 'Gagal Membuat Preset',
+        description: error instanceof Error ? error.message : 'Terjadi kesalahan',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  // Function to delete a widget from the dashboard
+  const handleDeleteWidget = useCallback(async (widgetId: string) => {
+    try {
+      // Use mock API to delete widget
+      await widgetMockApi.deleteWidget(widgetId);
       
-      // Update widgets in the store
-      setWidgetsForRole(user.role, presetWidgets);
+      // Update store state
+      removeWidget(widgetId);
+      
+      // Update grid layout
+      setGridLayout(prevLayout => prevLayout.filter(item => item.i !== widgetId));
+      
+      // Remove widget size configuration
+      setWidgetSizes(prev => {
+        const newSizes = { ...prev };
+        delete newSizes[widgetId];
+        return newSizes;
+      });
+
+      // Show success notification
+      toast({
+        title: "Widget Dihapus",
+        description: "Widget telah berhasil dihapus dari dashboard.",
+        variant: "default"
+      });
+    } catch (error) {
+      console.error('Error deleting widget:', error);
+      
+      // Show error notification
+      toast({
+        title: "Gagal Menghapus Widget",
+        description: "Terjadi kesalahan saat menghapus widget.",
+        variant: "destructive"
+      });
+    }
+  }, [
+    removeWidget, 
+    setGridLayout, 
+    setWidgetSizes, 
+    widgetMockApi.deleteWidget, 
+    toast
+  ]);
+
+  // Function to dynamically render widget based on its category
+  const renderWidget = useCallback((widget: WidgetTemplate) => {
+    // Find the appropriate widget component based on the category
+    const WidgetComponent = WIDGET_COMPONENTS[widget.category];
+    
+    // If no matching component is found, return a fallback
+    if (!WidgetComponent) {
+      return (
+        <Card>
+          <CardHeader>
+            <CardTitle>Widget Tidak Tersedia</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p>Kategori widget: {widget.category}</p>
+          </CardContent>
+        </Card>
+      );
+    }
+
+    // Render the widget with its data and delete handler
+    return (
+      <WidgetComponent 
+        data={widget.data || []} 
+        onDelete={() => handleDeleteWidget(widget.id)} 
+      />
+    );
+  }, [WIDGET_COMPONENTS, handleDeleteWidget]);
+
+  useEffect(() => {
+    if (user) {
+      // Load preset widgets for the user's role
+      const roleWidgets = WidgetManager.getWidgetsForRole(user.role as UserRole);
+      
+      // Set widgets based on user's role
+      setWidgetsForRole(user.role as UserRole);
+      
+      // Combine role-specific and default widgets
+      setAvailableWidgets([
+        ...roleWidgets
+      ]);
     }
   }, [user]);
 
@@ -544,28 +859,36 @@ const FlexDashboardPage: React.FC = () => {
               <SelectValue placeholder="Pilih Preset Dashboard" />
             </SelectTrigger>
             <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Preset Dashboard</SelectLabel>
-                {availablePresets.map((preset) => (
-                  <SelectItem 
-                    key={preset.value} 
-                    value={preset.value}
-                  >
-                    {preset.label}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
+              {availablePresets.map((preset) => (
+                <SelectItem 
+                  key={preset.value} 
+                  value={preset.value}
+                >
+                  {preset.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
 
-          {/* Add Widget Button */}
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => setIsAddWidgetDialogOpen(true)}
-          >
-            <Plus className="mr-2 h-4 w-4" /> Widget
-          </Button>
+          {/* Bottom Action Buttons */}
+          <div className="fixed bottom-4 right-4 z-50 flex space-x-2">
+            {/* Buat Preset Button */}
+            <Button 
+              onClick={() => setIsPresetDialogOpen(true)} 
+              variant="secondary"
+              className="flex items-center"
+            >
+              <BookPlus className="mr-2 h-4 w-4" /> Buat Preset
+            </Button>
+
+            {/* Buat Widget Button */}
+            <Button 
+              onClick={() => setIsWidgetConfigOpen(true)} 
+              className="flex items-center"
+            >
+              <PlusCircle className="mr-2 h-4 w-4" /> Buat Widget
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -610,73 +933,6 @@ const FlexDashboardPage: React.FC = () => {
       ]);
     }
   }, [user]);
-
-  const handleAddWidget = (widget: WidgetTemplate) => {
-    if (widget.isCustomizable) {
-      const isDuplicate = widgets.some(w => w.title === widget.title);
-      
-      if (!isDuplicate) {
-        addWidget(widget);
-        toast({
-          title: "Widget Ditambahkan",
-          description: `Widget "${widget.title}" berhasil ditambahkan.`,
-        });
-        setIsAddWidgetDialogOpen(false);
-      } else {
-        toast({
-          title: "Gagal Menambahkan Widget",
-          description: "Widget dengan judul yang sama sudah ada.",
-          variant: "destructive"
-        });
-      }
-    } else {
-      toast({
-        title: "Widget Tidak Dapat Ditambahkan",
-        description: "Widget ini tidak dapat disesuaikan.",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const handleRemoveWidget = (widgetId: string) => {
-    setWidgets(currentWidgets => 
-      currentWidgets.filter(w => w.id !== widgetId)
-    );
-    
-    toast({
-      title: "Widget Dihapus",
-      description: "Widget berhasil dihapus dari dashboard.",
-    });
-  };
-
-  const renderWidget = (widget: BaseWidget) => {
-    const WidgetComponent = WIDGET_COMPONENTS[widget.category];
-    
-    return (
-      <div className="h-full w-full relative group/widget">
-        {/* Hover-specific widget actions */}
-        <div className="absolute top-2 right-2 z-10 flex space-x-2 opacity-0 group-hover/widget:opacity-100 transition-opacity duration-300">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="text-destructive hover:bg-destructive/10"
-            onClick={() => handleRemoveWidget(widget.id)}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </div>
-
-        {WidgetComponent ? (
-          <WidgetComponent 
-            data={widget} 
-            onDelete={() => handleRemoveWidget(widget.id)} 
-          />
-        ) : (
-          <p className="text-gray-500">Widget tidak tersedia</p>
-        )}
-      </div>
-    );
-  };
 
   useEffect(() => {
     const layout = widgets.map((widget, index) => {
@@ -753,6 +1009,149 @@ const FlexDashboardPage: React.FC = () => {
     }
   }, [user]);
 
+  // Method to dynamically add a new widget
+  const handleAddNewWidget = useCallback(async () => {
+    try {
+      // More comprehensive widget configuration options
+      const widgetConfigurations = [
+        {
+          category: WidgetCategory.FINANCIAL,
+          title: 'Laporan Keuangan Bulanan',
+          dataSource: DataSource.FINANCIAL,
+          visualizationType: VisualizationType.BAR_CHART,
+          icon: DollarSign,
+          roles: [UserRole.ADMIN, UserRole.STAFF],
+          fields: ['tithe', 'offering', 'special']
+        },
+        {
+          category: WidgetCategory.MEMBERSHIP,
+          title: 'Pertumbuhan Keanggotaan',
+          dataSource: DataSource.MEMBERSHIP,
+          visualizationType: VisualizationType.LINE_CHART,
+          icon: Users,
+          roles: [UserRole.ADMIN],
+          fields: ['newMembers', 'totalMembers']
+        },
+        {
+          category: WidgetCategory.EVENT,
+          title: 'Jadwal Acara Mendatang',
+          dataSource: DataSource.EVENTS,
+          visualizationType: VisualizationType.TABLE,
+          icon: Calendar,
+          roles: [UserRole.STAFF, UserRole.ADMIN],
+          fields: ['name', 'date', 'attendanceExpected']
+        },
+        {
+          category: WidgetCategory.ATTENDANCE_TREND,
+          title: 'Trend Kehadiran Mingguan',
+          dataSource: DataSource.ATTENDANCE,
+          visualizationType: VisualizationType.BAR_CHART,
+          icon: BarChart2,
+          roles: [UserRole.ADMIN],
+          fields: ['morning', 'evening', 'midweek']
+        },
+        {
+          category: WidgetCategory.MINISTRY,
+          title: 'Statistik Pelayanan',
+          dataSource: DataSource.FINANCIAL,
+          visualizationType: VisualizationType.PIE_CHART,
+          icon: Briefcase,
+          roles: [UserRole.ADMIN, UserRole.STAFF],
+          fields: ['ministry', 'facilities', 'outreach']
+        }
+      ];
+
+      // Randomly select a widget configuration
+      const randomConfig = widgetConfigurations[
+        Math.floor(Math.random() * widgetConfigurations.length)
+      ];
+
+      // Generate appropriate mock data based on data source
+      const mockData = mockDataGenerators[randomConfig.dataSource][
+        Object.keys(mockDataGenerators[randomConfig.dataSource])[0]
+      ]();
+
+      // Create a new widget using mock API
+      const newWidget = await widgetMockApi.createWidget({
+        title: randomConfig.title,
+        category: randomConfig.category,
+        description: `Widget dinamis untuk ${randomConfig.title}`,
+        roles: randomConfig.roles,
+        dataConfig: {
+          source: randomConfig.dataSource,
+          fields: randomConfig.fields
+        },
+        visualizationConfig: {
+          type: randomConfig.visualizationType
+        },
+        data: mockData
+      });
+
+      // Add the new widget to the dashboard
+      addWidget(newWidget);
+
+      // Show success notification
+      toast({
+        title: "Widget Ditambahkan",
+        description: `${randomConfig.title} berhasil dibuat.`,
+        variant: "default"
+      });
+    } catch (error) {
+      console.error('Error adding new widget:', error);
+      
+      // Show error notification
+      toast({
+        title: "Gagal Menambahkan Widget",
+        description: "Terjadi kesalahan saat membuat widget baru.",
+        variant: "destructive"
+      });
+    }
+  }, [addWidget, toast]);
+
+  const handleCreateWidget = useCallback(async (widget: CreateWidgetDTO) => {
+    try {
+      // Use WidgetManager static method to create a new widget
+      const newWidget = await WidgetManager.createWidget(widget);
+      
+      // Add widget to the store
+      addWidget(newWidget);
+      
+      // Calculate layout for the new widget
+      const newLayout: WidgetLayout = {
+        i: newWidget.id,
+        x: 0,
+        y: Infinity, // Add to bottom
+        w: newWidget.size === 'LARGE' ? 4 : 2,
+        h: newWidget.size === 'LARGE' ? 4 : 2
+      };
+
+      // Update grid layout
+      setGridLayout(prevLayout => [...prevLayout, newLayout]);
+      
+      // Close the configuration dialog
+      setIsWidgetConfigOpen(false);
+
+      // Show success toast
+      toast({
+        title: "Widget Ditambahkan",
+        description: `Widget "${newWidget.title}" berhasil dibuat.`
+      });
+
+      return newWidget;
+    } catch (error) {
+      console.error('Error creating widget:', error);
+      
+      // Show error toast
+      toast({
+        title: "Gagal Membuat Widget",
+        description: error instanceof Error ? error.message : "Terjadi kesalahan saat membuat widget.",
+        variant: "destructive"
+      });
+
+      throw error;
+    }
+  }, [addWidget, setGridLayout, setIsWidgetConfigOpen, toast]);
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-full">
@@ -770,7 +1169,7 @@ const FlexDashboardPage: React.FC = () => {
             Anda perlu login untuk mengakses Dashboard.
           </p>
         </div>
-      </div>
+    </div>
     );
   }
 
@@ -791,109 +1190,212 @@ const FlexDashboardPage: React.FC = () => {
   return (
     <>
       <style>{resizeHandleStyles}</style>
-      <div className="p-4 space-y-4">
-        {renderDashboardControls()}
-        <ResponsiveGridLayout
-          className="layout"
-          layouts={{ lg: gridLayout }}
-          breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480 }}
-          cols={{ lg: 12, md: 10, sm: 6, xs: 4 }}
-          rowHeight={70}
-          onLayoutChange={(layout) => {
-            // Dynamically adjust widget sizes
-            const constrainedLayout = layout.map(item => {
-              const widget = widgets.find(w => w.id === item.i);
-              const manualSize = widgetSizes[item.i];
-              
-              // If manually sized, maintain those dimensions
-              if (manualSize) {
-                return {
-                  ...item,
-                  w: manualSize.w,
-                  h: manualSize.h,
-                  minW: 3,
-                  minH: 3
-                };
-              }
-              
-              // Otherwise, use dynamic calculation
-              const { w, h } = calculateWidgetSize(widget);
-              
-              return {
-                ...item,
-                w,
-                h,
-                minW: 3,
-                minH: 3
-              };
-            });
-            
-            setGridLayout(constrainedLayout);
-          }}
-          onResizeStop={(layout, oldItem, newItem) => {
-            // Preserve manually resized dimensions
-            setWidgetSizes((prevSizes) => ({
-              ...prevSizes,
-              [newItem.i]: { w: newItem.w, h: newItem.h }
-            }));
-          }}
-          compactType="vertical"
-          preventCollision={false}
-          isDraggable={true}
-          isResizable={true}
-          resizeHandles={['se', 'sw', 'ne', 'nw']}
-          margin={[10, 10]}
-          containerPadding={[10, 10]}
-        >
-          {widgets.map(widget => (
-            <div 
-              key={widget.id} 
-              className="group"
-              data-widget-category={widget.category}
-            >
-              {renderWidget(widget)}
-            </div>
-          ))}
-        </ResponsiveGridLayout>
-
-        {/* Add Widget Dialog */}
-        <Dialog 
-          open={isAddWidgetDialogOpen} 
-          onOpenChange={setIsAddWidgetDialogOpen}
-        >
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>Pilih Widget</DialogTitle>
-            </DialogHeader>
-            <div className="grid grid-cols-2 gap-4">
-              {availableWidgets.map(widget => (
-                <Card 
-                  key={widget.id} 
-                  className="hover:border-primary cursor-pointer transition-all"
-                  onClick={() => handleAddWidget(widget)}
+      <div className="panel-page">
+        <div className="panel-page-content">
+          <div className="w-full h-full">
+            <div className="flex flex-col h-full">
+              {renderDashboardControls()}
+              <div className="flex-grow w-full">
+                <ResponsiveGridLayout
+                  className="layout w-full"
+                  layouts={{ lg: gridLayout }}
+                  breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480 }}
+                  cols={{ lg: 12, md: 10, sm: 6, xs: 4 }}
+                  rowHeight={70}
+                  onLayoutChange={(layout) => {
+                    // Dynamically adjust widget sizes
+                    const constrainedLayout = layout.map(item => {
+                      const widget = widgets.find(w => w.id === item.i);
+                      const manualSize = widgetSizes[item.i];
+                      
+                      // If manually sized, maintain those dimensions
+                      if (manualSize) {
+                        return {
+                          ...item,
+                          w: manualSize.w,
+                          h: manualSize.h,
+                          minW: 3,
+                          minH: 3
+                        };
+                      }
+                      
+                      // Otherwise, use dynamic calculation
+                      const { w, h } = calculateWidgetSize(widget);
+                      
+                      return {
+                        ...item,
+                        w,
+                        h,
+                        minW: 3,
+                        minH: 3
+                      };
+                    });
+                    
+                    setGridLayout(constrainedLayout);
+                  }}
+                  onResizeStop={(layout, oldItem, newItem) => {
+                    // Preserve manually resized dimensions
+                    setWidgetSizes((prev) => ({
+                      ...prev,
+                      [newItem.i]: { w: newItem.w, h: newItem.h }
+                    }));
+                  }}
+                  compactType="vertical"
+                  preventCollision={false}
+                  isDraggable={true}
+                  isResizable={true}
+                  resizeHandles={['se', 'sw', 'ne', 'nw']}
+                  margin={[10, 10]}
+                  containerPadding={[10, 10]}
+                  style={{ width: '100%' }}
                 >
-                  <CardHeader>
-                    <CardTitle>{widget.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-gray-500 mb-2">{widget.description}</p>
-                    <div className="flex justify-between items-center">
-                      <Badge variant="secondary">{widget.category}</Badge>
-                      <Button 
-                        size="sm" 
-                        variant={widget.isCustomizable ? 'default' : 'ghost'}
-                        disabled={!widget.isCustomizable}
-                      >
-                        {widget.isCustomizable ? 'Tambah' : 'Tidak Tersedia'}
-                      </Button>
+                  {widgets.map(widget => (
+                    <div 
+                      key={widget.id} 
+                      className="group"
+                      data-widget-category={widget.category}
+                    >
+                      <div className="absolute top-2 right-2">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={() => handleDeleteWidget(widget.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      {renderWidget(widget)}
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
+                  ))}
+                </ResponsiveGridLayout>
+              </div>
             </div>
-          </DialogContent>
-        </Dialog>
+          </div>
+        </div>
       </div>
+
+      {/* Add Widget Dialog */}
+      <Dialog 
+        open={isAddWidgetDialogOpen} 
+        onOpenChange={setIsAddWidgetDialogOpen}
+      >
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Pilih Widget</DialogTitle>
+          </DialogHeader>
+          <div className="grid grid-cols-2 gap-4">
+            {availableWidgets.map(widget => (
+              <Card 
+                key={widget.id} 
+                className="hover:border-primary cursor-pointer transition-all"
+                onClick={() => handleAddWidget(widget)}
+              >
+                <CardHeader>
+                  <CardTitle>{widget.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-500 mb-2">{widget.description}</p>
+                  <div className="flex justify-between items-center">
+                    <Badge variant="secondary">{widget.category}</Badge>
+                    <Button 
+                      size="sm" 
+                      variant={widget.isCustomizable ? 'default' : 'ghost'}
+                      disabled={!widget.isCustomizable}
+                    >
+                      {widget.isCustomizable ? 'Tambah' : 'Tidak Tersedia'}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Preset Creation Dialog */}
+      <Dialog 
+        open={isPresetDialogOpen} 
+        onOpenChange={setIsPresetDialogOpen}
+      >
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Buat Preset Widget Baru</DialogTitle>
+            <DialogDescription>
+              Buat template widget kustom untuk digunakan di dashboard
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="name" className="text-right">
+                Nama Preset
+              </Label>
+              <Input 
+                id="name" 
+                value={newPreset.name}
+                onChange={(e) => setNewPreset(prev => ({
+                  ...prev, 
+                  name: e.target.value
+                }))}
+                placeholder="Contoh: Ringkasan Keuangan" 
+                className="col-span-3" 
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="description" className="text-right">
+                Deskripsi
+              </Label>
+              <Input 
+                id="description" 
+                value={newPreset.description}
+                onChange={(e) => setNewPreset(prev => ({
+                  ...prev, 
+                  description: e.target.value
+                }))}
+                placeholder="Deskripsi singkat preset" 
+                className="col-span-3" 
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="category" className="text-right">
+                Kategori
+              </Label>
+              <Select 
+                value={newPreset.category}
+                onValueChange={(value) => setNewPreset(prev => ({
+                  ...prev, 
+                  category: value as WidgetCategory
+                }))}
+              >
+                <SelectTrigger className="col-span-3">
+                  <SelectValue placeholder="Pilih Kategori" />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.values(WidgetCategory).map(category => (
+                    <SelectItem key={category} value={category}>
+                      {category}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button 
+              type="submit" 
+              onClick={handleCreatePreset}
+            >
+              Buat Preset
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Widget Configuration Form */}
+      <WidgetConfigForm 
+        isOpen={isWidgetConfigOpen}
+        onClose={() => setIsWidgetConfigOpen(false)}
+        onSubmit={handleCreateWidget}
+      />
     </>
   );
 };
