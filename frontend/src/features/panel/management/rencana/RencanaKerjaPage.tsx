@@ -101,6 +101,52 @@ export default function RencanaKerjaPage() {
     moveTask(currentBoard.id, sourceColumnId, destinationColumnId, taskId);
   };
 
+  const renderFilterMenu = () => (
+    <div className="rencana-filters">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" size="sm" className="rencana-filter-button">
+            <Filter className="h-4 w-4" />
+            Filter
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuItem onClick={() => setFilterStatus(null)}>
+            Semua
+          </DropdownMenuItem>
+          {Object.values(TaskStatus).map((status) => (
+            <DropdownMenuItem
+              key={status}
+              onClick={() => setFilterStatus(status)}
+            >
+              {status}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" size="sm" className="rencana-filter-button">
+            <SortDesc className="h-4 w-4" />
+            Urutkan
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuItem onClick={() => setSortBy('priority')}>
+            Prioritas
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setSortBy('dueDate')}>
+            Tenggat Waktu
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setSortBy('createdAt')}>
+            Tanggal Dibuat
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
+  );
+
   const handleAddColumn = () => {
     if (!newColumnTitle.trim()) return;
 
@@ -156,230 +202,178 @@ export default function RencanaKerjaPage() {
     }));
   }, [currentBoard, filterStatus, sortBy]);
 
-  const renderFilterMenu = () => (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon">
-          <Filter className="h-4 w-4" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent>
-        <DropdownMenuItem onClick={() => setFilterStatus(null)}>
-          Semua Status
-        </DropdownMenuItem>
-        {Object.values(TaskStatus).map(status => (
-          <DropdownMenuItem 
-            key={status} 
-            onClick={() => setFilterStatus(status)}
-          >
-            {status}
-          </DropdownMenuItem>
-        ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-
-  const renderSortMenu = () => (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon">
-          <SortDesc className="h-4 w-4" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent>
-        <DropdownMenuItem onClick={() => setSortBy('createdAt')}>
-          Tanggal Dibuat
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setSortBy('priority')}>
-          Prioritas
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setSortBy('dueDate')}>
-          Tanggal Jatuh Tempo
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-
   return (
-    <div className="h-full flex flex-col">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">
+    <div className="flex flex-col h-full w-full overflow-hidden">
+      {/* Mobile-friendly header */}
+      <div className="flex flex-col md:flex-row items-center justify-between p-4 space-y-2 md:space-y-0">
+        <div className="flex items-center space-x-2 w-full md:w-auto">
+          <h1 className="text-xl font-bold truncate flex-grow">
             {currentBoard.title}
-          </h2>
-          {currentBoard.description && (
-            <p className="text-muted-foreground">{currentBoard.description}</p>
-          )}
+          </h1>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  size="icon" 
+                  className="md:hidden"
+                  onClick={() => setIsCreateOpen(true)}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Tambah Tugas</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
-        <div className="flex gap-2">
-          {renderFilterMenu()}
-          {renderSortMenu()}
-          <Button 
-            onClick={() => setIsCreateOpen(true)}
-            className="flex items-center gap-2"
-          >
-            <Plus className="h-4 w-4" />
-            Tambah Tugas
-          </Button>
-          <Button 
-            variant="outline" 
-            onClick={() => setIsAddColumnDialogOpen(true)}
-          >
-            <Plus className="mr-2 h-4 w-4" /> Tambah Kolom
-          </Button>
+
+        {/* Responsive filter and action buttons */}
+        <div className="flex flex-wrap justify-end gap-2 w-full md:w-auto">
+          <div className="flex space-x-2">
+            {renderFilterMenu()}
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="hidden md:flex"
+              onClick={() => setIsCreateOpen(true)}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Tambah Tugas
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="hidden md:flex"
+              onClick={() => setIsAddColumnDialogOpen(true)}
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Tambah Kolom
+            </Button>
+          </div>
         </div>
       </div>
 
+      {/* Drag and Drop Context with Mobile Scrolling */}
       <DragDropContext onDragEnd={handleDragEnd}>
-        <div className="grid grid-cols-3 gap-4 flex-grow overflow-x-auto">
-          {filteredColumns.map((column) => (
-            <Droppable key={column.id} droppableId={column.id}>
-              {(provided) => (
-                <div 
-                  ref={provided.innerRef} 
-                  {...provided.droppableProps}
-                  className="bg-gray-100 rounded-lg p-4 min-h-[500px] flex flex-col"
-                >
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="font-semibold text-lg">{column.title}</h3>
-                    <span className="text-sm text-muted-foreground">
-                      {column.tasks.length} Tugas
-                    </span>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <DropdownMenuItem 
-                          onSelect={() => setEditingColumn({
-                            id: column.id, 
-                            title: column.title
-                          })}
-                        >
-                          <Edit className="mr-2 h-4 w-4" /> Edit Kolom
-                        </DropdownMenuItem>
-                        <DropdownMenuItem 
-                          onSelect={() => handleDeleteColumn(column.id)}
-                          className="text-red-600"
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" /> Hapus Kolom
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                  
-                  {column.tasks.map((task, index) => (
-                    <Draggable 
-                      key={task.id} 
-                      draggableId={task.id} 
-                      index={index}
-                    >
-                      {(provided) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          className={cn(
-                            "bg-white p-3 rounded-lg mb-3 shadow-sm cursor-move",
-                            {
-                              "border-2 border-red-500": task.priority === 'CRITICAL',
-                              "border-2 border-orange-500": task.priority === 'HIGH',
-                              "border-2 border-blue-500": task.priority === 'MEDIUM',
-                            }
-                          )}
-                          onClick={() => setSelectedTask({
-                            boardId: currentBoard.id,
-                            columnId: column.id,
-                            taskId: task.id
-                          })}
-                        >
-                          <div className="flex justify-between items-start">
-                            <h4 className="font-medium text-sm">{task.title}</h4>
-                            <div className="flex items-center gap-2">
-                              {task.dueDate && (
-                                <span className="text-xs text-muted-foreground">
-                                  {format(new Date(task.dueDate), 'dd MMM')}
-                                </span>
-                              )}
-                              <span 
-                                className={cn(
-                                  "text-xs px-2 py-1 rounded-full",
-                                  {
-                                    "bg-red-100 text-red-800": task.priority === 'CRITICAL',
-                                    "bg-orange-100 text-orange-800": task.priority === 'HIGH',
-                                    "bg-blue-100 text-blue-800": task.priority === 'MEDIUM',
-                                    "bg-gray-100 text-gray-800": task.priority === 'LOW',
-                                  }
-                                )}
+        <div className="flex-grow overflow-x-auto overflow-y-hidden">
+          <div className="flex space-x-4 p-4 h-full min-w-[1000px] md:min-w-full">
+            {filteredColumns.map((column, columnIndex) => (
+              <Droppable key={column.id} droppableId={column.id}>
+                {(provided) => (
+                  <div 
+                    ref={provided.innerRef} 
+                    {...provided.droppableProps}
+                    className="bg-muted/50 rounded-lg p-3 w-[300px] min-w-[250px] max-w-[350px]"
+                  >
+                    <div className="flex justify-between items-center mb-3">
+                      <h3 className="font-semibold text-sm truncate flex-grow mr-2">
+                        {column.title}
+                      </h3>
+                      <div className="flex items-center space-x-1">
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-7 w-7"
+                                onClick={() => {
+                                  setEditingColumn({
+                                    id: column.id,
+                                    title: column.title
+                                  });
+                                }}
                               >
-                                {task.priority}
-                              </span>
-                            </div>
-                          </div>
-                          {task.description && (
-                            <p className="text-xs text-muted-foreground mt-2 line-clamp-2">
-                              {task.description}
-                            </p>
-                          )}
-                          <div className="flex items-center justify-between mt-2">
-                            <div className="flex items-center gap-1">
-                              {task.checklist && (
-                                <span className="text-xs text-muted-foreground">
-                                  {task.checklist.filter(item => item.completed).length} / {task.checklist.length}
-                                </span>
-                              )}
-                              {task.comments && task.comments.length > 0 && (
-                                <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                                  <MessageSquare className="h-3 w-3" />
-                                  {task.comments.length}
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Edit Kolom</TooltipContent>
+                          </Tooltip>
+                          
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-7 w-7"
+                                onClick={() => handleDeleteColumn(column.id)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Hapus Kolom</TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
+                    </div>
+
+                    <div 
+                      className="space-y-3 max-h-[calc(100vh-250px)] overflow-y-auto custom-scrollbar"
+                    >
+                      {column.tasks.map((task, taskIndex) => (
+                        <Draggable 
+                          key={task.id} 
+                          draggableId={task.id} 
+                          index={taskIndex}
+                        >
+                          {(provided) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              className="bg-background border rounded-lg p-3 shadow-sm hover:shadow-md transition-shadow"
+                              onClick={() => setSelectedTask({
+                                boardId: currentBoard.id,
+                                columnId: column.id,
+                                taskId: task.id
+                              })}
+                            >
+                              <div className="flex justify-between items-start">
+                                <h4 className="font-medium text-sm flex-grow mr-2 truncate">
+                                  {task.title}
+                                </h4>
+                                <div 
+                                  className={cn(
+                                    "px-2 py-1 rounded-full text-xs font-semibold",
+                                    task.priority === 'CRITICAL' && 'bg-red-100 text-red-800',
+                                    task.priority === 'HIGH' && 'bg-orange-100 text-orange-800',
+                                    task.priority === 'MEDIUM' && 'bg-yellow-100 text-yellow-800',
+                                    task.priority === 'LOW' && 'bg-green-100 text-green-800'
+                                  )}
+                                >
+                                  {task.priority}
+                                </div>
+                              </div>
+                              {task.dueDate && (
+                                <div className="text-xs text-muted-foreground mt-1">
+                                  {format(new Date(task.dueDate), 'dd MMM yyyy')}
                                 </div>
                               )}
                             </div>
-                            {task.assignees && task.assignees.length > 0 && (
-                              <div className="flex -space-x-2">
-                                {task.assignees.slice(0, 3).map((assignee, index) => (
-                                  <Avatar key={index} className="h-6 w-6 border-2 border-white">
-                                    <AvatarFallback className="text-xs">
-                                      {assignee.charAt(0).toUpperCase()}
-                                    </AvatarFallback>
-                                  </Avatar>
-                                ))}
-                                {task.assignees.length > 3 && (
-                                  <div className="h-6 w-6 bg-gray-200 rounded-full flex items-center justify-center text-xs">
-                                    +{task.assignees.length - 3}
-                                  </div>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      )}
-                    </Draggable>
-                  ))}
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
-          ))}
+                          )}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
+                    </div>
+                  </div>
+                )}
+              </Droppable>
+            ))}
+          </div>
         </div>
       </DragDropContext>
 
+      {/* Dialogs and Modals */}
       <CreateTaskDialog 
         open={isCreateOpen} 
-        onOpenChange={setIsCreateOpen} 
-        boardId={currentBoard.id} 
+        onOpenChange={setIsCreateOpen}
+        boardId={currentBoard.id}
       />
 
-      {selectedTask && (
-        <TaskDetails 
-          boardId={selectedTask.boardId}
-          columnId={selectedTask.columnId}
-          taskId={selectedTask.taskId}
-          onClose={() => setSelectedTask(null)}
-        />
-      )}
+      <TaskDetails 
+        task={selectedTask} 
+        onClose={() => setSelectedTask(null)} 
+      />
 
       {/* Add Column Dialog */}
       <Dialog 
@@ -398,7 +392,7 @@ export default function RencanaKerjaPage() {
               <Label htmlFor="columnTitle" className="text-right">
                 Nama Kolom
               </Label>
-              <Input
+              <Input 
                 id="columnTitle"
                 value={newColumnTitle}
                 onChange={(e) => setNewColumnTitle(e.target.value)}
@@ -428,7 +422,7 @@ export default function RencanaKerjaPage() {
           <DialogHeader>
             <DialogTitle>Edit Kolom</DialogTitle>
             <DialogDescription>
-              Ubah nama kolom yang ada
+              Ubah nama kolom yang dipilih
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -436,7 +430,7 @@ export default function RencanaKerjaPage() {
               <Label htmlFor="editColumnTitle" className="text-right">
                 Nama Kolom
               </Label>
-              <Input
+              <Input 
                 id="editColumnTitle"
                 value={editingColumn?.title || ''}
                 onChange={(e) => setEditingColumn(prev => 

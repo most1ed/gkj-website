@@ -12,6 +12,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/Tabs";
 import { Card } from "@/components/ui/Card";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
+import { useLocation } from "react-router-dom";
+import { useToast } from "@/components/ui/use-toast";
+import React, { useEffect } from 'react';
 
 const ScrollAnimatedSection = ({ children }: { children: React.ReactNode }) => {
   const ref = useRef(null);
@@ -43,6 +46,23 @@ const ScrollAnimatedSection = ({ children }: { children: React.ReactNode }) => {
 
 export function HomePage() {
   const { data, isLoading } = useHomeData();
+  const location = useLocation();
+  const { toast } = useToast();
+
+  // Handle logout message from navigation state
+  useEffect(() => {
+    if (location.state?.logoutMessage) {
+      toast({
+        title: 'Logout Berhasil',
+        description: location.state.logoutMessage,
+        variant: 'default',
+        duration: 3000
+      });
+
+      // Clear the state to prevent repeated toasts
+      window.history.replaceState({}, document.title);
+    }
+  }, [location, toast]);
 
   if (isLoading) {
     return <div>Loading...</div>;

@@ -26,7 +26,10 @@ import {
   BookOpenIcon,
   ImageIcon,
   CreditCardIcon,
-  KanbanIcon
+  KanbanIcon,
+  KeyIcon,
+  MoonIcon,
+  LogOutIcon
 } from 'lucide-react';
 import { 
   Tooltip, 
@@ -44,11 +47,13 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from '@/components/common/theme/ThemeToggle';
 import { PanelFooter } from '@/components/common/PanelFooter';
 import { useAuth } from '@/hooks/auth';
 import { Toaster } from '@/components/ui/toaster';
+import { useToast } from '@/components/ui/use-toast';
 
 // Breadcrumbs Component
 const Breadcrumbs: React.FC = () => {
@@ -136,26 +141,137 @@ const NotificationDropdown: React.FC = () => {
 // Profile Dropdown Component
 const ProfileDropdown: React.FC = () => {
   const { user, logout } = useAuth();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+
+  const profileActions = [
+    {
+      label: 'Profil Saya',
+      icon: UserIcon,
+      action: () => {
+        console.log('Navigating to profile');
+        navigate('/panel/profile');
+      }
+    },
+    {
+      label: 'Pengaturan',
+      icon: SettingsIcon,
+      action: () => {
+        console.log('Navigating to settings');
+        navigate('/panel/settings');
+      }
+    },
+    {
+      label: 'Ganti Kata Sandi',
+      icon: KeyIcon,
+      action: () => {
+        console.log('Opening password change dialog');
+        toast({
+          title: 'Ganti Kata Sandi',
+          description: 'Fitur ganti kata sandi akan segera hadir.',
+          variant: 'default'
+        });
+      }
+    },
+    {
+      label: 'Tema',
+      icon: MoonIcon,
+      action: () => {
+        console.log('Opening theme selector');
+        toast({
+          title: 'Pilih Tema',
+          description: 'Pilihan tema akan segera tersedia.',
+          variant: 'default'
+        });
+      }
+    }
+  ];
+
+  const handleLogout = () => {
+    try {
+      // Clear any active sessions or tokens
+      logout();
+
+      // Clear local storage or session storage if needed
+      localStorage.removeItem('userToken');
+      sessionStorage.removeItem('userSession');
+
+      // Show success toast
+      toast({
+        title: 'Logout Berhasil',
+        description: 'Anda telah berhasil keluar dari sistem.',
+        variant: 'default',
+        duration: 2000 // Show for 2 seconds
+      });
+
+      // Small delay to ensure toast is visible
+      setTimeout(() => {
+        // Navigate to home page
+        navigate('/', { 
+          replace: true, // Replace current history entry
+          state: { 
+            logoutMessage: 'Anda telah berhasil logout' 
+          }
+        });
+      }, 500); // Short delay for smooth transition
+
+    } catch (error) {
+      console.error('Logout process failed', error);
+      
+      // Error handling toast
+      toast({
+        title: 'Logout Gagal',
+        description: 'Terjadi kesalahan saat logout. Silakan coba lagi.',
+        variant: 'destructive',
+        duration: 3000
+      });
+    }
+  };
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon">
+        <Button variant="ghost" size="icon" className="relative">
           <UserIcon className="h-5 w-5" />
+          {user?.unreadNotifications > 0 && (
+            <span className="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full animate-pulse" />
+          )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" className="w-64">
         <DropdownMenuLabel>
           <div className="flex items-center space-x-2">
-            <UserIcon className="h-5 w-5" />
-            <span>{user?.name || 'My Account'}</span>
+            <Avatar>
+              <AvatarImage src={user?.avatarUrl} alt={user?.name} />
+              <AvatarFallback>{user?.name?.charAt(0)}</AvatarFallback>
+            </Avatar>
+            <div className="flex flex-col">
+              <span className="font-semibold">{user?.name || 'My Account'}</span>
+              <span className="text-xs text-muted-foreground">{user?.email}</span>
+            </div>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>Profile</DropdownMenuItem>
-        <DropdownMenuItem>Settings</DropdownMenuItem>
+        
+        {profileActions.map((action, index) => (
+          <DropdownMenuItem 
+            key={index} 
+            onClick={action.action}
+            className="cursor-pointer"
+          >
+            <action.icon className="mr-2 h-4 w-4" />
+            {action.label}
+          </DropdownMenuItem>
+        ))}
+        
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={logout}>Logout</DropdownMenuItem>
+        <DropdownMenuItem 
+          onClick={handleLogout} 
+          className="text-destructive focus:text-destructive cursor-pointer"
+        >
+          <LogOutIcon className="mr-2 h-4 w-4" />
+          Logout
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
@@ -211,7 +327,7 @@ const useResponsiveSidebar = () => {
     isMobile, 
     isMobileSidebarOpen,
     toggleCollapse,
-    toggleMobileSidebar
+    toggleMobileSidebar 
   };
 };
 
@@ -458,8 +574,8 @@ export const PanelLayout: React.FC = () => {
           isMobile 
             ? "ml-0" 
             : isCollapsed 
-              ? "ml-16" 
-              : "ml-64"
+              ? "ml-1" 
+              : "ml-88"
         )}>
           <header className="sticky top-0 z-40 w-full border-b bg-background">
             <div className="flex h-16 items-center justify-between px-4">
@@ -495,15 +611,16 @@ export const PanelLayout: React.FC = () => {
         </div>
         {isMobile && isMobileSidebarOpen && (
           <div 
-            className="fixed top-0 left-0 z-50 h-screen w-full bg-background p-4"
+            className="fixed top-0 left-0 z-50 h-screen w-[80%] max-w-[320px] bg-background p-4 shadow-lg overflow-y-auto"
           >
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between mb-4 border-b pb-2">
               <Link 
                 to="/panel/flexdash" 
                 className="flex items-center gap-2 text-lg font-semibold"
+                onClick={toggleMobileSidebar}
               >
                 <LayoutIcon className="h-6 w-6" />
-                <span>GKJ Panel</span>
+                <span className="truncate">GKJ Panel</span>
               </Link>
               <Button 
                 variant="ghost" 
@@ -513,8 +630,23 @@ export const PanelLayout: React.FC = () => {
                 <ChevronLeftIcon />
               </Button>
             </div>
-            <div className="flex-1 overflow-y-auto py-4 space-y-1">
-              {sidebarItems.map(renderSidebarItem)}
+            <div className="space-y-1">
+              {sidebarItems.map((item, index) => (
+                <NavLink
+                  key={item.path}
+                  to={item.path}
+                  onClick={toggleMobileSidebar}
+                  className={({ isActive }) => cn(
+                    "flex items-center gap-3 p-2 rounded-md transition-colors duration-200 w-full",
+                    isActive 
+                      ? "bg-primary/10 text-primary" 
+                      : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                  )}
+                >
+                  <item.icon className="h-5 w-5" />
+                  <span className="text-sm truncate">{item.label}</span>
+                </NavLink>
+              ))}
             </div>
           </div>
         )}
