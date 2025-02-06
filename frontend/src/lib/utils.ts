@@ -141,3 +141,13 @@ export function safeNumber(
   const num = Number(value)
   return isNaN(num) ? fallback : num
 }
+
+// Format number to Indonesian Rupiah currency
+export function formatCurrency(value: number, currency: string = 'Rp'): string {
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(value);
+}

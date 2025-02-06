@@ -9,7 +9,7 @@ import {
   CogIcon,
   NewspaperIcon,
   PhotoIcon,
-  BookOpenIcon,
+  BookOpen,
   ChartPieIcon,
   UserGroupIcon,
   BuildingOfficeIcon,

@@ -1,10 +1,10 @@
 import React from 'react';
 import { 
-  LockClosedIcon, 
-  UserIcon,
-  DatabaseIcon,
-  ShieldExclamationIcon
-} from '@heroicons/react/24/outline';
+  Lock, 
+  User,
+  Database,
+  ShieldAlert
+} from 'lucide-react';
 import { PageTemplateGenerator } from '@/features/public/page-generator';
 import { PageTemplate } from '@/features/public/page-generator/types';
 
@@ -19,7 +19,7 @@ export default function PrivacyPolicyPage() {
       {
         id: 'data-collection',
         title: 'Pengumpulan Data',
-        icon: DatabaseIcon,
+        icon: Database,
         description: 'Informasi tentang data yang kami kumpulkan.',
         details: [
           'Data pribadi yang diberikan secara sukarela',
@@ -31,7 +31,7 @@ export default function PrivacyPolicyPage() {
       {
         id: 'data-usage',
         title: 'Penggunaan Data',
-        icon: UserIcon,
+        icon: User,
         description: 'Cara kami menggunakan informasi pribadi Anda.',
         details: [
           'Komunikasi pelayanan gereja',
@@ -43,19 +43,19 @@ export default function PrivacyPolicyPage() {
       {
         id: 'data-protection',
         title: 'Perlindungan Data',
-        icon: LockClosedIcon,
+        icon: Lock,
         description: 'Langkah-langkah keamanan data kami.',
         details: [
           'Enkripsi data sensitif',
           'Pembatasan akses data',
           'Penyimpanan aman',
-          'Pembaruan berkala sistem keamanan'
+          'Pemantauan keamanan berkala'
         ]
       },
       {
         id: 'user-rights',
         title: 'Hak Pengguna',
-        icon: ShieldExclamationIcon,
+        icon: ShieldAlert,
         description: 'Hak Anda terkait data pribadi.',
         details: [
           'Hak akses data pribadi',

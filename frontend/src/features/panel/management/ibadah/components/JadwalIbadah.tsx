@@ -21,6 +21,24 @@ import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import { Plus, Edit, Trash2, Calendar as CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogDescription,
+  DialogFooter 
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import { toast } from "@/components/ui/use-toast";
 
 interface WorshipService {
   id: string;
@@ -61,34 +79,79 @@ export function JadwalIbadah() {
     },
   ]);
 
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [currentService, setCurrentService] = useState<Partial<WorshipService>>({});
+
   const getStatusBadgeClass = (status: WorshipService["status"]) => {
     switch (status) {
-      case "scheduled":
-        return "bg-blue-100 text-blue-700 dark:bg-blue-700 dark:text-blue-100";
-      case "ongoing":
-        return "bg-green-100 text-green-700 dark:bg-green-700 dark:text-green-100";
-      case "completed":
-        return "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-100";
-      case "cancelled":
-        return "bg-red-100 text-red-700 dark:bg-red-700 dark:text-red-100";
-      default:
-        return "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-100";
+      case "scheduled": return "bg-blue-100 text-blue-700 dark:bg-blue-700 dark:text-blue-100";
+      case "ongoing": return "bg-green-100 text-green-700 dark:bg-green-700 dark:text-green-100";
+      case "completed": return "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-100";
+      case "cancelled": return "bg-red-100 text-red-700 dark:bg-red-700 dark:text-red-100";
+      default: return "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-100";
     }
   };
 
   const getStatusText = (status: WorshipService["status"]) => {
     switch (status) {
-      case "scheduled":
-        return "Terjadwal";
-      case "ongoing":
-        return "Berlangsung";
-      case "completed":
-        return "Selesai";
-      case "cancelled":
-        return "Dibatalkan";
-      default:
-        return "-";
+      case "scheduled": return "Terjadwal";
+      case "ongoing": return "Berlangsung";
+      case "completed": return "Selesai";
+      case "cancelled": return "Dibatalkan";
+      default: return "-";
     }
+  };
+
+  const handleAddService = () => {
+    const newService: WorshipService = {
+      id: `${services.length + 1}`,
+      date: selectedDate || new Date(),
+      time: currentService.time || "09:00",
+      type: currentService.type || "Ibadah Minggu",
+      theme: currentService.theme,
+      preacher: currentService.preacher || "Pdt. Tidak Diketahui",
+      liturgist: currentService.liturgist || "Pnt. Tidak Diketahui",
+      musicians: currentService.musicians || [],
+      status: "scheduled"
+    };
+
+    setServices([...services, newService]);
+    toast({
+      title: "Jadwal Ibadah Ditambahkan",
+      description: `${newService.type} pada ${format(newService.date, 'PPP', { locale: id })} berhasil ditambahkan.`
+    });
+
+    setIsAddModalOpen(false);
+    setCurrentService({});
+  };
+
+  const handleEditService = () => {
+    const updatedServices = services.map(service => 
+      service.id === currentService.id 
+        ? { ...service, ...currentService } as WorshipService 
+        : service
+    );
+
+    setServices(updatedServices);
+    toast({
+      title: "Jadwal Ibadah Diperbarui",
+      description: `${currentService.type} berhasil diperbarui.`
+    });
+
+    setIsEditModalOpen(false);
+    setCurrentService({});
+  };
+
+  const handleDeleteService = (serviceId: string) => {
+    const updatedServices = services.filter(service => service.id !== serviceId);
+    setServices(updatedServices);
+    
+    toast({
+      title: "Jadwal Ibadah Dihapus",
+      description: "Jadwal ibadah telah dihapus dari daftar.",
+      variant: "destructive"
+    });
   };
 
   const filteredServices = selectedDate
@@ -131,7 +194,10 @@ export function JadwalIbadah() {
               Daftar jadwal ibadah dan pelayanan
             </p>
           </div>
-          <Button>
+          <Button onClick={() => {
+            setCurrentService({ date: selectedDate || new Date() });
+            setIsAddModalOpen(true);
+          }}>
             <Plus className="h-4 w-4 mr-2" />
             Tambah Jadwal
           </Button>
@@ -182,11 +248,22 @@ export function JadwalIbadah() {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right space-x-2">
-                    <Button size="sm" variant="outline">
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => {
+                        setCurrentService(service);
+                        setIsEditModalOpen(true);
+                      }}
+                    >
                       <Edit className="h-4 w-4 mr-2" />
                       Edit
                     </Button>
-                    <Button size="sm" variant="destructive">
+                    <Button 
+                      size="sm" 
+                      variant="destructive"
+                      onClick={() => handleDeleteService(service.id)}
+                    >
                       <Trash2 className="h-4 w-4 mr-2" />
                       Hapus
                     </Button>
@@ -197,6 +274,196 @@ export function JadwalIbadah() {
           </Table>
         </div>
       </div>
+
+      {/* Add Service Modal */}
+      <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Tambah Jadwal Ibadah</DialogTitle>
+            <DialogDescription>
+              Masukkan detail jadwal ibadah baru
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="type" className="text-right">
+                Jenis Ibadah
+              </Label>
+              <Select 
+                value={currentService.type || "Ibadah Minggu"}
+                onValueChange={(value) => setCurrentService(prev => ({ ...prev, type: value }))}
+              >
+                <SelectTrigger className="col-span-3">
+                  <SelectValue placeholder="Pilih Jenis Ibadah" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Ibadah Minggu">Ibadah Minggu</SelectItem>
+                  <SelectItem value="Ibadah Khusus">Ibadah Khusus</SelectItem>
+                  <SelectItem value="Doa Pemuda">Doa Pemuda</SelectItem>
+                  <SelectItem value="Kebaktian Kategorial">Kebaktian Kategorial</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="time" className="text-right">
+                Waktu
+              </Label>
+              <Input
+                id="time"
+                type="time"
+                value={currentService.time || "09:00"}
+                onChange={(e) => setCurrentService(prev => ({ ...prev, time: e.target.value }))}
+                className="col-span-3"
+              />
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="theme" className="text-right">
+                Tema
+              </Label>
+              <Input
+                id="theme"
+                value={currentService.theme || ""}
+                onChange={(e) => setCurrentService(prev => ({ ...prev, theme: e.target.value }))}
+                placeholder="Tema ibadah (opsional)"
+                className="col-span-3"
+              />
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="preacher" className="text-right">
+                Pengkhotbah
+              </Label>
+              <Input
+                id="preacher"
+                value={currentService.preacher || ""}
+                onChange={(e) => setCurrentService(prev => ({ ...prev, preacher: e.target.value }))}
+                placeholder="Nama pengkhotbah"
+                className="col-span-3"
+              />
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="liturgist" className="text-right">
+                Liturgos
+              </Label>
+              <Input
+                id="liturgist"
+                value={currentService.liturgist || ""}
+                onChange={(e) => setCurrentService(prev => ({ ...prev, liturgist: e.target.value }))}
+                placeholder="Nama liturgos"
+                className="col-span-3"
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAddModalOpen(false)}>
+              Batal
+            </Button>
+            <Button onClick={handleAddService}>
+              Tambah Jadwal
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Service Modal */}
+      <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Jadwal Ibadah</DialogTitle>
+            <DialogDescription>
+              Perbarui detail jadwal ibadah
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="type" className="text-right">
+                Jenis Ibadah
+              </Label>
+              <Select 
+                value={currentService.type || "Ibadah Minggu"}
+                onValueChange={(value) => setCurrentService(prev => ({ ...prev, type: value }))}
+              >
+                <SelectTrigger className="col-span-3">
+                  <SelectValue placeholder="Pilih Jenis Ibadah" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Ibadah Minggu">Ibadah Minggu</SelectItem>
+                  <SelectItem value="Ibadah Khusus">Ibadah Khusus</SelectItem>
+                  <SelectItem value="Doa Pemuda">Doa Pemuda</SelectItem>
+                  <SelectItem value="Kebaktian Kategorial">Kebaktian Kategorial</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="time" className="text-right">
+                Waktu
+              </Label>
+              <Input
+                id="time"
+                type="time"
+                value={currentService.time || "09:00"}
+                onChange={(e) => setCurrentService(prev => ({ ...prev, time: e.target.value }))}
+                className="col-span-3"
+              />
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="theme" className="text-right">
+                Tema
+              </Label>
+              <Input
+                id="theme"
+                value={currentService.theme || ""}
+                onChange={(e) => setCurrentService(prev => ({ ...prev, theme: e.target.value }))}
+                placeholder="Tema ibadah (opsional)"
+                className="col-span-3"
+              />
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="preacher" className="text-right">
+                Pengkhotbah
+              </Label>
+              <Input
+                id="preacher"
+                value={currentService.preacher || ""}
+                onChange={(e) => setCurrentService(prev => ({ ...prev, preacher: e.target.value }))}
+                placeholder="Nama pengkhotbah"
+                className="col-span-3"
+              />
+            </div>
+
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="liturgist" className="text-right">
+                Liturgos
+              </Label>
+              <Input
+                id="liturgist"
+                value={currentService.liturgist || ""}
+                onChange={(e) => setCurrentService(prev => ({ ...prev, liturgist: e.target.value }))}
+                placeholder="Nama liturgos"
+                className="col-span-3"
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditModalOpen(false)}>
+              Batal
+            </Button>
+            <Button onClick={handleEditService}>
+              Simpan Perubahan
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

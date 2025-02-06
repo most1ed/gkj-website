@@ -23,7 +23,7 @@ import {
   LayoutIcon,
   NewspaperIcon,
   DatabaseIcon,
-  BookOpenIcon,
+  BookOpen,
   ImageIcon,
   CreditCardIcon,
   KanbanIcon,
@@ -410,7 +410,7 @@ const sidebarItems = [
   },
   {
     label: 'Alkitab',
-    icon: BookOpenIcon,
+    icon: BookOpen,
     path: '/panel/admin/alkitab',
   },
   {

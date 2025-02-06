@@ -1,133 +1,124 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { 
   Target, 
-  Heart, 
   Globe, 
-  Users, 
+  Heart, 
   BookOpen, 
-  Eye 
+  Users 
 } from 'lucide-react';
 
-const missionPillars = [
+const missionValues = [
   {
-    icon: Heart,
-    title: 'Pelayanan Berbasis Kasih',
-    description: 'Menunjukkan kasih Kristus melalui pelayanan yang tulus dan penuh empati'
+    icon: Target,
+    title: "Visi Rohani",
+    description: "Membentuk jemaat yang bertumbuh dalam iman, pengetahuan, dan pelayanan Kristus.",
+    details: [
+      "Pengajaran Alkitab yang mendalam",
+      "Pembinaan iman berkelanjutan",
+      "Penguatan kehidupan rohani"
+    ]
   },
   {
     icon: Globe,
-    title: 'Penginjilan & Misi',
-    description: 'Menyebarkan Injil dan membawa harapan kepada masyarakat'
+    title: "Misi Sosial",
+    description: "Menghadirkan kasih Kristus melalui pelayanan yang transformatif dalam masyarakat.",
+    details: [
+      "Pemberdayaan komunitas",
+      "Kepedulian terhadap kaum marginal",
+      "Kerjasama lintas denominasi"
+    ]
   },
   {
-    icon: Users,
-    title: 'Pembinaan Jemaat',
-    description: 'Membangun iman dan karakter anggota jemaat'
+    icon: Heart,
+    title: "Pelayanan Kasih",
+    description: "Menunjukkan kasih Allah melalui tindakan nyata dan empati.",
+    details: [
+      "Program bantuan sosial",
+      "Konseling dan pendampingan",
+      "Jaringan dukungan pastoral"
+    ]
   }
 ];
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: { 
-    opacity: 1,
-    transition: {
-      delayChildren: 0.3,
-      staggerChildren: 0.2
-    }
+const communityEngagementSteps = [
+  {
+    icon: BookOpen,
+    title: "Edukasi",
+    description: "Program pendidikan dan pengembangan iman"
+  },
+  {
+    icon: Users,
+    title: "Partisipasi",
+    description: "Keterlibatan aktif dalam pelayanan gereja"
   }
-};
-
-const itemVariants = {
-  hidden: { y: 20, opacity: 0 },
-  visible: { 
-    y: 0, 
-    opacity: 1,
-    transition: {
-      type: "spring",
-      stiffness: 100
-    }
-  }
-};
+];
 
 export default function MissionStatementPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white py-16">
-      <motion.div 
-        className="container mx-auto px-4 max-w-6xl"
-        initial="hidden"
-        animate="visible"
-        variants={containerVariants}
-      >
-        <motion.div 
-          className="text-center mb-16"
-          variants={itemVariants}
-        >
-          <Target className="mx-auto mb-6 text-primary" size={64} />
-          <h1 className="text-4xl font-bold mb-4 text-gray-800">
-            Pernyataan Misi
-          </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Komitmen kami untuk menghadirkan kasih Kristus, 
-            memberdayakan jemaat, dan memberikan transformasi positif dalam masyarakat
-          </p>
-        </motion.div>
+    <div className="container mx-auto p-4 max-w-6xl">
+      <header className="text-center mb-16">
+        <Target className="mx-auto mb-6 text-primary" size={64} />
+        <h1 className="text-4xl font-bold mb-4">Misi dan Nilai Gereja</h1>
+        <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          Menghadirkan kasih Kristus melalui pelayanan yang holistik, 
+          membawa transformasi spiritual dan sosial dalam masyarakat.
+        </p>
+      </header>
 
-        <motion.div 
-          className="bg-white rounded-xl shadow-lg p-8 mb-12 text-center"
-          variants={itemVariants}
-        >
-          <Eye className="mx-auto mb-4 text-primary" size={48} />
-          <h2 className="text-3xl font-bold mb-4 text-gray-800">Visi Kami</h2>
-          <p className="text-xl text-gray-600 max-w-4xl mx-auto">
-            Menjadi gereja yang hidup, dinamis, dan transformatif 
-            yang menghadirkan kasih Kristus dalam setiap aspek kehidupan masyarakat.
-          </p>
-        </motion.div>
-
-        <motion.div 
-          className="grid md:grid-cols-3 gap-8"
-          variants={containerVariants}
-        >
-          {missionPillars.map((pillar, index) => (
-            <motion.div 
-              key={index}
-              className="bg-white rounded-xl shadow-lg p-8 text-center hover:shadow-xl transition-shadow"
-              variants={itemVariants}
-              whileHover={{ scale: 1.05 }}
+      <section className="mb-16">
+        <h2 className="text-3xl font-semibold mb-8 text-center">
+          Nilai-Nilai Utama
+        </h2>
+        <div className="grid md:grid-cols-3 gap-8">
+          {missionValues.map((value, index) => (
+            <div 
+              key={index} 
+              className="bg-card border rounded-lg p-6 text-center shadow-sm hover:shadow-md transition-shadow"
             >
-              <pillar.icon className="mx-auto mb-4 text-primary" size={48} />
-              <h3 className="text-2xl font-bold mb-4 text-gray-800">
-                {pillar.title}
-              </h3>
-              <p className="text-gray-600">
-                {pillar.description}
-              </p>
-            </motion.div>
+              <value.icon className="mx-auto mb-4 text-primary" size={48} />
+              <h3 className="text-2xl font-bold mb-4">{value.title}</h3>
+              <p className="text-muted-foreground mb-6">{value.description}</p>
+              <ul className="list-disc list-inside text-foreground space-y-2">
+                {value.details.map((detail, idx) => (
+                  <li key={idx}>{detail}</li>
+                ))}
+              </ul>
+            </div>
           ))}
-        </motion.div>
+        </div>
+      </section>
 
-        <motion.div 
-          className="mt-16 text-center"
-          variants={itemVariants}
+      <section className="bg-secondary/10 rounded-lg p-12 mb-16">
+        <h2 className="text-3xl font-semibold mb-8 text-center">
+          Langkah Keterlibatan Komunitas
+        </h2>
+        <div className="grid md:grid-cols-2 gap-8">
+          {communityEngagementSteps.map((step, index) => (
+            <div 
+              key={index} 
+              className="bg-card border rounded-lg p-6 text-center shadow-sm hover:shadow-md transition-shadow"
+            >
+              <step.icon className="mx-auto mb-4 text-primary" size={48} />
+              <h3 className="text-2xl font-bold mb-4">{step.title}</h3>
+              <p className="text-muted-foreground">{step.description}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="text-center">
+        <h2 className="text-3xl font-bold mb-6">Bergabung dalam Misi</h2>
+        <p className="text-xl text-muted-foreground mb-8">
+          Tertarik untuk berkontribusi dan membuat perbedaan? 
+          Hubungi kami untuk informasi lebih lanjut tentang pelayanan kami.
+        </p>
+        <a 
+          href="mailto:misi@gkjgrogoljakarta.org"
+          className="btn-primary"
         >
-          <h2 className="text-3xl font-bold mb-6 text-gray-800">
-            Bergabung dalam Misi
-          </h2>
-          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Tertarik untuk berkontribusi dalam misi kami? 
-            Mari bersama-sama membawa perubahan positif.
-          </p>
-          <motion.a 
-            href="mailto:misi@gkjgrogoljakarta.org"
-            className="inline-block bg-primary text-white px-8 py-4 rounded-lg hover:bg-primary-dark transition-colors"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            Hubungi Tim Misi
-          </motion.a>
-        </motion.div>
-      </motion.div>
+          Hubungi Tim Misi
+        </a>
+      </section>
     </div>
   );
 }

@@ -1,77 +1,61 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { 
+  BaseWidget, 
+  CreateWidgetDTO, 
+  WidgetLayout,
+  WidgetTemplate 
+} from '@/features/panel/flexdash/types/widget.types';
 import { UserRole } from '@/routes/types';
-import { BaseWidget, WidgetTemplate } from '../types/widget.types';
-import { WidgetManager } from '../utils/widgetHelpers';
 
 interface FlexDashboardState {
   widgets: BaseWidget[];
-  addWidget: (widget: WidgetTemplate) => void;
+  addWidget: (widget: CreateWidgetDTO) => void;
   removeWidget: (widgetId: string) => void;
-  clearWidgets: () => void;
-  setWidgetsForRole: (role: UserRole) => void;
+  updateWidgetLayout: (widgetId: string, layout: WidgetLayout) => void;
+  updateWidgetContent: (widgetId: string, content: Partial<WidgetTemplate>) => void;
 }
 
-export const useFlexDashboardStore = create<FlexDashboardState>()(
+export const useFlexDashboardStore = create<FlexDashboardState>(
   persist(
     (set, get) => ({
       widgets: [],
-      
+
       addWidget: (widget) => {
-        set((state) => {
-          // Prevent duplicate widgets by checking title
-          const isDuplicate = state.widgets.some(
-            w => w.title.toLowerCase() === widget.title.toLowerCase()
-          );
-
-          if (isDuplicate) {
-            return state;
-          }
-
-          const newWidget: BaseWidget = {
-            ...widget,
-            id: `widget-${Date.now()}`, // Unique ID
-            createdAt: new Date().toISOString()
-          };
-
-          return {
-            widgets: [...state.widgets, newWidget]
-          };
-        });
+        set((state) => ({
+          widgets: [...state.widgets, widget]
+        }));
       },
 
       removeWidget: (widgetId) => {
         set((state) => ({
-          widgets: state.widgets.filter(widget => widget.id !== widgetId)
+          widgets: state.widgets.filter(w => w.id !== widgetId)
         }));
       },
 
-      clearWidgets: () => {
-        set({ widgets: [] });
+      updateWidgetLayout: (widgetId, layout) => {
+        set((state) => ({
+          widgets: state.widgets.map(widget => 
+            widget.id === widgetId 
+              ? { ...widget, layout } 
+              : widget
+          )
+        }));
       },
 
-      setWidgetsForRole: (role: UserRole) => {
-        set((state) => {
-          // Get default widgets for the role
-          const roleWidgets = WidgetManager.getWidgetsForRole(role);
-          
-          // Merge existing widgets with role-specific widgets
-          const mergedWidgets = [
-            ...state.widgets,
-            ...roleWidgets.filter(
-              roleWidget => !state.widgets.some(
-                existingWidget => existingWidget.title === roleWidget.title
-              )
-            )
-          ];
-
-          return { widgets: mergedWidgets };
-        });
+      updateWidgetContent: (widgetId, content) => {
+        set((state) => ({
+          widgets: state.widgets.map(widget => 
+            widget.id === widgetId 
+              ? { ...widget, ...content } 
+              : widget
+          )
+        }));
       }
     }),
     {
-      name: 'flex-dashboard-storage', // Unique name for storage
-      partialize: (state) => ({ widgets: state.widgets }) // Only persist widgets
+      name: 'flex-dashboard-storage',
+      partialize: (state) => ({ widgets: state.widgets })
     }
   )
 );

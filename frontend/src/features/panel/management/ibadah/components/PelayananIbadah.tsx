@@ -17,9 +17,22 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogDescription, 
+  DialogFooter, 
+  DialogHeader, 
+  DialogTitle 
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Calendar } from "@/components/ui/calendar";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "@/components/ui/use-toast";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
-import { Search, Edit, Trash2, Check, X } from "lucide-react";
+import { Search, Edit, Trash2, Check, X, Plus } from "lucide-react";
 
 interface ServiceSchedule {
   id: string;
@@ -62,6 +75,10 @@ export function PelayananIbadah() {
     },
   ]);
 
+  const [isAddScheduleModalOpen, setIsAddScheduleModalOpen] = useState(false);
+  const [isEditScheduleModalOpen, setIsEditScheduleModalOpen] = useState(false);
+  const [currentSchedule, setCurrentSchedule] = useState<Partial<ServiceSchedule>>({});
+
   const getStatusBadgeClass = (status: ServiceSchedule["status"]) => {
     switch (status) {
       case "confirmed":
@@ -88,6 +105,66 @@ export function PelayananIbadah() {
     }
   };
 
+  const handleAddSchedule = () => {
+    if (!currentSchedule.name || !currentSchedule.role || !currentSchedule.time) {
+      toast({
+        title: "Error",
+        description: "Silakan lengkapi semua informasi jadwal",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const newSchedule: ServiceSchedule = {
+      id: `${schedules.length + 1}`,
+      date: currentSchedule.date || new Date(),
+      time: currentSchedule.time,
+      role: currentSchedule.role,
+      name: currentSchedule.name,
+      status: currentSchedule.status || "pending",
+      notes: currentSchedule.notes
+    };
+
+    setSchedules([...schedules, newSchedule]);
+    toast({
+      title: "Jadwal Ditambahkan",
+      description: `Jadwal untuk ${newSchedule.name} berhasil ditambahkan.`
+    });
+
+    // Reset states
+    setIsAddScheduleModalOpen(false);
+    setCurrentSchedule({});
+  };
+
+  const handleEditSchedule = () => {
+    const updatedSchedules = schedules.map(schedule => 
+      schedule.id === currentSchedule.id 
+        ? { ...schedule, ...currentSchedule } as ServiceSchedule 
+        : schedule
+    );
+
+    setSchedules(updatedSchedules);
+    toast({
+      title: "Jadwal Diperbarui",
+      description: `Jadwal untuk ${currentSchedule.name} berhasil diperbarui.`
+    });
+
+    // Reset states
+    setIsEditScheduleModalOpen(false);
+    setCurrentSchedule({});
+  };
+
+  const handleDeleteSchedule = (scheduleId: string) => {
+    const updatedSchedules = schedules.filter(schedule => schedule.id !== scheduleId);
+    setSchedules(updatedSchedules);
+    
+    toast({
+      title: "Jadwal Dihapus",
+      description: "Jadwal pelayanan telah dihapus.",
+      variant: "destructive"
+    });
+  };
+
   const filteredSchedules = schedules.filter(
     (schedule) =>
       schedule.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -103,7 +180,11 @@ export function PelayananIbadah() {
             Daftar jadwal pelayanan ibadah
           </p>
         </div>
-        <Button>
+        <Button onClick={() => {
+          setCurrentSchedule({});
+          setIsAddScheduleModalOpen(true);
+        }}>
+          <Plus className="mr-2 h-4 w-4" />
           Atur Jadwal
         </Button>
       </div>
@@ -213,25 +294,22 @@ export function PelayananIbadah() {
                 </TableCell>
                 <TableCell>{schedule.notes || "-"}</TableCell>
                 <TableCell className="text-right space-x-2">
-                  {schedule.status === "pending" && (
-                    <>
-                      <Button size="sm" variant="outline" className="text-green-600 dark:text-green-400">
-                        <Check className="h-4 w-4 mr-2" />
-                        Terima
-                      </Button>
-                      <Button size="sm" variant="outline" className="text-red-600 dark:text-red-400">
-                        <X className="h-4 w-4 mr-2" />
-                        Tolak
-                      </Button>
-                    </>
-                  )}
-                  <Button size="sm" variant="outline">
-                    <Edit className="h-4 w-4 mr-2" />
-                    Edit
+                  <Button 
+                    variant="outline" 
+                    size="icon"
+                    onClick={() => {
+                      setCurrentSchedule(schedule);
+                      setIsEditScheduleModalOpen(true);
+                    }}
+                  >
+                    <Edit className="h-4 w-4" />
                   </Button>
-                  <Button size="sm" variant="destructive">
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Hapus
+                  <Button 
+                    variant="outline" 
+                    size="icon"
+                    onClick={() => handleDeleteSchedule(schedule.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
                   </Button>
                 </TableCell>
               </TableRow>
@@ -239,6 +317,228 @@ export function PelayananIbadah() {
           </TableBody>
         </Table>
       </div>
+
+      {/* Add Schedule Modal */}
+      <Dialog open={isAddScheduleModalOpen} onOpenChange={setIsAddScheduleModalOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Tambah Jadwal Pelayanan</DialogTitle>
+            <DialogDescription>
+              Masukkan detail jadwal pelayanan baru
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="grid grid-cols-2 gap-6 py-4">
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>Tanggal</Label>
+                <Calendar
+                  mode="single"
+                  selected={currentSchedule.date || new Date()}
+                  onSelect={(date) => setCurrentSchedule(prev => ({ 
+                    ...prev, 
+                    date: date || new Date() 
+                  }))}
+                  className="border rounded-md"
+                  locale={id}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="time">Waktu</Label>
+                <Input 
+                  id="time" 
+                  type="time"
+                  value={currentSchedule.time || ""}
+                  onChange={(e) => setCurrentSchedule(prev => ({ 
+                    ...prev, 
+                    time: e.target.value 
+                  }))}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="role">Peran</Label>
+                <Select
+                  value={currentSchedule.role}
+                  onValueChange={(value) => setCurrentSchedule(prev => ({ 
+                    ...prev, 
+                    role: value 
+                  }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pilih Peran" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Liturgos">Liturgos</SelectItem>
+                    <SelectItem value="Organis">Organis</SelectItem>
+                    <SelectItem value="Penyambut">Penyambut</SelectItem>
+                    <SelectItem value="Pembicara">Pembicara</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="name">Nama Pelayan</Label>
+                <Input 
+                  id="name" 
+                  placeholder="Nama lengkap pelayan"
+                  value={currentSchedule.name || ""}
+                  onChange={(e) => setCurrentSchedule(prev => ({ 
+                    ...prev, 
+                    name: e.target.value 
+                  }))}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="notes">Catatan</Label>
+                <Textarea 
+                  id="notes" 
+                  placeholder="Catatan tambahan (opsional)"
+                  value={currentSchedule.notes || ""}
+                  onChange={(e) => setCurrentSchedule(prev => ({ 
+                    ...prev, 
+                    notes: e.target.value 
+                  }))}
+                />
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button 
+              type="submit"
+              onClick={handleAddSchedule}
+            >
+              Tambah Jadwal
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Schedule Modal */}
+      <Dialog open={isEditScheduleModalOpen} onOpenChange={setIsEditScheduleModalOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Edit Jadwal Pelayanan</DialogTitle>
+            <DialogDescription>
+              Perbarui detail jadwal pelayanan
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="grid grid-cols-2 gap-6 py-4">
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>Tanggal</Label>
+                <Calendar
+                  mode="single"
+                  selected={currentSchedule.date || new Date()}
+                  onSelect={(date) => setCurrentSchedule(prev => ({ 
+                    ...prev, 
+                    date: date || new Date() 
+                  }))}
+                  className="border rounded-md"
+                  locale={id}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="time">Waktu</Label>
+                <Input 
+                  id="time" 
+                  type="time"
+                  value={currentSchedule.time || ""}
+                  onChange={(e) => setCurrentSchedule(prev => ({ 
+                    ...prev, 
+                    time: e.target.value 
+                  }))}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="role">Peran</Label>
+                <Select
+                  value={currentSchedule.role}
+                  onValueChange={(value) => setCurrentSchedule(prev => ({ 
+                    ...prev, 
+                    role: value 
+                  }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pilih Peran" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Liturgos">Liturgos</SelectItem>
+                    <SelectItem value="Organis">Organis</SelectItem>
+                    <SelectItem value="Penyambut">Penyambut</SelectItem>
+                    <SelectItem value="Pembicara">Pembicara</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="name">Nama Pelayan</Label>
+                <Input 
+                  id="name" 
+                  placeholder="Nama lengkap pelayan"
+                  value={currentSchedule.name || ""}
+                  onChange={(e) => setCurrentSchedule(prev => ({ 
+                    ...prev, 
+                    name: e.target.value 
+                  }))}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="status">Status</Label>
+                <Select
+                  value={currentSchedule.status}
+                  onValueChange={(value) => setCurrentSchedule(prev => ({ 
+                    ...prev, 
+                    status: value as ServiceSchedule['status'] 
+                  }))}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pilih Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="confirmed">Dikonfirmasi</SelectItem>
+                    <SelectItem value="pending">Menunggu</SelectItem>
+                    <SelectItem value="declined">Ditolak</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="notes">Catatan</Label>
+                <Textarea 
+                  id="notes" 
+                  placeholder="Catatan tambahan (opsional)"
+                  value={currentSchedule.notes || ""}
+                  onChange={(e) => setCurrentSchedule(prev => ({ 
+                    ...prev, 
+                    notes: e.target.value 
+                  }))}
+                />
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button 
+              type="submit"
+              onClick={handleEditSchedule}
+            >
+              Simpan Perubahan
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

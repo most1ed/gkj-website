@@ -1,7 +1,8 @@
 import { 
   createBrowserRouter, 
   RouterProvider, 
-  Navigate 
+  Route, 
+  createRoutesFromElements 
 } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
 import { 
@@ -28,7 +29,7 @@ const NotFoundPage = lazy(() => import('@/features/errors/NotFoundPage'));
 
 // Loading and Error Components
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
-import ErrorBoundary from '@/components/errors/ErrorBoundary';
+import { ErrorBoundary, withErrorBoundary } from '@/components/ui/error-boundary';
 
 // Authentication Hook
 import { useAuth } from '@/hooks/auth';
@@ -55,7 +56,7 @@ function ProtectedRoute({
 }
 
 // Route Configurations
-const routes: ExtendedRouteObject[] = [
+const publicRoutes = [
   {
     path: '/',
     element: <RootLayout />,
@@ -63,87 +64,178 @@ const routes: ExtendedRouteObject[] = [
       {
         path: '',
         element: <HomePage />
+      }
+    ]
+  },
+  {
+    path: 'login',
+    element: <AuthLayout><LoginPage /></AuthLayout>
+  },
+  {
+    path: 'register',
+    element: <AuthLayout><RegisterPage /></AuthLayout>
+  }
+];
+
+const authRoutes = [];
+
+const panelRoutes = [
+  {
+    path: 'panel',
+    element: <PanelLayout />,
+    children: [
+      {
+        path: '',
+        element: (
+          <ProtectedRoute requiredRoles={[UserRole.ADMIN, UserRole.MAJELIS]}>
+            <DashboardPage />
+          </ProtectedRoute>
+        )
       },
       {
-        path: 'login',
-        element: <AuthLayout><LoginPage /></AuthLayout>
+        path: 'services',
+        element: (
+          <ProtectedRoute requiredRoles={[UserRole.ADMIN, UserRole.MAJELIS]}>
+            <ServicesPage />
+          </ProtectedRoute>
+        )
       },
       {
-        path: 'register',
-        element: <AuthLayout><RegisterPage /></AuthLayout>
+        path: 'members',
+        element: (
+          <ProtectedRoute requiredRoles={[UserRole.ADMIN, UserRole.MAJELIS]}>
+            <MembersPage />
+          </ProtectedRoute>
+        )
       },
       {
-        path: 'panel',
-        element: <PanelLayout />,
-        children: [
-          {
-            path: '',
-            element: (
-              <ProtectedRoute requiredRoles={[UserRole.ADMIN, UserRole.MAJELIS]}>
-                <DashboardPage />
-              </ProtectedRoute>
-            )
-          },
-          {
-            path: 'services',
-            element: (
-              <ProtectedRoute requiredRoles={[UserRole.ADMIN, UserRole.MAJELIS]}>
-                <ServicesPage />
-              </ProtectedRoute>
-            )
-          },
-          {
-            path: 'members',
-            element: (
-              <ProtectedRoute requiredRoles={[UserRole.ADMIN, UserRole.MAJELIS]}>
-                <MembersPage />
-              </ProtectedRoute>
-            )
-          },
-          {
-            path: 'profile',
-            element: (
-              <ProtectedRoute>
-                <ProfilePage />
-              </ProtectedRoute>
-            )
-          }
-        ]
-      },
-      {
-        path: 'unauthorized',
-        element: <UnauthorizedPage />
-      },
-      {
-        path: '*',
-        element: <NotFoundPage />
+        path: 'profile',
+        element: (
+          <ProtectedRoute>
+            <ProfilePage />
+          </ProtectedRoute>
+        )
       }
     ]
   }
 ];
 
-// Create Browser Router
-const router = createBrowserRouter(
-  routes.map(route => ({
-    ...route,
-    element: (
-      <ErrorBoundary fallback={<NotFoundPage />}>
-        <Suspense fallback={<div>Loading...</div>}>
-          {route.element}
-        </Suspense>
-      </ErrorBoundary>
-    )
-  }))
+const errorRoutes = [
+  {
+    path: 'unauthorized',
+    element: <UnauthorizedPage />
+  },
+  {
+    path: '*',
+    element: <NotFoundPage />
+  }
+];
+
+// Global error fallback
+const GlobalErrorFallback = () => (
+  <div className="min-h-screen flex items-center justify-center bg-background">
+    <div className="text-center">
+      <h1 className="text-4xl font-bold text-destructive mb-4">
+        Kesalahan Aplikasi
+      </h1>
+      <p className="text-xl text-muted-foreground mb-8">
+        Maaf, terjadi masalah yang tidak terduga.
+      </p>
+      <button 
+        onClick={() => window.location.reload()}
+        className="px-6 py-3 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+      >
+        Muat Ulang Aplikasi
+      </button>
+    </div>
+  </div>
 );
 
-// Router Provider Component
-const AppRouter: React.FC = () => {
-  return <RouterProvider router={router} />;
-};
+// Create router with error boundaries
+const router = createBrowserRouter(
+  createRoutesFromElements(
+    <Route 
+      errorElement={
+        <ErrorBoundary fallback={<GlobalErrorFallback />}>
+          <div>Terjadi Kesalahan</div>
+        </ErrorBoundary>
+      }
+    >
+      {/* Wrap all route groups with Suspense for code splitting */}
+      <Route 
+        element={
+          <Suspense fallback={<LoadingSpinner fullScreen />}>
+            <Outlet />
+          </Suspense>
+        }
+      >
+        {/* Public Routes */}
+        {publicRoutes.map((route, index) => (
+          <Route 
+            key={`public-${index}`} 
+            path={route.path} 
+            element={
+              <ErrorBoundary>
+                {route.element}
+              </ErrorBoundary>
+            } 
+          />
+        ))}
 
-export { 
-  AppRouter, 
-  routes, 
-  router, 
-  ProtectedRoute 
-};
+        {/* Authentication Routes */}
+        {authRoutes.map((route, index) => (
+          <Route 
+            key={`auth-${index}`} 
+            path={route.path} 
+            element={
+              <ErrorBoundary>
+                {route.element}
+              </ErrorBoundary>
+            } 
+          />
+        ))}
+
+        {/* Panel Routes */}
+        {panelRoutes.map((route, index) => (
+          <Route 
+            key={`panel-${index}`} 
+            path={route.path} 
+            element={
+              <ErrorBoundary>
+                {route.element}
+              </ErrorBoundary>
+            } 
+            children={route.children?.map((childRoute, childIndex) => (
+              <Route 
+                key={`panel-child-${childIndex}`} 
+                path={childRoute.path} 
+                element={
+                  <ErrorBoundary>
+                    {childRoute.element}
+                  </ErrorBoundary>
+                } 
+              />
+            ))}
+          />
+        ))}
+
+        {/* Error Routes */}
+        {errorRoutes.map((route, index) => (
+          <Route 
+            key={`error-${index}`} 
+            path={route.path} 
+            element={
+              <ErrorBoundary>
+                {route.element}
+              </ErrorBoundary>
+            } 
+          />
+        ))}
+      </Route>
+    </Route>
+  )
+);
+
+export function AppRouter() {
+  return <RouterProvider router={router} />;
+}

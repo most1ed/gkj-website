@@ -6,9 +6,19 @@ import { OfferingStats } from "./components/OfferingStats";
 import { Button } from "@/components/ui/button";
 import { Plus, CreditCard } from "lucide-react";
 import { useUserOfferings } from "./hooks/useUserOfferings";
+import { useState } from "react";
 
 export default function UserOfferingsPage() {
   const { data, isLoading } = useUserOfferings();
+  const [activeTab, setActiveTab] = useState<string>("give");
+
+  const handleNewOffering = () => {
+    setActiveTab("give");
+  };
+
+  const handleManagePaymentMethods = () => {
+    setActiveTab("payment");
+  };
 
   return (
     <div className="space-y-6 p-8">
@@ -20,11 +30,14 @@ export default function UserOfferingsPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline">
+          <Button 
+            variant="outline" 
+            onClick={handleManagePaymentMethods}
+          >
             <CreditCard className="mr-2 h-4 w-4" />
             Kelola Metode Pembayaran
           </Button>
-          <Button>
+          <Button onClick={handleNewOffering}>
             <Plus className="mr-2 h-4 w-4" />
             Persembahan Baru
           </Button>
@@ -34,7 +47,12 @@ export default function UserOfferingsPage() {
       {/* Overview Stats */}
       <OfferingStats data={data?.stats} />
 
-      <Tabs defaultValue="give" className="space-y-4">
+      <Tabs 
+        value={activeTab} 
+        onValueChange={setActiveTab} 
+        defaultValue="give" 
+        className="space-y-4"
+      >
         <TabsList>
           <TabsTrigger value="give">Beri Persembahan</TabsTrigger>
           <TabsTrigger value="history">Riwayat</TabsTrigger>

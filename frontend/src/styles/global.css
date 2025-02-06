@@ -141,7 +141,7 @@ a:hover {
   }
 
   blockquote {
-    @apply mt-6 border-l-2 border-primary pl-6 italic;
+    @apply border-l-4 border-primary/50 pl-4 italic text-muted-foreground;
   }
 
   ul {
@@ -1049,4 +1049,95 @@ html, body {
 
 .suspense-spinner {
   @apply border-4 border-primary/50 border-t-primary/90 rounded-full w-12 h-12 animate-spin;
+}
+
+/* Dark Theme Document Styles */
+.dark .document-card {
+  @apply bg-gray-800 border-gray-700 text-gray-200;
+}
+
+.dark .document-card:hover {
+  @apply bg-gray-700 border-gray-600;
+}
+
+.dark .document-status {
+  @apply bg-opacity-20;
+}
+
+.dark .document-status-diproses {
+  @apply bg-yellow-500 text-yellow-200;
+}
+
+.dark .document-status-selesai {
+  @apply bg-green-500 text-green-200;
+}
+
+.dark .document-status-ditolak {
+  @apply bg-red-500 text-red-200;
+}
+
+.dark .document-status-menunggu {
+  @apply bg-blue-500 text-blue-200;
+}
+
+/* Enhanced Dark Theme Utility Classes */
+.dark .bg-muted {
+  @apply bg-gray-800;
+}
+
+.dark .text-muted-foreground {
+  @apply text-gray-400;
+}
+
+.dark .border-muted {
+  @apply border-gray-700;
+}
+
+/* Dark Theme Table Styles */
+.dark .table-row {
+  @apply border-b border-gray-700;
+}
+
+.dark .table-row:hover {
+  @apply bg-gray-800;
+}
+
+/* Dark Theme Form Inputs */
+.dark .input-dark {
+  @apply bg-gray-800 border-gray-700 text-gray-200 placeholder-gray-500;
+}
+
+.dark .input-dark:focus {
+  @apply ring-2 ring-blue-600 border-blue-600;
+}
+
+/* Dark Theme Modal and Dialog */
+.dark .dialog-overlay {
+  @apply bg-black bg-opacity-60;
+}
+
+.dark .dialog-content {
+  @apply bg-gray-900 border-gray-700 text-gray-200;
+}
+
+/* Dark Theme Separator */
+.dark .separator {
+  @apply bg-gray-700;
+}
+
+/* Scrollbar in Dark Mode */
+.dark {
+  scrollbar-color: #4a5568 #2d3748;
+}
+
+.dark ::-webkit-scrollbar {
+  @apply bg-gray-800;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  @apply bg-gray-600 rounded-lg;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-500;
 }

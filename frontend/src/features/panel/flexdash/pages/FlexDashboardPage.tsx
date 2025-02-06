@@ -21,6 +21,8 @@ import {
   Plus,
   PlusCircle,
   X,
+  PlusIcon,
+  LayoutTemplateIcon,
   
   // Additional Contextual Icons
   TrendingUp,
@@ -90,13 +92,14 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
-import { WidgetConfigForm } from '../components/WidgetConfigForm';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
+import { CreateCustomWidgetDialog } from '../components/CreateCustomWidgetDialog';
+import { useFlexDashboardStore } from '../store/flexDashboardStore';
 
 // Types
 import { 
@@ -109,11 +112,11 @@ import {
 } from '@/features/panel/flexdash/types/widget.types';
 
 // Zustand Store and Utilities
-import { useFlexDashboardStore } from '@/features/panel/flexdash/store/flexDashboardStore';
-import { WidgetManager } from '@/features/panel/flexdash/utils/widgetHelpers';
+import { useDashboardPresetStore } from '../store/dashboardPresetStore';
+import { CreateDashboardPresetDTO } from '../types/preset.types';
 
-// API Mock
-import { widgetMockApi } from '@/features/panel/flexdash/api/widgetMockApi';
+// Centralized mock API
+import { mockApi, widgetMock } from '@/lib/mock';
 
 // Responsive Grid Layout with Width Provider
 const ResponsiveGridLayout = WidthProvider(Responsive);
@@ -561,199 +564,245 @@ const WIDGET_SIZE_CONFIG = {
 // Preset Dashboard Configurations
 const DASHBOARD_PRESETS = {
   [UserRole.ADMIN]: {
-    name: 'Admin Dashboard',
+    name: 'Dashboard Administrasi',
+    description: 'Ikhtisar konten, artikel, dan pengaturan gereja',
     widgets: [
       { 
         category: WidgetCategory.OVERVIEW, 
-        title: 'System Overview',
-        data: {} // Placeholder for system-wide metrics
-      },
-      { 
-        category: WidgetCategory.FINANCIAL, 
-        title: 'Financial Summary',
-        data: {} // Placeholder for financial data
-      },
-      { 
-        category: WidgetCategory.MEMBERSHIP, 
-        title: 'Membership Insights',
-        data: {} // Placeholder for membership data
-      },
-      { 
-        category: WidgetCategory.MINISTRY, 
-        title: 'Ministry Performance',
-        data: {} // Placeholder for ministry data
-      },
-      { 
-        category: WidgetCategory.EVENT, 
-        title: 'Upcoming Events',
-        data: {} // Placeholder for events data
+        title: 'Statistik Konten', 
+        description: 'Ringkasan artikel, kategori, dan tag'
       }
     ]
   },
   [UserRole.TREASURER]: {
-    name: 'Financial Dashboard',
+    name: 'Dashboard Keuangan',
+    description: 'Analisis dan laporan keuangan gereja',
     widgets: [
       { 
         category: WidgetCategory.FINANCIAL, 
-        title: 'Income Overview',
-        data: {} // Specific financial widgets
+        title: 'Trend Keuangan', 
+        description: 'Laporan pendapatan dan pengeluaran'
       },
       { 
-        category: WidgetCategory.FINANCIAL, 
-        title: 'Expense Tracking',
-        data: {} // Different financial widget
-      },
-      { 
-        category: WidgetCategory.OVERVIEW, 
-        title: 'Financial Health',
-        data: {} // Summary widget
+        category: WidgetCategory.DONATION_DISTRIBUTION, 
+        title: 'Distribusi Persembahan', 
+        description: 'Analisis pola persembahan'
       }
     ]
   },
   [UserRole.MINISTRY_LEADER]: {
-    name: 'Ministry Dashboard',
+    name: 'Dashboard Jemaat',
+    description: 'Statistik dan informasi keanggotaan',
     widgets: [
       { 
-        category: WidgetCategory.MINISTRY, 
-        title: 'Ministry Attendance',
-        data: {} // Ministry-specific widget
+        category: WidgetCategory.MEMBERSHIP, 
+        title: 'Komposisi Jemaat', 
+        description: 'Statistik keanggotaan berdasarkan kategori'
       },
       { 
-        category: WidgetCategory.EVENT, 
-        title: 'Ministry Events',
-        data: {} // Events related to ministry
+        category: WidgetCategory.AGE_DISTRIBUTION, 
+        title: 'Demografi Umur', 
+        description: 'Distribusi umur jemaat'
       },
       { 
-        category: WidgetCategory.OVERVIEW, 
-        title: 'Ministry Summary',
-        data: {} // Overview of ministry metrics
+        category: WidgetCategory.GENDER_DISTRIBUTION, 
+        title: 'Komposisi Gender', 
+        description: 'Perbandingan gender jemaat'
       }
     ]
   },
-  default: {
-    name: 'Default Dashboard',
+  [UserRole.SERVICE_COORDINATOR]: {
+    name: 'Dashboard Pelayanan',
+    description: 'Aktivitas dan jadwal pelayanan',
     widgets: [
       { 
-        category: WidgetCategory.OVERVIEW, 
-        title: 'Welcome Dashboard',
-        data: {} // Basic overview for all users
+        category: WidgetCategory.ATTENDANCE_TREND, 
+        title: 'Partisipasi Pelayanan', 
+        description: 'Tren kehadiran dan keterlibatan'
       }
     ]
   }
 };
 
 // Dynamic widget size calculation
-const calculateWidgetSize = (widget: BaseWidget) => {
-  // Determine widget configuration
-  const widgetConfig = WIDGET_SIZE_CONFIG[widget.category] || WIDGET_SIZE_CONFIG.default;
-  
-  // Check if the widget has a chart component
-  const WidgetComponent = WIDGET_COMPONENTS[widget.category];
-  const hasChartComponent = WidgetComponent && widgetConfig.hasChart;
-  
-  // Return appropriate size based on chart presence
-  return hasChartComponent 
-    ? widgetConfig.size 
-    : widgetConfig.minSize;
-};
-
-// Function to generate a unique ID for widgets
-const generateWidgetId = () => `widget_${Math.random().toString(36).substr(2, 9)}`;
-
-// Function to load dashboard preset based on user role
-const loadDashboardPreset = (userRole: UserRole) => {
-  // Select preset based on user role, fallback to default
-  const preset = DASHBOARD_PRESETS[userRole] || DASHBOARD_PRESETS.default;
-  
-  // Transform preset widgets into full widget objects
-  return preset.widgets.map(presetWidget => ({
-    id: generateWidgetId(),
-    category: presetWidget.category,
-    title: presetWidget.title,
-    data: presetWidget.data,
-    lastUpdated: new Date().toISOString()
-  }));
-};
+import { calculateWidgetMinSize, generateDynamicWidgetLayout, sanitizeGridLayout } from '../utils/widgetSizeCalculator';
+import { WidgetManager } from '../utils/widgetManager';
 
 const FlexDashboardPage: React.FC = () => {
-  const { user, isLoading } = useAuth();
+  const { user } = useAuth();
   const { toast } = useToast();
   const { 
     widgets, 
-    setWidgetsForRole, 
     addWidget, 
-    removeWidget 
+    removeWidget, 
+    updateWidgetLayout 
   } = useFlexDashboardStore();
+  const { addPreset } = useDashboardPresetStore();
 
+  // State for dialog and widget management
   const [isAddWidgetDialogOpen, setIsAddWidgetDialogOpen] = useState(false);
   const [availableWidgets, setAvailableWidgets] = useState<WidgetTemplate[]>([]);
   const [gridLayout, setGridLayout] = useState<any[]>([]);
-  const [widgetSizes, setWidgetSizes] = useState<{[key: string]: { w: number, h: number }}>({});
-  const [isWidgetConfigOpen, setIsWidgetConfigOpen] = useState(false);
-
-  // State for preset management
+  const [isCreateCustomWidgetDialogOpen, setIsCreateCustomWidgetDialogOpen] = useState(false);
   const [isPresetDialogOpen, setIsPresetDialogOpen] = useState(false);
-  const [newPreset, setNewPreset] = useState<Partial<WidgetPreset>>({
-    name: '',
-    description: '',
-    category: WidgetCategory.OVERVIEW,
-    defaultConfig: {}
-  });
 
-  // Handler for creating a new preset
-  const handleCreatePreset = async () => {
+  // State for preset creation
+  const [presetName, setPresetName] = useState('');
+  const [selectedPresetRole, setSelectedPresetRole] = useState<UserRole | ''>('');
+
+  // Load preset dashboard based on role
+  const loadPresetDashboard = async (presetRole: UserRole) => {
     try {
-      const createdPreset = await widgetPresetApi.createPreset({
-        name: newPreset.name || 'Preset Baru',
-        description: newPreset.description || 'Preset widget kustom',
-        category: newPreset.category || WidgetCategory.OVERVIEW,
-        defaultConfig: newPreset.defaultConfig || {}
+      console.log(`Attempting to load preset dashboard for role: ${presetRole}`);
+
+      // Fetch presets for the specific role
+      const presets = await widgetMock.getDashboardPresets(presetRole);
+      console.log('Fetched presets:', presets);
+      
+      if (presets.length === 0) {
+        console.warn(`No presets found for role: ${presetRole}`);
+        toast({
+          title: 'Preset Tidak Tersedia',
+          description: `Tidak ada preset dashboard untuk peran ${presetRole}`,
+          variant: 'destructive'
+        });
+        return;
+      }
+
+      // Clear existing widgets
+      widgets.forEach(widget => {
+        console.log(`Removing existing widget: ${widget.id}`);
+        removeWidget(widget.id);
+      });
+      setGridLayout([]);
+
+      // Get widgets for the selected role from the mock API
+      const roleWidgets = await widgetMock.getWidgetsByRole(presetRole);
+      console.log('Fetched role widgets:', roleWidgets);
+
+      if (roleWidgets.length === 0) {
+        console.warn(`No widgets found for role: ${presetRole}`);
+        toast({
+          title: 'Widget Tidak Tersedia',
+          description: `Tidak ada widget untuk peran ${presetRole}`,
+          variant: 'destructive'
+        });
+        return;
+      }
+
+      // Add widgets to the dashboard
+      roleWidgets.forEach((widget, index) => {
+        const newWidget = {
+          ...widget,
+          id: WidgetManager.generateWidgetId(), // Ensure unique ID
+          layout: generateDynamicWidgetLayout([...widgets], widget, index) // Generate layout
+        };
+        console.log(`Adding widget: ${newWidget.title}`);
+        addWidget(newWidget);
       });
 
-      // Optional: Add toast or notification
       toast({
-        title: 'Preset Berhasil Dibuat',
-        description: `Preset "${createdPreset.name}" telah ditambahkan`,
-        variant: 'default'
-      });
-
-      // Close dialog and reset form
-      setIsPresetDialogOpen(false);
-      setNewPreset({
-        name: '',
-        description: '',
-        category: WidgetCategory.OVERVIEW,
-        defaultConfig: {}
+        title: `Dashboard Preset Dimuat`,
+        description: `Dashboard telah diperbarui dengan widget untuk peran ${presetRole}.`
       });
     } catch (error) {
-      // Error handling
+      console.error('Detailed error loading preset dashboard:', error);
       toast({
-        title: 'Gagal Membuat Preset',
-        description: error instanceof Error ? error.message : 'Terjadi kesalahan',
+        title: 'Kesalahan',
+        description: `Gagal memuat preset dashboard: ${error instanceof Error ? error.message : 'Unknown error'}`,
         variant: 'destructive'
       });
     }
   };
 
-  // Function to delete a widget from the dashboard
+  // Handler for creating a new preset
+  const handleCreatePreset = useCallback(() => {
+    // Validate inputs
+    if (!presetName.trim()) {
+      toast({
+        title: 'Validasi Gagal',
+        description: 'Nama preset harus diisi',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    if (!selectedPresetRole) {
+      toast({
+        title: 'Validasi Gagal',
+        description: 'Pilih peran pengguna untuk preset',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    // Prepare preset data
+    const presetData: CreateDashboardPresetDTO = {
+      name: presetName,
+      role: selectedPresetRole as UserRole,
+      layout: gridLayout,
+      widgets: widgets
+    };
+
+    // Save preset
+    const newPreset = addPreset(presetData);
+
+    // Show success toast
+    toast({
+      title: 'Preset Berhasil Dibuat',
+      description: `Preset "${presetName}" untuk peran ${selectedPresetRole} telah disimpan.`,
+      variant: 'default'
+    });
+
+    // Close dialog
+    setIsPresetDialogOpen(false);
+
+    // Reset form
+    setPresetName('');
+    setSelectedPresetRole('');
+  }, [
+    presetName, 
+    selectedPresetRole, 
+    gridLayout, 
+    widgets, 
+    addPreset, 
+    toast, 
+    setIsPresetDialogOpen
+  ]);
+
+  // Add this method to handle widget addition
+  const handleAddWidget = useCallback((category: WidgetCategory) => {
+    const newWidget: CreateWidgetDTO = {
+      id: WidgetManager.generateWidgetId(),
+      category,
+      title: `${category} Widget`,
+      layout: generateDynamicWidgetLayout(widgets, { category } as BaseWidget)
+    };
+
+    addWidget(newWidget);
+    setIsAddWidgetDialogOpen(false);
+    toast({
+      title: "Widget Ditambahkan",
+      description: `${category} berhasil ditambahkan ke dashboard.`
+    });
+  }, [widgets, addWidget, toast]);
+
+  const handleCreateWidget = useCallback(() => {
+    toast({
+      title: 'Fitur Belum Tersedia',
+      description: 'Pembuatan widget akan segera hadir.',
+      variant: 'default'
+    });
+  }, [toast]);
+
   const handleDeleteWidget = useCallback(async (widgetId: string) => {
     try {
-      // Use mock API to delete widget
-      await widgetMockApi.deleteWidget(widgetId);
-      
-      // Update store state
+      // Remove widget from the store
       removeWidget(widgetId);
       
       // Update grid layout
       setGridLayout(prevLayout => prevLayout.filter(item => item.i !== widgetId));
       
-      // Remove widget size configuration
-      setWidgetSizes(prev => {
-        const newSizes = { ...prev };
-        delete newSizes[widgetId];
-        return newSizes;
-      });
-
       // Show success notification
       toast({
         title: "Widget Dihapus",
@@ -761,20 +810,16 @@ const FlexDashboardPage: React.FC = () => {
         variant: "default"
       });
     } catch (error) {
-      console.error('Error deleting widget:', error);
-      
-      // Show error notification
+      // Error handling
       toast({
         title: "Gagal Menghapus Widget",
-        description: "Terjadi kesalahan saat menghapus widget.",
+        description: error instanceof Error ? error.message : "Terjadi kesalahan saat menghapus widget.",
         variant: "destructive"
       });
     }
   }, [
     removeWidget, 
     setGridLayout, 
-    setWidgetSizes, 
-    widgetMockApi.deleteWidget, 
     toast
   ]);
 
@@ -808,94 +853,6 @@ const FlexDashboardPage: React.FC = () => {
 
   useEffect(() => {
     if (user) {
-      // Load preset widgets for the user's role
-      const roleWidgets = WidgetManager.getWidgetsForRole(user.role as UserRole);
-      
-      // Set widgets based on user's role
-      setWidgetsForRole(user.role as UserRole);
-      
-      // Combine role-specific and default widgets
-      setAvailableWidgets([
-        ...roleWidgets
-      ]);
-    }
-  }, [user]);
-
-  // Add a method to load a specific dashboard preset
-  const loadPresetDashboard = (presetRole: UserRole) => {
-    const presetWidgets = loadDashboardPreset(presetRole);
-    
-    // Clear existing widgets and add preset widgets
-    setWidgetsForRole(presetRole, presetWidgets);
-    
-    // Optional: Show a toast notification
-    toast({
-      title: `Loaded ${DASHBOARD_PRESETS[presetRole]?.name || 'Dashboard Preset'}`,
-      description: 'Dashboard has been updated with role-specific widgets.'
-    });
-  };
-
-  // Render preset dropdown and widget addition UI
-  const renderDashboardControls = () => {
-    // Determine available presets based on user role
-    const availablePresets = Object.entries(DASHBOARD_PRESETS)
-      .filter(([role]) => role !== 'default')
-      .map(([role, preset]) => ({
-        value: role,
-        label: preset.name
-      }));
-
-    return (
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Dashboard Fleksibel</h1>
-        <div className="flex items-center space-x-2">
-          {/* Preset Dashboard Dropdown */}
-          <Select 
-            onValueChange={(selectedRole) => {
-              loadPresetDashboard(selectedRole as UserRole);
-            }}
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Pilih Preset Dashboard" />
-            </SelectTrigger>
-            <SelectContent>
-              {availablePresets.map((preset) => (
-                <SelectItem 
-                  key={preset.value} 
-                  value={preset.value}
-                >
-                  {preset.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          {/* Bottom Action Buttons */}
-          <div className="fixed bottom-4 right-4 z-50 flex space-x-2">
-            {/* Buat Preset Button */}
-            <Button 
-              onClick={() => setIsPresetDialogOpen(true)} 
-              variant="secondary"
-              className="flex items-center"
-            >
-              <BookPlus className="mr-2 h-4 w-4" /> Buat Preset
-            </Button>
-
-            {/* Buat Widget Button */}
-            <Button 
-              onClick={() => setIsWidgetConfigOpen(true)} 
-              className="flex items-center"
-            >
-              <PlusCircle className="mr-2 h-4 w-4" /> Buat Widget
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  useEffect(() => {
-    if (user) {
       // Provide a default set of widgets for all users
       const defaultWidgets = [
         {
@@ -905,7 +862,7 @@ const FlexDashboardPage: React.FC = () => {
           category: WidgetCategory.OVERVIEW,
           content: `Anda login sebagai ${user.role}`,
           roles: Object.values(UserRole),
-          size: WidgetSize.LARGE,
+          size: 'LARGE',
           icon: 'home',
           isCustomizable: true
         },
@@ -916,17 +873,18 @@ const FlexDashboardPage: React.FC = () => {
           category: WidgetCategory.OVERVIEW,
           content: `Email: ${user.email}`,
           roles: Object.values(UserRole),
-          size: WidgetSize.MEDIUM,
+          size: 'MEDIUM',
           icon: 'user',
           isCustomizable: true
         }
       ];
 
-      // Set widgets based on user's role, with fallback to default
-      const roleWidgets = WidgetManager.getWidgetsForRole(user.role as UserRole);
-      setWidgetsForRole(user.role as UserRole);
-      
-      // Combine role-specific and default widgets
+      // Safely get role-specific widgets
+      const roleWidgets = Array.isArray(WidgetManager.getWidgetsForRole(user.role as UserRole)) 
+        ? WidgetManager.getWidgetsForRole(user.role as UserRole)
+        : [];
+
+      // Set widgets with proper array spread
       setAvailableWidgets([
         ...defaultWidgets,
         ...roleWidgets
@@ -935,230 +893,19 @@ const FlexDashboardPage: React.FC = () => {
   }, [user]);
 
   useEffect(() => {
-    const layout = widgets.map((widget, index) => {
-      // Check if widget has a manually set size
-      const manualSize = widgetSizes[widget.id];
-      
-      // If manually sized, use those dimensions
-      if (manualSize) {
-        return {
-          i: widget.id,
-          x: (index % 3) * 4,
-          y: Math.floor(index / 3) * 4,
-          w: manualSize.w,
-          h: manualSize.h,
-          minW: 3,
-          minH: 3
-        };
-      }
-      
-      // Otherwise, use dynamic calculation
-      const { w, h } = calculateWidgetSize(widget);
-      
+    const layout = widgets.map((widget) => {
+      const widgetSize = calculateWidgetMinSize(widget);
       return {
         i: widget.id,
-        x: (index % 3) * 4,
-        y: Math.floor(index / 3) * 4,
-        w,
-        h,
-        minW: 3,
-        minH: 3
+        x: 0,
+        y: 0,
+        w: widgetSize.minWidth || 2,
+        h: widgetSize.minHeight || 2
       };
     });
 
-    setGridLayout(layout);
-  }, [widgets, widgetSizes]);
-
-  useEffect(() => {
-    if (user) {
-      // Provide a default set of widgets for all users
-      const defaultWidgets = [
-        {
-          id: 'user-overview',
-          title: `Selamat Datang, ${user.name}`,
-          description: 'Ringkasan informasi untuk semua pengguna',
-          category: WidgetCategory.OVERVIEW,
-          content: `Anda login sebagai ${user.role}`,
-          roles: Object.values(UserRole),
-          size: WidgetSize.LARGE,
-          icon: 'home',
-          isCustomizable: true
-        },
-        {
-          id: 'profile-summary',
-          title: 'Profil Pengguna',
-          description: 'Informasi dasar akun Anda',
-          category: WidgetCategory.OVERVIEW,
-          content: `Email: ${user.email}`,
-          roles: Object.values(UserRole),
-          size: WidgetSize.MEDIUM,
-          icon: 'user',
-          isCustomizable: true
-        }
-      ];
-
-      // Set widgets based on user's role, with fallback to default
-      const roleWidgets = WidgetManager.getWidgetsForRole(user.role as UserRole);
-      setWidgetsForRole(user.role as UserRole);
-      
-      // Combine role-specific and default widgets
-      setAvailableWidgets([
-        ...defaultWidgets,
-        ...roleWidgets
-      ]);
-    }
-  }, [user]);
-
-  // Method to dynamically add a new widget
-  const handleAddNewWidget = useCallback(async () => {
-    try {
-      // More comprehensive widget configuration options
-      const widgetConfigurations = [
-        {
-          category: WidgetCategory.FINANCIAL,
-          title: 'Laporan Keuangan Bulanan',
-          dataSource: DataSource.FINANCIAL,
-          visualizationType: VisualizationType.BAR_CHART,
-          icon: DollarSign,
-          roles: [UserRole.ADMIN, UserRole.STAFF],
-          fields: ['tithe', 'offering', 'special']
-        },
-        {
-          category: WidgetCategory.MEMBERSHIP,
-          title: 'Pertumbuhan Keanggotaan',
-          dataSource: DataSource.MEMBERSHIP,
-          visualizationType: VisualizationType.LINE_CHART,
-          icon: Users,
-          roles: [UserRole.ADMIN],
-          fields: ['newMembers', 'totalMembers']
-        },
-        {
-          category: WidgetCategory.EVENT,
-          title: 'Jadwal Acara Mendatang',
-          dataSource: DataSource.EVENTS,
-          visualizationType: VisualizationType.TABLE,
-          icon: Calendar,
-          roles: [UserRole.STAFF, UserRole.ADMIN],
-          fields: ['name', 'date', 'attendanceExpected']
-        },
-        {
-          category: WidgetCategory.ATTENDANCE_TREND,
-          title: 'Trend Kehadiran Mingguan',
-          dataSource: DataSource.ATTENDANCE,
-          visualizationType: VisualizationType.BAR_CHART,
-          icon: BarChart2,
-          roles: [UserRole.ADMIN],
-          fields: ['morning', 'evening', 'midweek']
-        },
-        {
-          category: WidgetCategory.MINISTRY,
-          title: 'Statistik Pelayanan',
-          dataSource: DataSource.FINANCIAL,
-          visualizationType: VisualizationType.PIE_CHART,
-          icon: Briefcase,
-          roles: [UserRole.ADMIN, UserRole.STAFF],
-          fields: ['ministry', 'facilities', 'outreach']
-        }
-      ];
-
-      // Randomly select a widget configuration
-      const randomConfig = widgetConfigurations[
-        Math.floor(Math.random() * widgetConfigurations.length)
-      ];
-
-      // Generate appropriate mock data based on data source
-      const mockData = mockDataGenerators[randomConfig.dataSource][
-        Object.keys(mockDataGenerators[randomConfig.dataSource])[0]
-      ]();
-
-      // Create a new widget using mock API
-      const newWidget = await widgetMockApi.createWidget({
-        title: randomConfig.title,
-        category: randomConfig.category,
-        description: `Widget dinamis untuk ${randomConfig.title}`,
-        roles: randomConfig.roles,
-        dataConfig: {
-          source: randomConfig.dataSource,
-          fields: randomConfig.fields
-        },
-        visualizationConfig: {
-          type: randomConfig.visualizationType
-        },
-        data: mockData
-      });
-
-      // Add the new widget to the dashboard
-      addWidget(newWidget);
-
-      // Show success notification
-      toast({
-        title: "Widget Ditambahkan",
-        description: `${randomConfig.title} berhasil dibuat.`,
-        variant: "default"
-      });
-    } catch (error) {
-      console.error('Error adding new widget:', error);
-      
-      // Show error notification
-      toast({
-        title: "Gagal Menambahkan Widget",
-        description: "Terjadi kesalahan saat membuat widget baru.",
-        variant: "destructive"
-      });
-    }
-  }, [addWidget, toast]);
-
-  const handleCreateWidget = useCallback(async (widget: CreateWidgetDTO) => {
-    try {
-      // Use WidgetManager static method to create a new widget
-      const newWidget = await WidgetManager.createWidget(widget);
-      
-      // Add widget to the store
-      addWidget(newWidget);
-      
-      // Calculate layout for the new widget
-      const newLayout: WidgetLayout = {
-        i: newWidget.id,
-        x: 0,
-        y: Infinity, // Add to bottom
-        w: newWidget.size === 'LARGE' ? 4 : 2,
-        h: newWidget.size === 'LARGE' ? 4 : 2
-      };
-
-      // Update grid layout
-      setGridLayout(prevLayout => [...prevLayout, newLayout]);
-      
-      // Close the configuration dialog
-      setIsWidgetConfigOpen(false);
-
-      // Show success toast
-      toast({
-        title: "Widget Ditambahkan",
-        description: `Widget "${newWidget.title}" berhasil dibuat.`
-      });
-
-      return newWidget;
-    } catch (error) {
-      console.error('Error creating widget:', error);
-      
-      // Show error toast
-      toast({
-        title: "Gagal Membuat Widget",
-        description: error instanceof Error ? error.message : "Terjadi kesalahan saat membuat widget.",
-        variant: "destructive"
-      });
-
-      throw error;
-    }
-  }, [addWidget, setGridLayout, setIsWidgetConfigOpen, toast]);
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-full">
-        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-primary"></div>
-      </div>
-    );
-  }
+    setGridLayout(sanitizeGridLayout(layout));
+  }, [widgets]);
 
   if (!user) {
     return (
@@ -1187,6 +934,58 @@ const FlexDashboardPage: React.FC = () => {
     .react-resizable-handle-nw { cursor: nw-resize; }
   `;
 
+  const renderWidgetManagementButtons = () => (
+    <div className="flex space-x-2 mb-4">
+      <Button 
+        variant="outline" 
+        onClick={() => setIsAddWidgetDialogOpen(true)}
+      >
+        <PlusIcon className="mr-2 h-4 w-4" /> Tambah Widget
+      </Button>
+      <Button 
+        variant="secondary" 
+        onClick={() => setIsPresetDialogOpen(true)}
+      >
+        <BookPlus className="mr-2 h-4 w-4" /> Buat Preset
+      </Button>
+    </div>
+  );
+
+  const gridLayoutProps = {
+    className: "layout w-full",
+    cols: { lg: 12, md: 10, sm: 6, xs: 4 },
+    rowHeight: 70,
+    breakpoints: { lg: 1200, md: 996, sm: 768, xs: 480 },
+    compactType: "vertical",
+    preventCollision: false,
+    isDraggable: true,
+    isResizable: true,
+    resizeHandles: ['se', 'sw', 'ne', 'nw'],
+    margin: [10, 10],
+    containerPadding: [10, 10],
+    style: { width: '100%', paddingBottom: '100px' } // Add extra padding at bottom
+  };
+
+  const constrainLayout = (layout: any[]) => {
+    const maxAllowedY = 14; // Corresponds to maxRows - 1
+    return layout.map(item => {
+      // Ensure y position and height don't exceed max allowed rows
+      const constrainedY = Math.min(item.y, maxAllowedY);
+      const constrainedH = Math.min(item.h, maxAllowedY - constrainedY + 1);
+      
+      return {
+        ...item,
+        y: constrainedY,
+        h: constrainedH
+      };
+    });
+  };
+
+  const handleLayoutChange = (newLayout: any[]) => {
+    const validatedLayout = sanitizeGridLayout(newLayout);
+    setGridLayout(validatedLayout);
+  };
+
   return (
     <>
       <style>{resizeHandleStyles}</style>
@@ -1194,60 +993,41 @@ const FlexDashboardPage: React.FC = () => {
         <div className="panel-page-content">
           <div className="w-full h-full">
             <div className="flex flex-col h-full">
-              {renderDashboardControls()}
+              {/* Render preset dropdown and widget addition UI */}
+              <div className="flex justify-between items-center mb-4">
+                <h1 className="text-2xl font-bold">Dashboard Fleksibel</h1>
+                <div className="flex items-center space-x-2">
+                  {/* Preset Dashboard Dropdown */}
+                  <Select 
+                    onValueChange={(selectedRole) => {
+                      loadPresetDashboard(selectedRole as UserRole);
+                    }}
+                  >
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Pilih Preset Dashboard" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.values(UserRole)
+                        .filter(role => role !== UserRole.MEMBER)
+                        .map((role) => (
+                          <SelectItem 
+                            key={role} 
+                            value={role}
+                          >
+                            {DASHBOARD_PRESETS[role]?.name || 'Dashboard ' + role}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              {renderWidgetManagementButtons()}
               <div className="flex-grow w-full">
                 <ResponsiveGridLayout
-                  className="layout w-full"
+                  {...gridLayoutProps}
                   layouts={{ lg: gridLayout }}
-                  breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480 }}
-                  cols={{ lg: 12, md: 10, sm: 6, xs: 4 }}
-                  rowHeight={70}
-                  onLayoutChange={(layout) => {
-                    // Dynamically adjust widget sizes
-                    const constrainedLayout = layout.map(item => {
-                      const widget = widgets.find(w => w.id === item.i);
-                      const manualSize = widgetSizes[item.i];
-                      
-                      // If manually sized, maintain those dimensions
-                      if (manualSize) {
-                        return {
-                          ...item,
-                          w: manualSize.w,
-                          h: manualSize.h,
-                          minW: 3,
-                          minH: 3
-                        };
-                      }
-                      
-                      // Otherwise, use dynamic calculation
-                      const { w, h } = calculateWidgetSize(widget);
-                      
-                      return {
-                        ...item,
-                        w,
-                        h,
-                        minW: 3,
-                        minH: 3
-                      };
-                    });
-                    
-                    setGridLayout(constrainedLayout);
-                  }}
-                  onResizeStop={(layout, oldItem, newItem) => {
-                    // Preserve manually resized dimensions
-                    setWidgetSizes((prev) => ({
-                      ...prev,
-                      [newItem.i]: { w: newItem.w, h: newItem.h }
-                    }));
-                  }}
-                  compactType="vertical"
-                  preventCollision={false}
-                  isDraggable={true}
-                  isResizable={true}
-                  resizeHandles={['se', 'sw', 'ne', 'nw']}
-                  margin={[10, 10]}
-                  containerPadding={[10, 10]}
-                  style={{ width: '100%' }}
+                  onLayoutChange={handleLayoutChange}
+                  style={{ minHeight: '600px', paddingBottom: '150px' }} // Ensure minimum height and bottom padding
                 >
                   {widgets.map(widget => (
                     <div 
@@ -1281,32 +1061,27 @@ const FlexDashboardPage: React.FC = () => {
       >
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Pilih Widget</DialogTitle>
+            <DialogTitle>Tambah Widget Baru</DialogTitle>
+            <DialogDescription>
+              Pilih kategori widget yang ingin ditambahkan ke dashboard.
+            </DialogDescription>
           </DialogHeader>
-          <div className="grid grid-cols-2 gap-4">
-            {availableWidgets.map(widget => (
-              <Card 
-                key={widget.id} 
-                className="hover:border-primary cursor-pointer transition-all"
-                onClick={() => handleAddWidget(widget)}
+          <div className="grid grid-cols-3 gap-4 py-4">
+            {Object.values(WidgetCategory).map((category) => (
+              <Button 
+                key={category}
+                variant="outline"
+                onClick={() => handleAddWidget(category)}
+                className="flex flex-col items-center justify-center space-y-2 p-4"
               >
-                <CardHeader>
-                  <CardTitle>{widget.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-gray-500 mb-2">{widget.description}</p>
-                  <div className="flex justify-between items-center">
-                    <Badge variant="secondary">{widget.category}</Badge>
-                    <Button 
-                      size="sm" 
-                      variant={widget.isCustomizable ? 'default' : 'ghost'}
-                      disabled={!widget.isCustomizable}
-                    >
-                      {widget.isCustomizable ? 'Tambah' : 'Tidak Tersedia'}
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+                {/* Add corresponding icons for each category */}
+                {category === WidgetCategory.FINANCIAL && <DollarSign />}
+                {category === WidgetCategory.MEMBERSHIP && <Users />}
+                {category === WidgetCategory.MINISTRY && <Church />}
+                {category === WidgetCategory.EVENT && <Calendar />}
+                {category === WidgetCategory.OVERVIEW && <BarChart2 />}
+                <span>{category}</span>
+              </Button>
             ))}
           </div>
         </DialogContent>
@@ -1319,82 +1094,64 @@ const FlexDashboardPage: React.FC = () => {
       >
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Buat Preset Widget Baru</DialogTitle>
+            <DialogTitle>Buat Preset Dashboard</DialogTitle>
             <DialogDescription>
-              Buat template widget kustom untuk digunakan di dashboard
+              Simpan konfigurasi dashboard saat ini sebagai preset untuk peran tertentu.
             </DialogDescription>
           </DialogHeader>
+          
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">
-                Nama Preset
-              </Label>
+              <Label className="text-right">Nama Preset</Label>
               <Input 
-                id="name" 
-                value={newPreset.name}
-                onChange={(e) => setNewPreset(prev => ({
-                  ...prev, 
-                  name: e.target.value
-                }))}
-                placeholder="Contoh: Ringkasan Keuangan" 
+                value={presetName}
+                onChange={(e) => setPresetName(e.target.value)}
+                placeholder="Contoh: Dashboard Admin Utama" 
                 className="col-span-3" 
               />
             </div>
+            
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="description" className="text-right">
-                Deskripsi
-              </Label>
-              <Input 
-                id="description" 
-                value={newPreset.description}
-                onChange={(e) => setNewPreset(prev => ({
-                  ...prev, 
-                  description: e.target.value
-                }))}
-                placeholder="Deskripsi singkat preset" 
-                className="col-span-3" 
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="category" className="text-right">
-                Kategori
-              </Label>
-              <Select 
-                value={newPreset.category}
-                onValueChange={(value) => setNewPreset(prev => ({
-                  ...prev, 
-                  category: value as WidgetCategory
-                }))}
+              <Label className="text-right">Peran Pengguna</Label>
+              <Select
+                value={selectedPresetRole}
+                onValueChange={(value) => setSelectedPresetRole(value as UserRole)}
               >
                 <SelectTrigger className="col-span-3">
-                  <SelectValue placeholder="Pilih Kategori" />
+                  <SelectValue placeholder="Pilih Peran" />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.values(WidgetCategory).map(category => (
-                    <SelectItem key={category} value={category}>
-                      {category}
+                  {Object.values(UserRole).map(role => (
+                    <SelectItem key={role} value={role}>
+                      {role}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
           </div>
+          
           <DialogFooter>
             <Button 
-              type="submit" 
-              onClick={handleCreatePreset}
+              variant="outline" 
+              onClick={() => setIsPresetDialogOpen(false)}
             >
-              Buat Preset
+              Batal
+            </Button>
+            <Button 
+              onClick={handleCreatePreset}
+              disabled={!presetName || !selectedPresetRole}
+            >
+              Simpan Preset
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Widget Configuration Form */}
-      <WidgetConfigForm 
-        isOpen={isWidgetConfigOpen}
-        onClose={() => setIsWidgetConfigOpen(false)}
-        onSubmit={handleCreateWidget}
+      {/* Create Custom Widget Dialog */}
+      <CreateCustomWidgetDialog 
+        open={isCreateCustomWidgetDialogOpen}
+        onOpenChange={setIsCreateCustomWidgetDialogOpen}
       />
     </>
   );

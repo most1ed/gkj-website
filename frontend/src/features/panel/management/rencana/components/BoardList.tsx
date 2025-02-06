@@ -48,11 +48,11 @@ export function BoardList() {
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="rencana-board-grid">
         {filteredBoards.map((board) => (
           <Card
             key={board.id}
-            className="cursor-pointer hover:bg-accent/50 transition-colors"
+            className="rencana-board-card"
             onClick={() => setActiveBoard(board.id)}
           >
             <CardHeader>
@@ -62,7 +62,7 @@ export function BoardList() {
               )}
             </CardHeader>
             <CardContent>
-              <div className="flex justify-between text-sm text-muted-foreground">
+              <div className="rencana-board-stats">
                 <div>
                   {board.columns.reduce(
                     (acc, col) => acc + col.tasks.length,

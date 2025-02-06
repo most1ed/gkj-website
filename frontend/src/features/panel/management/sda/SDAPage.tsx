@@ -1,6 +1,6 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Plus, FileDown } from "lucide-react";
+import { Plus, FileDown, BarChart } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -10,6 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { SDAStatistics } from "./components/SDAStatistics";
 
 interface SDM {
   id: string;
@@ -100,12 +101,20 @@ export default function SDAPage() {
         </div>
       </div>
 
-      <Tabs defaultValue="sdm" className="space-y-4">
+      <Tabs defaultValue="statistik" className="space-y-4">
         <TabsList>
+          <TabsTrigger value="statistik">
+            <BarChart className="mr-2 h-4 w-4" />
+            Statistik
+          </TabsTrigger>
           <TabsTrigger value="sdm">Sumber Daya Manusia</TabsTrigger>
           <TabsTrigger value="aset">Aset</TabsTrigger>
           <TabsTrigger value="jadwal">Penjadwalan</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="statistik" className="space-y-4">
+          <SDAStatistics sdmData={sdmData} assetData={assetData} />
+        </TabsContent>
 
         <TabsContent value="sdm" className="space-y-4">
           <Table>

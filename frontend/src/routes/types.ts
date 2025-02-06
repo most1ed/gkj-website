@@ -1,5 +1,6 @@
-import { ReactNode } from 'react';
+import { ReactNode, createElement } from 'react';
 import { RouteObject } from 'react-router-dom';
+import { BookOpen } from 'lucide-react';
 
 // Enum for user roles with clear permissions
 export enum UserRole {
@@ -28,7 +29,7 @@ export interface ExtendedRouteObject extends RouteObject {
 export interface NavigationItem {
   label: string;
   path: string;
-  icon?: ReactNode;
+  icon?: ReactNode | (() => ReactNode) | React.ComponentType;
   roles?: UserRole[];
   children?: NavigationItem[];
 }
@@ -68,6 +69,12 @@ export function generateNavigationMenu(userRole: UserRole): NavigationItem[] {
       label: 'Profile', 
       path: '/panel/profile', 
       roles: [UserRole.USER, UserRole.STAFF, UserRole.ADMIN] 
+    },
+    {
+      label: 'Jenis Persembahan',
+      path: '/panel/offerings/types',
+      roles: [UserRole.ADMIN, UserRole.STAFF],
+      icon: createElement(BookOpen)
     }
   ];
 

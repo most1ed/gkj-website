@@ -107,6 +107,132 @@ const paginatedUsers = mockApi.testing.responseSimulator.paginate(
 );
 ```
 
+## Widget Mock API
+
+### Features
+- Generate dummy widgets
+- Create, update, and delete widgets
+- Manage custom widgets
+- Create and manage dashboard presets
+
+### Example Usage
+```typescript
+import { mockApi } from '@/lib/mock';
+
+// Generate dummy widgets
+const dummyWidgets = mockApi.widget.generateDummyWidgets();
+
+// Create a custom widget
+const customWidget = await mockApi.widget.createCustomWidget({
+  title: 'Custom Attendance Tracker',
+  category: WidgetCategory.ATTENDANCE_TREND
+});
+
+// Get widgets for a specific role
+const adminWidgets = await mockApi.widget.getWidgetsByRole(UserRole.ADMIN);
+
+// Create a dashboard preset
+const dashboardPreset = await mockApi.widget.createDashboardPreset({
+  name: 'Admin Dashboard',
+  role: UserRole.ADMIN
+});
+```
+
+### Deprecation Notice
+The following mock API files have been deprecated in favor of the centralized mock API:
+- `/src/features/panel/flexdash/api/widgetMockApi.ts`
+- `/src/features/panel/flexdash/api/flexDashboardMockApi.ts`
+
+Please update your imports to use `@/lib/mock` instead.
+
+## Dashboard Preset System
+
+### Available Preset Groups
+
+1. **Administrasi**
+   - Fokus: Konten, artikel, dan pengaturan gereja
+   - Kategori Widget: 
+     - Overview
+     - Ministry
+     - Settings
+
+2. **Keuangan**
+   - Fokus: Analisis dan laporan keuangan
+   - Kategori Widget:
+     - Financial
+     - Donation Distribution
+     - Budget
+
+3. **Jemaat**
+   - Fokus: Statistik dan informasi keanggotaan
+   - Kategori Widget:
+     - Membership
+     - Age Distribution
+     - Gender Distribution
+
+4. **Pelayanan**
+   - Fokus: Aktivitas dan jadwal pelayanan
+   - Kategori Widget:
+     - Event
+     - Attendance Trend
+
+5. **Rencana**
+   - Fokus: Manajemen tugas dan proyek
+   - Kategori Widget:
+     - Task Management
+
+6. **Ibadah**
+   - Fokus: Liturgi dan jadwal ibadah
+   - Kategori Widget:
+     - Event
+
+7. **Media**
+   - Fokus: Manajemen konten multimedia
+   - Kategori Widget:
+     - Media Library
+
+### Widget Categories
+
+- `OVERVIEW`: Ringkasan dan ikhtisar
+- `FINANCIAL`: Laporan dan analisis keuangan
+- `MEMBERSHIP`: Statistik keanggotaan
+- `EVENT`: Jadwal dan kegiatan
+- `ATTENDANCE_TREND`: Tren kehadiran
+- `MINISTRY`: Aktivitas pelayanan
+- `DONATION_DISTRIBUTION`: Distribusi persembahan
+- `AGE_DISTRIBUTION`: Demografi umur
+- `GENDER_DISTRIBUTION`: Komposisi gender
+- `SETTINGS`: Pengaturan sistem
+- `BUDGET`: Manajemen anggaran
+- `TASK_MANAGEMENT`: Pengelolaan tugas
+- `MEDIA_LIBRARY`: Perpustakaan media
+- `DOCUMENT_MANAGEMENT`: Manajemen dokumen
+- `PROFILE_INSIGHTS`: Wawasan profil
+
+### Example Usage
+
+```typescript
+// Retrieve presets for a specific role
+const adminPresets = await mockApi.widget.getDashboardPresets(UserRole.ADMIN);
+
+// Create a custom preset
+const customPreset = await mockApi.widget.createDashboardPreset({
+  name: 'Custom Dashboard',
+  description: 'Kombinasi widget keuangan dan jemaat',
+  role: UserRole.ADMIN,
+  widgets: [
+    { 
+      category: WidgetCategory.FINANCIAL, 
+      title: 'Ringkasan Keuangan' 
+    },
+    { 
+      category: WidgetCategory.MEMBERSHIP, 
+      title: 'Statistik Jemaat' 
+    }
+  ]
+});
+```
+
 ## Customization
 
 ### Generating Custom Mock Data

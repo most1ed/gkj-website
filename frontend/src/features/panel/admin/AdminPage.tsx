@@ -5,7 +5,7 @@ import {
   LayoutIcon,
   NewspaperIcon,
   DatabaseIcon,
-  BookOpenIcon,
+  BookOpen,
   ImageIcon,
   SettingsIcon,
 } from "lucide-react";
@@ -38,7 +38,7 @@ const adminMenuItems = [
   {
     label: "Alkitab",
     path: "/panel/admin/alkitab",
-    icon: BookOpenIcon,
+    icon: BookOpen,
     description: "Kelola konten alkitab",
   },
   {

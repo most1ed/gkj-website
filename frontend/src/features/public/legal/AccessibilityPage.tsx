@@ -5,7 +5,7 @@ import {
   EyeIcon, 
   HeartHandshakeIcon, 
   UsersIcon, 
-  BookOpenIcon 
+  BookOpen 
 } from 'lucide-react';
 
 const accessibilityFeatures = [
@@ -52,7 +52,7 @@ const inclusivityCommitments = [
   },
   {
     title: 'Pengembangan Berkelanjutan',
-    icon: BookOpenIcon,
+    icon: BookOpen,
     description: 'Terus belajar dan meningkatkan kualitas pelayanan inklusif.'
   }
 ];

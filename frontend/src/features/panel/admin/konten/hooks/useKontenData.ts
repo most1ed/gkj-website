@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { logError } from "@/lib/error-logging";
 
 interface AboutContent {
   description: string;
@@ -146,26 +147,59 @@ export function useKontenData() {
     },
   });
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  // Simulasi loading data
   useEffect(() => {
-    setIsLoading(true);
-    // Di sini nanti akan ada pemanggilan API
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
+    const fetchData = async () => {
+      try {
+        // Simulate API call with potential error
+        if (Math.random() < 0.1) {  // 10% chance of simulated error
+          throw new Error('Gagal memuat data konten');
+        }
+
+        // Simulated async data fetch
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        setIsLoading(false);
+      } catch (err) {
+        const errorObj = err instanceof Error ? err : new Error('Gagal memuat data');
+        setError(errorObj);
+        logError(errorObj);
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
+
+  const updateData = async (section: keyof KontenData, newData: Partial<KontenData[keyof KontenData]>) => {
+    try {
+      // Simulate API update
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      setData(prevData => ({
+        ...prevData,
+        [section]: {
+          ...prevData[section],
+          ...newData,
+          lastUpdated: new Date()
+        }
+      }));
+    } catch (err) {
+      const errorObj = err instanceof Error ? err : new Error(`Gagal memperbarui ${section}`);
+      logError(errorObj);
+      setError(errorObj);
+    }
+  };
 
   return {
     data,
     isLoading,
     error,
-    // Nanti bisa ditambahkan fungsi-fungsi untuk manipulasi data
-    updateAbout: async () => {},
-    updateHistory: async () => {},
-    updateVisionMission: async () => {},
-    updateOrganization: async () => {},
+    updateAbout: () => updateData('about', {}),
+    updateHistory: () => updateData('history', {}),
+    updateVisionMission: () => updateData('visionMission', {}),
+    updateOrganization: () => updateData('organization', {}),
   };
 }

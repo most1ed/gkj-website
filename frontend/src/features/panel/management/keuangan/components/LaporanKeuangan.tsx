@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { motion } from "framer-motion";
 import {
   Card,
   CardContent,
@@ -131,11 +132,16 @@ export function LaporanKeuangan() {
   };
 
   return (
-    <div className="space-y-6">
+    <motion.div 
+      className="space-y-6 animate-fade-in-up"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-medium">Laporan Keuangan</h3>
-          <p className="text-sm text-muted-foreground">
+          <h3 className="heading-secondary">Laporan Keuangan</h3>
+          <p className="text-muted-dark text-sm">
             Ringkasan dan detail keuangan gereja
           </p>
         </div>
@@ -144,16 +150,19 @@ export function LaporanKeuangan() {
             value={period}
             onValueChange={setPeriod}
           >
-            <SelectTrigger className="w-40">
+            <SelectTrigger className="w-40 input-primary bg-muted dark:bg-muted-dark">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-section">
               <SelectItem value="2024-01">Januari 2024</SelectItem>
               <SelectItem value="2023-12">Desember 2023</SelectItem>
               <SelectItem value="2023-11">November 2023</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline">
+          <Button 
+            variant="outline" 
+            className="btn-secondary dark:bg-primary-dark dark:text-primary-foreground dark:border-primary-dark dark:hover:bg-primary/80"
+          >
             <FileDown className="h-4 w-4 mr-2" />
             Export PDF
           </Button>
@@ -161,77 +170,85 @@ export function LaporanKeuangan() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card>
+        <Card className="card card-hover">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">
+            <CardTitle className="text-sm font-medium text-foreground">
               Total Pemasukan
             </CardTitle>
             <TrendingUp className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold text-primary-dark">
               {formatCurrency(report.summary.totalIncome)}
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="card card-hover">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">
+            <CardTitle className="text-sm font-medium text-foreground">
               Total Pengeluaran
             </CardTitle>
             <TrendingDown className="h-4 w-4 text-red-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold text-primary-dark">
               {formatCurrency(report.summary.totalExpense)}
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="card card-hover">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">
+            <CardTitle className="text-sm font-medium text-foreground">
               Saldo Bulan Ini
             </CardTitle>
             <TrendingUp className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold text-primary-dark">
               {formatCurrency(report.summary.balance)}
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              vs bulan lalu {formatCurrency(report.summary.previousBalance)}
-            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="card card-hover">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-foreground">
+              Saldo Sebelumnya
+            </CardTitle>
+            <TrendingDown className="h-4 w-4 text-red-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-primary-dark">
+              {formatCurrency(report.summary.previousBalance)}
+            </div>
           </CardContent>
         </Card>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
+        <Card className="card card-hover">
           <CardHeader>
-            <CardTitle>Pemasukan per Kategori</CardTitle>
-            <CardDescription>
-              Distribusi pemasukan berdasarkan kategori
-            </CardDescription>
+            <CardTitle className="text-foreground">Pemasukan per Kategori</CardTitle>
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Kategori</TableHead>
-                  <TableHead className="text-right">Jumlah</TableHead>
-                  <TableHead className="text-right">%</TableHead>
+                  <TableHead className="text-muted-dark">Kategori</TableHead>
+                  <TableHead className="text-muted-dark text-right">Jumlah</TableHead>
+                  <TableHead className="text-muted-dark text-right">Persentase</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {report.incomeByCategory.map((item) => (
                   <TableRow key={item.category}>
-                    <TableCell>{item.category}</TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-foreground">{item.category}</TableCell>
+                    <TableCell className="text-foreground text-right">
                       {formatCurrency(item.amount)}
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-muted-dark text-right">
                       {item.percentage}%
                     </TableCell>
                   </TableRow>
@@ -241,30 +258,27 @@ export function LaporanKeuangan() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="card card-hover">
           <CardHeader>
-            <CardTitle>Pengeluaran per Kategori</CardTitle>
-            <CardDescription>
-              Distribusi pengeluaran berdasarkan kategori
-            </CardDescription>
+            <CardTitle className="text-foreground">Pengeluaran per Kategori</CardTitle>
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Kategori</TableHead>
-                  <TableHead className="text-right">Jumlah</TableHead>
-                  <TableHead className="text-right">%</TableHead>
+                  <TableHead className="text-muted-dark">Kategori</TableHead>
+                  <TableHead className="text-muted-dark text-right">Jumlah</TableHead>
+                  <TableHead className="text-muted-dark text-right">Persentase</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {report.expenseByCategory.map((item) => (
                   <TableRow key={item.category}>
-                    <TableCell>{item.category}</TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-foreground">{item.category}</TableCell>
+                    <TableCell className="text-foreground text-right">
                       {formatCurrency(item.amount)}
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-muted-dark text-right">
                       {item.percentage}%
                     </TableCell>
                   </TableRow>
@@ -275,41 +289,37 @@ export function LaporanKeuangan() {
         </Card>
       </div>
 
-      <Card>
+      <Card className="card card-hover">
         <CardHeader>
-          <CardTitle>Riwayat Transaksi</CardTitle>
-          <CardDescription>
-            Daftar transaksi pemasukan dan pengeluaran
-          </CardDescription>
+          <CardTitle className="text-foreground">Riwayat Transaksi</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Tanggal</TableHead>
-                <TableHead>Deskripsi</TableHead>
-                <TableHead>Kategori</TableHead>
-                <TableHead className="text-right">Pemasukan</TableHead>
-                <TableHead className="text-right">Pengeluaran</TableHead>
+                <TableHead className="text-muted-dark">Tanggal</TableHead>
+                <TableHead className="text-muted-dark">Deskripsi</TableHead>
+                <TableHead className="text-muted-dark">Kategori</TableHead>
+                <TableHead className="text-muted-dark text-right">Jumlah</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {report.transactions.map((transaction) => (
                 <TableRow key={transaction.id}>
-                  <TableCell>
-                    {format(transaction.date, "dd MMM yyyy", { locale: id })}
+                  <TableCell className="text-foreground">
+                    {format(transaction.date, 'dd MMM yyyy', { locale: id })}
                   </TableCell>
-                  <TableCell>{transaction.description}</TableCell>
-                  <TableCell>{transaction.category}</TableCell>
-                  <TableCell className="text-right">
-                    {transaction.type === "income"
-                      ? formatCurrency(transaction.amount)
-                      : "-"}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {transaction.type === "expense"
-                      ? formatCurrency(transaction.amount)
-                      : "-"}
+                  <TableCell className="text-foreground">{transaction.description}</TableCell>
+                  <TableCell className="text-muted-dark">{transaction.category}</TableCell>
+                  <TableCell 
+                    className={`text-right ${
+                      transaction.type === 'income' 
+                        ? 'text-green-600 dark:text-green-400' 
+                        : 'text-red-600 dark:text-red-400'
+                    }`}
+                  >
+                    {transaction.type === 'income' ? '+' : '-'}
+                    {formatCurrency(transaction.amount)}
                   </TableCell>
                 </TableRow>
               ))}
@@ -317,6 +327,6 @@ export function LaporanKeuangan() {
           </Table>
         </CardContent>
       </Card>
-    </div>
+    </motion.div>
   );
 }

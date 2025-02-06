@@ -3,6 +3,9 @@ import { PanelLayout } from '@/layouts/PanelLayout';
 import { lazy, Suspense } from "react";
 import { Navigate } from 'react-router-dom';
 import { protectedRoute } from './route-utils';
+import { UserRole } from './types';
+import { BookOpen } from 'lucide-react';
+import { ErrorBoundary } from '@/components/ui/error-boundary';
 
 const ProfilePage = lazy(() => import('@/features/panel/base/profile/ProfilePage'));
 const DocumentsPage = lazy(() => import("@/features/panel/base/documents/DocumentsPage"));
@@ -21,6 +24,35 @@ const AlkitabPage = lazy(() => import("@/features/panel/admin/alkitab/AlkitabPag
 const MediaPage = lazy(() => import("@/features/panel/admin/media/MediaPage"));
 const PengaturanPage = lazy(() => import("@/features/panel/admin/pengaturan/PengaturanPage"));
 const FlexDashboardPage = lazy(() => import('@/features/panel/flexdash/pages/FlexDashboardPage'));
+import { OfferingTypeManagement } from '@/features/panel/base/offerings/components/OfferingTypeManagement';
+
+// Error fallback components (optional, can be customized)
+const DashboardErrorFallback = () => (
+  <div className="p-8 text-center">
+    <h2 className="text-2xl font-bold text-destructive">
+      Gagal Memuat Dashboard
+    </h2>
+    <p>Silakan refresh halaman atau hubungi dukungan teknis.</p>
+  </div>
+);
+
+const ManagementErrorFallback = () => (
+  <div className="p-8 text-center">
+    <h2 className="text-2xl font-bold text-destructive">
+      Gagal Memuat Halaman Manajemen
+    </h2>
+    <p>Data tidak dapat dimuat. Silakan periksa koneksi atau coba lagi nanti.</p>
+  </div>
+);
+
+const AdminErrorFallback = () => (
+  <div className="p-8 text-center">
+    <h2 className="text-2xl font-bold text-destructive">
+      Gagal Memuat Halaman Admin
+    </h2>
+    <p>Data tidak dapat dimuat. Silakan periksa koneksi atau coba lagi nanti.</p>
+  </div>
+);
 
 export const panelRoutes: RouteObject[] = [
   {
@@ -29,47 +61,76 @@ export const panelRoutes: RouteObject[] = [
     children: [
       {
         index: true,
-        element: <Navigate to="flexdash" replace />
+        element: (
+          <ErrorBoundary fallback={<DashboardErrorFallback />}>
+            <Suspense fallback={<div>Loading...</div>}>
+              <FlexDashboardPage />
+            </Suspense>
+          </ErrorBoundary>
+        )
       },
       {
         path: 'flexdash',
         element: (
-          <Suspense fallback={<div>Loading...</div>}>
-            <FlexDashboardPage />
-          </Suspense>
+          <ErrorBoundary fallback={<DashboardErrorFallback />}>
+            <Suspense fallback={<div>Loading...</div>}>
+              <FlexDashboardPage />
+            </Suspense>
+          </ErrorBoundary>
         ),
       },
       {
         path: 'profile',
         element: (
-          <Suspense fallback={<div>Loading...</div>}>
-            <ProfilePage />
-          </Suspense>
+          <ErrorBoundary>
+            <Suspense fallback={<div>Loading...</div>}>
+              <ProfilePage />
+            </Suspense>
+          </ErrorBoundary>
         ),
       },
       {
         path: 'documents',
         element: (
-          <Suspense fallback={<div>Loading...</div>}>
-            <DocumentsPage />
-          </Suspense>
+          <ErrorBoundary>
+            <Suspense fallback={<div>Loading...</div>}>
+              <DocumentsPage />
+            </Suspense>
+          </ErrorBoundary>
         ),
       },
       {
         path: 'events',
         element: (
-          <Suspense fallback={<div>Loading...</div>}>
-            <UserEventsPage />
-          </Suspense>
+          <ErrorBoundary>
+            <Suspense fallback={<div>Loading...</div>}>
+              <UserEventsPage />
+            </Suspense>
+          </ErrorBoundary>
         ),
       },
       {
         path: 'offerings',
         element: (
-          <Suspense fallback={<div>Loading...</div>}>
-            <UserOfferingsPage />
-          </Suspense>
+          <ErrorBoundary>
+            <Suspense fallback={<div>Loading...</div>}>
+              <UserOfferingsPage />
+            </Suspense>
+          </ErrorBoundary>
         ),
+      },
+      {
+        path: 'offerings/types',
+        element: (
+          <ErrorBoundary>
+            <OfferingTypeManagement />
+          </ErrorBoundary>
+        ),
+        meta: {
+          title: 'Manajemen Jenis Persembahan',
+          roles: [UserRole.ADMIN, UserRole.STAFF],
+          icon: <BookOpen />,
+        }
       },
       {
         path: 'management',
@@ -77,49 +138,61 @@ export const panelRoutes: RouteObject[] = [
           {
             path: 'jemaat',
             element: (
-              <Suspense fallback={<div>Loading...</div>}>
-                <JemaatPage />
-              </Suspense>
+              <ErrorBoundary fallback={<ManagementErrorFallback />}>
+                <Suspense fallback={<div>Loading...</div>}>
+                  <JemaatPage />
+                </Suspense>
+              </ErrorBoundary>
             ),
           },
           {
             path: 'ibadah',
             element: (
-              <Suspense fallback={<div>Loading...</div>}>
-                <IbadahPage />
-              </Suspense>
+              <ErrorBoundary fallback={<ManagementErrorFallback />}>
+                <Suspense fallback={<div>Loading...</div>}>
+                  <IbadahPage />
+                </Suspense>
+              </ErrorBoundary>
             ),
           },
           {
             path: 'pelayanan',
             element: (
-              <Suspense fallback={<div>Loading...</div>}>
-                <PelayananPage />
-              </Suspense>
+              <ErrorBoundary fallback={<ManagementErrorFallback />}>
+                <Suspense fallback={<div>Loading...</div>}>
+                  <PelayananPage />
+                </Suspense>
+              </ErrorBoundary>
             ),
           },
           {
             path: 'keuangan',
             element: (
-              <Suspense fallback={<div>Loading...</div>}>
-                <KeuanganPage />
-              </Suspense>
+              <ErrorBoundary fallback={<ManagementErrorFallback />}>
+                <Suspense fallback={<div>Loading...</div>}>
+                  <KeuanganPage />
+                </Suspense>
+              </ErrorBoundary>
             ),
           },
           {
             path: 'sda',
             element: (
-              <Suspense fallback={<div>Loading...</div>}>
-                <SDAPage />
-              </Suspense>
+              <ErrorBoundary fallback={<ManagementErrorFallback />}>
+                <Suspense fallback={<div>Loading...</div>}>
+                  <SDAPage />
+                </Suspense>
+              </ErrorBoundary>
             ),
           },
           {
             path: 'rencana',
             element: (
-              <Suspense fallback={<div>Loading...</div>}>
-                <RencanaKerjaPage />
-              </Suspense>
+              <ErrorBoundary fallback={<ManagementErrorFallback />}>
+                <Suspense fallback={<div>Loading...</div>}>
+                  <RencanaKerjaPage />
+                </Suspense>
+              </ErrorBoundary>
             ),
           },
         ]
@@ -130,49 +203,61 @@ export const panelRoutes: RouteObject[] = [
           {
             path: 'konten',
             element: (
-              <Suspense fallback={<div>Loading...</div>}>
-                <KontenPage />
-              </Suspense>
+              <ErrorBoundary fallback={<AdminErrorFallback />}>
+                <Suspense fallback={<div>Loading...</div>}>
+                  <KontenPage />
+                </Suspense>
+              </ErrorBoundary>
             ),
           },
           {
             path: 'artikel',
             element: (
-              <Suspense fallback={<div>Loading...</div>}>
-                <ArtikelPage />
-              </Suspense>
+              <ErrorBoundary fallback={<AdminErrorFallback />}>
+                <Suspense fallback={<div>Loading...</div>}>
+                  <ArtikelPage />
+                </Suspense>
+              </ErrorBoundary>
             ),
           },
           {
             path: 'master',
             element: (
-              <Suspense fallback={<div>Loading...</div>}>
-                <MasterPage />
-              </Suspense>
+              <ErrorBoundary fallback={<AdminErrorFallback />}>
+                <Suspense fallback={<div>Loading...</div>}>
+                  <MasterPage />
+                </Suspense>
+              </ErrorBoundary>
             ),
           },
           {
             path: 'alkitab',
             element: (
-              <Suspense fallback={<div>Loading...</div>}>
-                <AlkitabPage />
-              </Suspense>
+              <ErrorBoundary fallback={<AdminErrorFallback />}>
+                <Suspense fallback={<div>Loading...</div>}>
+                  <AlkitabPage />
+                </Suspense>
+              </ErrorBoundary>
             ),
           },
           {
             path: 'media',
             element: (
-              <Suspense fallback={<div>Loading...</div>}>
-                <MediaPage />
-              </Suspense>
+              <ErrorBoundary fallback={<AdminErrorFallback />}>
+                <Suspense fallback={<div>Loading...</div>}>
+                  <MediaPage />
+                </Suspense>
+              </ErrorBoundary>
             ),
           },
           {
             path: 'pengaturan',
             element: (
-              <Suspense fallback={<div>Loading...</div>}>
-                <PengaturanPage />
-              </Suspense>
+              <ErrorBoundary fallback={<AdminErrorFallback />}>
+                <Suspense fallback={<div>Loading...</div>}>
+                  <PengaturanPage />
+                </Suspense>
+              </ErrorBoundary>
             ),
           }
         ]

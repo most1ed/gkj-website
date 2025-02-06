@@ -37,11 +37,10 @@ interface PengaturanData {
 }
 
 export function usePengaturanData() {
-  return useQuery<PengaturanData>({
+  return useQuery({
     queryKey: ['pengaturan'],
     queryFn: async () => {
-      // TODO: Replace with actual API call
-      const response = await api.get('/api/pengaturan');
+      const response = await api.get('/pengaturan');
       return response.data;
     }
   });

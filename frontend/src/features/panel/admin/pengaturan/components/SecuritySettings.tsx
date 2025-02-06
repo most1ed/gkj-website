@@ -1,10 +1,20 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-export function SecuritySettings() {
+interface SecuritySettingsProps {
+  data?: any;
+}
+
+export function SecuritySettings({ data }: SecuritySettingsProps) {
   return (
     <div className="space-y-6">
       <div>
@@ -13,69 +23,99 @@ export function SecuritySettings() {
           Konfigurasi keamanan website
         </p>
       </div>
-      
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="space-y-0.5">
-            <Label>Two Factor Authentication</Label>
-            <p className="text-sm text-muted-foreground">
+
+      <div className="space-y-8">
+        <Card>
+          <CardHeader>
+            <CardTitle>Two Factor Authentication</CardTitle>
+            <CardDescription>
               Aktifkan autentikasi dua faktor untuk keamanan tambahan
-            </p>
-          </div>
-          <Switch />
-        </div>
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Switch />
+          </CardContent>
+        </Card>
 
-        <div className="space-y-2">
-          <Label htmlFor="sessionTimeout">Session Timeout</Label>
-          <Select>
-            <SelectTrigger>
-              <SelectValue placeholder="Pilih durasi" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="30">30 menit</SelectItem>
-              <SelectItem value="60">1 jam</SelectItem>
-              <SelectItem value="120">2 jam</SelectItem>
-              <SelectItem value="240">4 jam</SelectItem>
-              <SelectItem value="480">8 jam</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Session Timeout</CardTitle>
+            <CardDescription>
+              Durasi waktu sebelum sesi login berakhir
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Select defaultValue="30">
+              <SelectTrigger className="w-full md:w-[240px]">
+                <SelectValue placeholder="Pilih durasi timeout" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="15">15 menit</SelectItem>
+                <SelectItem value="30">30 menit</SelectItem>
+                <SelectItem value="60">1 jam</SelectItem>
+                <SelectItem value="120">2 jam</SelectItem>
+              </SelectContent>
+            </Select>
+          </CardContent>
+        </Card>
 
-        <div className="space-y-2">
-          <Label htmlFor="maxLoginAttempts">Maksimal Percobaan Login</Label>
-          <Select>
-            <SelectTrigger>
-              <SelectValue placeholder="Pilih jumlah" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="3">3 kali</SelectItem>
-              <SelectItem value="5">5 kali</SelectItem>
-              <SelectItem value="10">10 kali</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Maksimal Percobaan Login</CardTitle>
+            <CardDescription>
+              Jumlah maksimal percobaan login yang diizinkan sebelum akun terkunci
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Select defaultValue="3">
+              <SelectTrigger className="w-full md:w-[240px]">
+                <SelectValue placeholder="Pilih jumlah maksimal" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="3">3 kali</SelectItem>
+                <SelectItem value="5">5 kali</SelectItem>
+                <SelectItem value="10">10 kali</SelectItem>
+              </SelectContent>
+            </Select>
+          </CardContent>
+        </Card>
 
-        <div className="flex items-center justify-between">
-          <div className="space-y-0.5">
-            <Label>HTTPS Only</Label>
-            <p className="text-sm text-muted-foreground">
+        <Card>
+          <CardHeader>
+            <CardTitle>HTTPS Only</CardTitle>
+            <CardDescription>
               Paksa semua koneksi menggunakan HTTPS
-            </p>
-          </div>
-          <Switch defaultChecked />
-        </div>
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Switch />
+          </CardContent>
+        </Card>
 
-        <div className="space-y-2">
-          <Label htmlFor="allowedIPs">IP yang Diizinkan</Label>
-          <Textarea
-            id="allowedIPs"
-            placeholder="Masukkan IP yang diizinkan (satu per baris)"
-            className="min-h-[100px]"
-          />
+        <Card>
+          <CardHeader>
+            <CardTitle>IP yang Diizinkan</CardTitle>
+            <CardDescription>
+              Daftar alamat IP yang diizinkan untuk mengakses panel admin
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Textarea 
+              placeholder="Masukkan alamat IP (satu per baris)&#10;Contoh:&#10;192.168.1.1&#10;10.0.0.0/24" 
+              className="min-h-[120px] font-mono"
+            />
+            <p className="text-sm text-muted-foreground">
+              Format: IPv4 atau CIDR notation (contoh: 192.168.1.1 atau 10.0.0.0/24)
+            </p>
+          </CardContent>
+        </Card>
+
+        <div className="flex justify-end">
+          <Button type="submit" size="lg">
+            Simpan Perubahan
+          </Button>
         </div>
       </div>
-
-      <Button>Simpan Perubahan</Button>
     </div>
   );
 }

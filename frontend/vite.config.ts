@@ -1,11 +1,13 @@
 import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+import react from '@vitejs/plugin-react-swc';
 import path from 'path';
+import { TanStackRouterVite } from '@tanstack/router-vite-plugin';
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     react(),
+    TanStackRouterVite()
   ],
   base: '/',
   resolve: {
@@ -19,6 +21,7 @@ export default defineConfig({
     port: 3000,
     strictPort: false,
     host: true, // Listen on all addresses
+    open: true,
   },
   optimizeDeps: {
     include: [
@@ -36,6 +39,20 @@ export default defineConfig({
     exclude: ['@vitejs/plugin-react']
   },
   build: {
-    target: 'es2020'
+    target: 'es2020',
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            return 'vendor';
+          }
+        }
+      }
+    }
+  },
+  define: {
+    'import.meta.env.ROUTER_FUTURE_FLAGS': JSON.stringify({
+      v7_startTransition: true
+    })
   }
 })

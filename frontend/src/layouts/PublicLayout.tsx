@@ -58,9 +58,9 @@ export function PublicLayout() {
   const location = useLocation();
   
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col">
+    <div className="layout-min-height bg-background text-foreground">
       <Navbar />
-      <main className="flex-grow pt-20">
+      <main className="layout-flex-grow pt-20">
         {/* Add key to force re-render on route change */}
         <div key={location.pathname}>
           <Outlet />

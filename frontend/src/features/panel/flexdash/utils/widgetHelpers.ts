@@ -1,13 +1,85 @@
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { 
   BaseWidget, 
   WidgetCategory, 
   WidgetSize,
   WidgetTemplate,
-  DashboardPreset 
+  DashboardPreset,
+  WidgetLayout 
 } from '../types/widget.types';
 import { UserRole } from '@/routes/types';
+import { v4 as uuidv4 } from 'uuid';
+import { 
+  BaseWidget, 
+  WidgetTemplate, 
+  UserRole, 
+  WidgetCategory, 
+  CreateWidgetDTO 
+} from '../types/widget.types';
+import { widgetMock } from '@/lib/mock';
 
 export class WidgetManager {
+  // Predefined widget components
+  static getWidgetComponents(): Record<string, () => React.ReactElement> {
+    return {
+      // Financial Overview Widget
+      'financial-overview': () => {
+        return React.createElement(Card, null, 
+          React.createElement(CardHeader, null, 
+            React.createElement(CardTitle, null, 'Financial Overview')
+          ),
+          React.createElement(CardContent, null,
+            React.createElement('p', null, 'Total Contributions: Rp 500,000,000'),
+            React.createElement('p', null, 'Monthly Budget: Rp 50,000,000')
+          )
+        );
+      },
+
+      // Membership Statistics Widget
+      'membership-stats': () => {
+        return React.createElement(Card, null, 
+          React.createElement(CardHeader, null, 
+            React.createElement(CardTitle, null, 'Membership Stats')
+          ),
+          React.createElement(CardContent, null,
+            React.createElement('p', null, 'Total Members: 1,500'),
+            React.createElement('p', null, 'New Members (This Month): 25')
+          )
+        );
+      },
+
+      // Event Calendar Widget
+      'event-calendar': () => {
+        return React.createElement(Card, null, 
+          React.createElement(CardHeader, null, 
+            React.createElement(CardTitle, null, 'Upcoming Events')
+          ),
+          React.createElement(CardContent, null,
+            React.createElement('ul', null,
+              React.createElement('li', null, 'Sunday Service - Every Sunday'),
+              React.createElement('li', null, 'Youth Meeting - Next Saturday'),
+              React.createElement('li', null, 'Annual Church Conference - 15 March')
+            )
+          )
+        );
+      },
+
+      // Ministry Progress Widget
+      'ministry-progress': () => {
+        return React.createElement(Card, null, 
+          React.createElement(CardHeader, null, 
+            React.createElement(CardTitle, null, 'Ministry Progress')
+          ),
+          React.createElement(CardContent, null,
+            React.createElement('p', null, 'Active Ministries: 5'),
+            React.createElement('p', null, 'Ongoing Projects: 3')
+          )
+        );
+      }
+    };
+  }
+
   // Predefined dashboard presets with more detailed templates
   static getDashboardPresets(): DashboardPreset[] {
     return [
@@ -26,7 +98,7 @@ export class WidgetManager {
             isCustomizable: true
           },
           {
-            id: 'financial-summary',
+            id: 'financial-overview',
             title: 'Ringkasan Keuangan',
             description: 'Ikhtisar kondisi keuangan gereja',
             category: WidgetCategory.FINANCIAL,
@@ -64,10 +136,10 @@ export class WidgetManager {
             isCustomizable: false
           },
           {
-            id: 'events-summary',
+            id: 'event-calendar',
             title: 'Ringkasan Acara',
             description: 'Daftar dan detail acara gereja',
-            category: WidgetCategory.EVENTS,
+            category: WidgetCategory.EVENT,
             content: 'Acara Mendatang: Kebaktian Minggu | Pertemuan Pemuda | Konferensi Tahunan',
             roles: [UserRole.STAFF],
             size: WidgetSize.MEDIUM,
@@ -96,42 +168,56 @@ export class WidgetManager {
   }
 
   // Get preset widgets for a specific role
-  static getWidgetsForRole(role: UserRole): WidgetTemplate[] {
-    const preset = this.getDashboardPresets().find(p => p.role === role);
-    
-    // Default widgets for all roles if no specific preset found
-    const defaultWidgets: WidgetTemplate[] = [
-      {
-        id: 'general-overview',
-        title: 'Ikhtisar Umum',
-        description: 'Informasi dasar untuk semua pengguna',
-        category: WidgetCategory.OVERVIEW,
-        content: 'Selamat datang di dashboard GKJ',
-        roles: Object.values(UserRole),
-        size: WidgetSize.MEDIUM,
-        icon: 'home',
-        isCustomizable: true
-      }
-    ];
-
-    return preset ? [...preset.widgets, ...defaultWidgets] : defaultWidgets;
+  static async getWidgetsForRole(role: UserRole): Promise<BaseWidget[]> {
+    return await widgetMock.getWidgetsByRole(role);
   }
 
-  // Get all available widget templates
-  static getAllWidgetTemplates(): WidgetTemplate[] {
-    return this.getDashboardPresets().flatMap(preset => preset.widgets);
+  // Create a new widget
+  static async createWidget(widgetData: CreateWidgetDTO): Promise<BaseWidget> {
+    return await widgetMock.createWidget(widgetData);
   }
 
-  // Utility method to get recommended size for a category
-  static getRecommendedSize(category: WidgetCategory): WidgetSize {
-    const sizeMap = {
-      [WidgetCategory.OVERVIEW]: WidgetSize.LARGE,
-      [WidgetCategory.FINANCIAL]: WidgetSize.MEDIUM,
-      [WidgetCategory.MEMBERSHIP]: WidgetSize.MEDIUM,
-      [WidgetCategory.EVENTS]: WidgetSize.SMALL,
-      [WidgetCategory.MINISTRY]: WidgetSize.MEDIUM
+  // Update an existing widget
+  static async updateWidget(widgetId: string, updates: Partial<BaseWidget>): Promise<BaseWidget> {
+    return await widgetMock.updateWidget(widgetId, updates);
+  }
+
+  // Delete a widget
+  static async deleteWidget(widgetId: string): Promise<boolean> {
+    return await widgetMock.deleteWidget(widgetId);
+  }
+
+  // Generate widget layout dynamically
+  static generateWidgetLayout(existingWidgets: BaseWidget[], newWidget: BaseWidget, maxColumns: number = 4): any {
+    const existingCount = existingWidgets.length;
+
+    // Calculate grid position
+    const x = (existingCount % maxColumns) * 2;
+    const y = Math.floor(existingCount / maxColumns) * 2;
+
+    // Determine minimum size based on widget category
+    const minSizes: Record<WidgetCategory, { w: number, h: number }> = {
+      [WidgetCategory.FINANCIAL]: { w: 4, h: 3 },
+      [WidgetCategory.MEMBER]: { w: 3, h: 2 },
+      [WidgetCategory.MINISTRY]: { w: 4, h: 3 },
+      [WidgetCategory.EVENT]: { w: 3, h: 2 },
+      [WidgetCategory.ANNOUNCEMENT]: { w: 3, h: 2 },
+      // Add more categories as needed
+      DEFAULT: { w: 2, h: 2 }
     };
 
-    return sizeMap[category] || WidgetSize.MEDIUM;
+    const { w, h } = minSizes[newWidget.category] || minSizes.DEFAULT;
+
+    return {
+      x,
+      y,
+      w,
+      h
+    };
+  }
+
+  // Generate a unique widget ID
+  static generateWidgetId(): string {
+    return uuidv4();
   }
 }

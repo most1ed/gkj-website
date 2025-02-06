@@ -4,8 +4,9 @@ import { PengeluaranManager } from "./components/PengeluaranManager";
 import { LaporanKeuangan } from "./components/LaporanKeuangan";
 import { AnggaranManager } from "./components/AnggaranManager";
 import { AnggaranApproval } from "./components/AnggaranApproval";
+import { KeuanganStatistics } from "./components/KeuanganStatistics";
 import { Button } from "@/components/ui/button";
-import { Plus, FileDown, Printer } from "lucide-react";
+import { Plus, FileDown, Printer, BarChart } from "lucide-react";
 import { useKeuanganData } from "./hooks/useKeuanganData";
 
 export default function KeuanganPage() {
@@ -30,26 +31,39 @@ export default function KeuanganPage() {
         </div>
       </div>
 
-      <Tabs defaultValue="persembahan" className="space-y-4">
+      <Tabs defaultValue="statistik" className="space-y-4">
         <TabsList>
+          <TabsTrigger value="statistik">
+            <BarChart className="mr-2 h-4 w-4" />
+            Statistik
+          </TabsTrigger>
           <TabsTrigger value="persembahan">Persembahan</TabsTrigger>
           <TabsTrigger value="pengeluaran">Pengeluaran</TabsTrigger>
           <TabsTrigger value="anggaran">Anggaran</TabsTrigger>
           <TabsTrigger value="approval">Persetujuan</TabsTrigger>
           <TabsTrigger value="laporan">Laporan</TabsTrigger>
         </TabsList>
+        
+        <TabsContent value="statistik" className="space-y-4">
+          <KeuanganStatistics data={data} />
+        </TabsContent>
+        
         <TabsContent value="persembahan" className="space-y-4">
           <PersembahanManager />
         </TabsContent>
+        
         <TabsContent value="pengeluaran" className="space-y-4">
           <PengeluaranManager />
         </TabsContent>
+        
         <TabsContent value="anggaran" className="space-y-4">
           <AnggaranManager />
         </TabsContent>
+        
         <TabsContent value="approval" className="space-y-4">
           <AnggaranApproval />
         </TabsContent>
+        
         <TabsContent value="laporan" className="space-y-4">
           <LaporanKeuangan />
         </TabsContent>

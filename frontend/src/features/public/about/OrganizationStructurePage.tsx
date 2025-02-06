@@ -4,62 +4,60 @@ import {
   Briefcase, 
   BookOpen, 
   Heart, 
-  Shield, 
-  Globe 
+  Megaphone, 
+  Handshake 
 } from 'lucide-react';
 
 const leadershipTeam = [
   {
-    title: 'Majelis Jemaat',
-    description: 'Badan Pemimpin Tertinggi',
+    title: "Majelis Jemaat",
+    description: "Badan kepemimpinan tertinggi yang bertanggung jawab atas kebijakan dan arah gereja",
     members: [
-      { name: 'Pdt. Johanes Setiawan', role: 'Ketua Majelis' },
-      { name: 'Bpk. Hendra Wijaya', role: 'Sekretaris' },
-      { name: 'Ibu Maria Hartono', role: 'Bendahara' }
+      { name: "Pdt. Nama Pendeta", role: "Ketua Majelis" },
+      { name: "Nama Penatua", role: "Sekretaris" },
+      { name: "Nama Penatua", role: "Bendahara" }
     ]
   },
   {
-    title: 'Tim Pastoral',
-    description: 'Pelayanan Rohani dan Pembinaan',
+    title: "Tim Pastoral",
+    description: "Melayani kebutuhan rohani jemaat dan memberikan bimbingan spiritual",
     members: [
-      { name: 'Pdt. Samuel Kristanto', role: 'Kepala Pelayanan Pastoral' },
-      { name: 'Ev. Daniel Pranata', role: 'Koordinator Pembinaan' },
-      { name: 'Ibu Susanto', role: 'Konseling Keluarga' }
+      { name: "Pdt. Nama Pendeta", role: "Pendeta Utama" },
+      { name: "Nama Pendeta", role: "Pendeta Muda" },
+      { name: "Nama Pembina", role: "Konselor" }
     ]
   }
 ];
 
 const ministryDivisions = [
   {
-    icon: Heart,
-    title: 'Pelayanan Sosial',
-    description: 'Fokus pada kepedulian dan pemberdayaan masyarakat',
-    responsibilities: [
-      'Program bantuan sosial',
-      'Pendampingan komunitas',
-      'Kegiatan amal dan donasi'
-    ]
-  },
-  {
+    title: "Pelayanan Iman",
     icon: BookOpen,
-    title: 'Pendidikan & Pembinaan',
-    description: 'Pengembangan iman dan pengetahuan',
+    description: "Fokus pada pertumbuhan iman dan pendalaman Alkitab",
     responsibilities: [
-      'Sekolah Minggu',
-      'Kelas Katekisasi',
-      'Kelompok Pemuda',
-      'Pembinaan Keluarga'
+      "Pembinaan Kategorial",
+      "Kajian Alkitab",
+      "Pendidikan Iman"
     ]
   },
   {
-    icon: Globe,
-    title: 'Misi & Penginjilan',
-    description: 'Penyebaran Injil dan pelayanan lintas batas',
+    title: "Pelayanan Misi",
+    icon: Megaphone,
+    description: "Mengembangkan misi gereja dalam konteks lokal dan global",
     responsibilities: [
-      'Misi dalam kota',
-      'Program penginjilan',
-      'Kerjasama lintas gereja',
-      'Pelayanan masyarakat'
+      "Penginjilan",
+      "Misi Sosial",
+      "Kerjasama Antar Gereja"
+    ]
+  },
+  {
+    title: "Pelayanan Kasih",
+    icon: Heart,
+    description: "Memberikan perhatian dan bantuan kepada mereka yang membutuhkan",
+    responsibilities: [
+      "Kepedulian Sosial",
+      "Konseling",
+      "Pemberdayaan Masyarakat"
     ]
   }
 ];
@@ -70,7 +68,7 @@ export default function OrganizationStructurePage() {
       <header className="text-center mb-16">
         <Users className="mx-auto mb-6 text-primary" size={64} />
         <h1 className="text-4xl font-bold mb-4">Struktur Organisasi</h1>
-        <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+        <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
           Struktur kepemimpinan dan pelayanan GKJ Grogol Jakarta yang 
           berfokus pada pengembangan iman, misi, dan pelayanan masyarakat
         </p>
@@ -84,12 +82,12 @@ export default function OrganizationStructurePage() {
           {leadershipTeam.map((team, index) => (
             <div 
               key={index} 
-              className="bg-white border rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow"
+              className="bg-card border rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow"
             >
               <h3 className="text-2xl font-bold mb-4 text-primary">
                 {team.title}
               </h3>
-              <p className="text-gray-600 mb-6">{team.description}</p>
+              <p className="text-muted-foreground mb-6">{team.description}</p>
               <ul className="space-y-4">
                 {team.members.map((member, idx) => (
                   <li 
@@ -97,7 +95,7 @@ export default function OrganizationStructurePage() {
                     className="flex justify-between border-b pb-2 last:border-b-0"
                   >
                     <span className="font-semibold">{member.name}</span>
-                    <span className="text-gray-600">{member.role}</span>
+                    <span className="text-muted-foreground">{member.role}</span>
                   </li>
                 ))}
               </ul>
@@ -106,7 +104,7 @@ export default function OrganizationStructurePage() {
         </div>
       </section>
 
-      <section className="bg-gray-100 rounded-lg p-12">
+      <section className="bg-secondary/10 rounded-lg p-12">
         <h2 className="text-3xl font-semibold mb-8 text-center">
           Divisi Pelayanan
         </h2>
@@ -114,12 +112,12 @@ export default function OrganizationStructurePage() {
           {ministryDivisions.map((division, index) => (
             <div 
               key={index} 
-              className="bg-white rounded-lg p-6 text-center shadow-sm hover:shadow-md transition-shadow"
+              className="bg-card rounded-lg p-6 text-center shadow-sm hover:shadow-md transition-shadow"
             >
               <division.icon className="mx-auto mb-4 text-primary" size={48} />
               <h3 className="text-2xl font-bold mb-4">{division.title}</h3>
-              <p className="text-gray-600 mb-6">{division.description}</p>
-              <ul className="list-disc list-inside text-gray-700 space-y-2">
+              <p className="text-muted-foreground mb-6">{division.description}</p>
+              <ul className="list-disc list-inside text-foreground space-y-2">
                 {division.responsibilities.map((resp, idx) => (
                   <li key={idx}>{resp}</li>
                 ))}
@@ -131,12 +129,12 @@ export default function OrganizationStructurePage() {
 
       <section className="mt-16 text-center">
         <h2 className="text-3xl font-bold mb-6">Bergabung dalam Pelayanan</h2>
-        <p className="text-xl text-gray-600 mb-8">
+        <p className="text-xl text-muted-foreground mb-8">
           Tertarik untuk berkontribusi? Hubungi kami untuk informasi lebih lanjut.
         </p>
         <a 
           href="mailto:pelayanan@gkjgrogoljakarta.org"
-          className="bg-primary text-white px-8 py-4 rounded-lg hover:bg-primary-dark transition-colors"
+          className="btn-primary"
         >
           Hubungi Tim Pelayanan
         </a>
