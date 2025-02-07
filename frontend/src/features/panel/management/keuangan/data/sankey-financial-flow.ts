@@ -2,6 +2,7 @@
 export interface SankeyNode {
   name: string;
   category: 'income' | 'flow' | 'expense';
+  description?: string;
 }
 
 export interface SankeyLink {
@@ -9,6 +10,7 @@ export interface SankeyLink {
   target: number;
   value: number;
   gradientKey: string;
+  description?: string;
 }
 
 export interface SankeyData {
@@ -18,20 +20,30 @@ export interface SankeyData {
 
 export const FINANCIAL_PALETTE = {
   income: {
-    base: '#64B5F6',          // Light blue for income
-    hover: '#42A5F5',
+    base: '#B0BEC5',          // Neutral gray for income
+    hover: '#90A4AE',
     variants: {
-      persepuluhan: '#64B5F6',
-      persembahan: '#42A5F5',
-      donasi: '#2196F3',
-      lainnya: '#1E88E5'
+      persepuluhan: '#B0BEC5',
+      persembahan: '#90A4AE',
+      donasi: '#78909C',
+      lainnya: '#607D8B'
     }
   },
   flow: {
-    profit: '#4CAF50',        // Green for profit flows
+    profit: '#66BB6A',        // Green for profit flows
     profitLight: '#81C784',
+    profitDark: '#4CAF50',
     expense: '#EF5350',       // Red for expense flows
-    expenseLight: '#E57373'
+    expenseLight: '#E57373',
+    expenseDark: '#D32F2F'
+  },
+  text: {
+    light: '#2D3748',
+    dark: '#E2E8F0'
+  },
+  background: {
+    light: '#FFFFFF',
+    dark: '#1A202C'
   }
 };
 
@@ -40,68 +52,151 @@ export const COMPREHENSIVE_SANKEY_DATA: SankeyData = {
     // Income Sources (Left)
     { 
       name: 'Persepuluhan',
-      category: 'income'
+      category: 'income',
+      description: 'Persembahan rutin sesuai prinsip perpuluhan'
     },
     { 
       name: 'Persembahan Mingguan',
-      category: 'income'
+      category: 'income',
+      description: 'Kolekte dan persembahan dalam ibadah mingguan'
     },
     { 
       name: 'Donasi Khusus',
-      category: 'income'
+      category: 'income',
+      description: 'Sumbangan untuk proyek atau kebutuhan spesifik'
     },
     { 
       name: 'Pendapatan Lainnya',
-      category: 'income'
+      category: 'income',
+      description: 'Sumber pendapatan tambahan di luar kategori utama'
     },
     
     // Flow Transformations (Middle)
     { 
       name: 'Total Pendapatan',
-      category: 'flow'
+      category: 'flow',
+      description: 'Akumulasi seluruh sumber pendapatan'
     },
     { 
       name: 'Pendapatan Operasional',
-      category: 'flow'
+      category: 'flow',
+      description: 'Pendapatan yang digunakan untuk kegiatan operasional'
     },
     { 
       name: 'Pendapatan Bersih',
-      category: 'flow'
+      category: 'flow',
+      description: 'Sisa pendapatan setelah pengurangan biaya operasional'
     },
     
     // Expense Categories (Right)
     { 
       name: 'Biaya Operasional',
-      category: 'expense'
+      category: 'expense',
+      description: 'Biaya rutin untuk menjalankan kegiatan gereja'
     },
     { 
       name: 'Gaji & Tunjangan',
-      category: 'expense'
+      category: 'expense',
+      description: 'Kompensasi untuk staf dan pelayan gereja'
     },
     { 
       name: 'Pemeliharaan',
-      category: 'expense'
+      category: 'expense',
+      description: 'Biaya perawatan gedung dan fasilitas'
     },
     { 
       name: 'Program Pelayanan',
-      category: 'expense'
+      category: 'expense',
+      description: 'Anggaran untuk kegiatan dan program pelayanan'
+    },
+    {
+      name: 'Pengembangan Misi',
+      category: 'expense',
+      description: 'Investasi untuk kegiatan misi dan penginjilan'
     }
   ],
   links: [
     // Income to Total Revenue
-    { source: 0, target: 4, value: 70000000, gradientKey: 'income-flow' },  // Persepuluhan
-    { source: 1, target: 4, value: 50000000, gradientKey: 'income-flow' },  // Persembahan
-    { source: 2, target: 4, value: 30000000, gradientKey: 'income-flow' },  // Donasi
-    { source: 3, target: 4, value: 20000000, gradientKey: 'income-flow' },  // Lainnya
+    { 
+      source: 0, 
+      target: 4, 
+      value: 85000000, 
+      gradientKey: 'income-flow',
+      description: 'Persepuluhan dialirkan ke Total Pendapatan'
+    },
+    { 
+      source: 1, 
+      target: 4, 
+      value: 65000000, 
+      gradientKey: 'income-flow',
+      description: 'Persembahan Mingguan dialirkan ke Total Pendapatan'
+    },
+    { 
+      source: 2, 
+      target: 4, 
+      value: 45000000, 
+      gradientKey: 'income-flow',
+      description: 'Donasi Khusus dialirkan ke Total Pendapatan'
+    },
+    { 
+      source: 3, 
+      target: 4, 
+      value: 35000000, 
+      gradientKey: 'income-flow',
+      description: 'Pendapatan Lainnya dialirkan ke Total Pendapatan'
+    },
 
     // Revenue Flow
-    { source: 4, target: 5, value: 170000000, gradientKey: 'profit-flow' }, // Total ke Operasional
-    { source: 5, target: 6, value: 120000000, gradientKey: 'profit-flow' }, // Operasional ke Bersih
+    { 
+      source: 4, 
+      target: 5, 
+      value: 230000000, 
+      gradientKey: 'profit-flow',
+      description: 'Total Pendapatan dialirkan ke Pendapatan Operasional'
+    },
+    { 
+      source: 5, 
+      target: 6, 
+      value: 170000000, 
+      gradientKey: 'profit-flow',
+      description: 'Pendapatan Operasional dikurangi biaya menjadi Pendapatan Bersih'
+    },
 
     // Expenses from Operating Income
-    { source: 5, target: 7, value: 30000000, gradientKey: 'expense-flow' },  // Biaya Operasional
-    { source: 5, target: 8, value: 25000000, gradientKey: 'expense-flow' },  // Gaji
-    { source: 5, target: 9, value: 20000000, gradientKey: 'expense-flow' },  // Pemeliharaan
-    { source: 5, target: 10, value: 15000000, gradientKey: 'expense-flow' }  // Program
+    { 
+      source: 5, 
+      target: 7, 
+      value: 45000000, 
+      gradientKey: 'expense-flow',
+      description: 'Biaya Operasional dikeluarkan dari Pendapatan Operasional'
+    },
+    { 
+      source: 5, 
+      target: 8, 
+      value: 40000000, 
+      gradientKey: 'expense-flow',
+      description: 'Gaji & Tunjangan dikeluarkan dari Pendapatan Operasional'
+    },
+    { 
+      source: 5, 
+      target: 9, 
+      value: 30000000, 
+      gradientKey: 'expense-flow',
+      description: 'Biaya Pemeliharaan dikeluarkan dari Pendapatan Operasional'
+    },
+    { 
+      source: 5, 
+      target: 10, 
+      value: 25000000, 
+      gradientKey: 'expense-flow',
+      description: 'Biaya Program Pelayanan dikeluarkan dari Pendapatan Operasional'
+    },
+    { 
+      source: 5, 
+      target: 11, 
+      value: 20000000, 
+      gradientKey: 'expense-flow',
+      description: 'Investasi Pengembangan Misi dari Pendapatan Operasional'
+    }
   ]
 };

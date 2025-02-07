@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
   Sankey, 
@@ -12,25 +12,23 @@ import { cn } from '@/lib/utils';
 import { 
   FINANCIAL_PALETTE, 
   COMPREHENSIVE_SANKEY_DATA,
-  SankeyData
+  SankeyData,
+  SankeyNode,
+  SankeyLink
 } from '../data/sankey-financial-flow';
 
-// Gradient definitions component
 const SankeyGradients: React.FC = () => (
   <defs>
-    {/* Income to Total Flow */}
     <linearGradient id="income-flow" x1="0%" y1="0%" x2="100%" y2="0%">
       <stop offset="0%" stopColor={FINANCIAL_PALETTE.income.base} stopOpacity="0.7" />
       <stop offset="100%" stopColor={FINANCIAL_PALETTE.flow.profitLight} stopOpacity="0.9" />
     </linearGradient>
     
-    {/* Profit Flows */}
     <linearGradient id="profit-flow" x1="0%" y1="0%" x2="100%" y2="0%">
       <stop offset="0%" stopColor={FINANCIAL_PALETTE.flow.profit} stopOpacity="0.8" />
       <stop offset="100%" stopColor={FINANCIAL_PALETTE.flow.profitLight} stopOpacity="1" />
     </linearGradient>
     
-    {/* Expense Flows */}
     <linearGradient id="expense-flow" x1="0%" y1="0%" x2="100%" y2="0%">
       <stop offset="0%" stopColor={FINANCIAL_PALETTE.flow.expense} stopOpacity="0.8" />
       <stop offset="100%" stopColor={FINANCIAL_PALETTE.flow.expenseLight} stopOpacity="1" />
@@ -47,6 +45,8 @@ export function KeuanganStatistics({
 }: KeuanganStatisticsProps) {
   const { theme } = useTheme();
   const isDarkMode = theme === 'dark';
+  const [selectedNode, setSelectedNode] = useState<SankeyNode | null>(null);
+  const [selectedLink, setSelectedLink] = useState<SankeyLink | null>(null);
 
   useEffect(() => {
     console.log('🎨 Sankey Styling Debug:', {
@@ -93,11 +93,16 @@ export function KeuanganStatistics({
       <CardHeader className="p-4 pb-0">
         <CardTitle 
           className={cn(
-            "text-xl font-bold tracking-tight",
+            "text-xl font-bold tracking-tight flex justify-between items-center",
             isDarkMode ? "text-gray-100" : "text-gray-900"
           )}
         >
           Aliran Keuangan Gereja
+          {selectedNode && (
+            <span className="text-sm font-medium text-gray-500">
+              {selectedNode.description}
+            </span>
+          )}
         </CardTitle>
       </CardHeader>
       
@@ -141,7 +146,16 @@ export function KeuanganStatistics({
         </div>
 
         {/* Enhanced Sankey Diagram */}
-        <div className="w-full h-[700px] relative">
+        <div className={cn(
+          "sankey-diagram-container",
+          isDarkMode ? "dark" : ""
+        )}>
+          <div 
+            className={cn(
+              "sankey-diagram-background",
+              isDarkMode ? "dark" : ""
+            )}
+          />
           <ResponsiveContainer width="100%" height="100%">
             <Sankey
               data={sankeyData}
@@ -149,13 +163,13 @@ export function KeuanganStatistics({
                 fill: (node) => {
                   switch(node.category) {
                     case 'income':
-                      return '#B0BEC5';  // Neutral gray for income
+                      return FINANCIAL_PALETTE.income.base;
                     case 'flow':
-                      return '#66BB6A';  // Green for profit
+                      return FINANCIAL_PALETTE.flow.profit;
                     case 'expense':
-                      return '#EF5350';  // Red for expense
+                      return FINANCIAL_PALETTE.flow.expense;
                     default:
-                      return '#B0BEC5';
+                      return FINANCIAL_PALETTE.income.base;
                   }
                 },
                 stroke: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
@@ -163,10 +177,15 @@ export function KeuanganStatistics({
                 label: {
                   fontSize: 12,
                   fontWeight: 600,
-                  fill: isDarkMode ? '#E2E8F0' : '#2D3748',
+                  fill: isDarkMode ? FINANCIAL_PALETTE.text.dark : FINANCIAL_PALETTE.text.light,
                   position: 'outside',
                   dy: -20,
-                  dx: (node) => node.category === 'income' ? -60 : node.category === 'expense' ? 60 : 0
+                  dx: (node) => node.category === 'income' ? -60 : node.category === 'expense' ? 60 : 0,
+                  className: 'sankey-node-label'
+                },
+                onClick: (node) => {
+                  setSelectedNode(node);
+                  setSelectedLink(null);
                 }
               }}
               link={{ 
@@ -174,7 +193,12 @@ export function KeuanganStatistics({
                 strokeWidth: 4,
                 fill: 'none',
                 strokeOpacity: 0.9,
-                curvature: 0.5
+                curvature: 0.5,
+                className: 'sankey-link',
+                onClick: (link) => {
+                  setSelectedLink(link);
+                  setSelectedNode(null);
+                }
               }}
               nodePadding={40}
               nodeWidth={40}
@@ -186,38 +210,19 @@ export function KeuanganStatistics({
               }}
               iterations={64}
             >
-              <defs>
-                <linearGradient id="income-flow" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0%" stopColor="#B0BEC5" stopOpacity={0.8} />
-                  <stop offset="100%" stopColor="#66BB6A" stopOpacity={0.8} />
-                </linearGradient>
-                <linearGradient id="profit-flow" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0%" stopColor="#66BB6A" stopOpacity={0.8} />
-                  <stop offset="100%" stopColor="#81C784" stopOpacity={0.8} />
-                </linearGradient>
-                <linearGradient id="expense-flow" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0%" stopColor="#EF5350" stopOpacity={0.8} />
-                  <stop offset="100%" stopColor="#E57373" stopOpacity={0.8} />
-                </linearGradient>
-              </defs>
+              <SankeyGradients />
               <Tooltip
                 content={({ active, payload }) => {
                   if (!active || !payload) return null;
                   const data = payload[0]?.payload;
                   
                   return (
-                    <div className={cn(
-                      "p-3 rounded-lg shadow-lg border",
-                      isDarkMode 
-                        ? "bg-gray-800/90 border-gray-700 text-white" 
-                        : "bg-white/90 border-gray-200 text-gray-900"
-                    )}>
-                      <p className="font-medium mb-1">
-                        {data?.name}
-                      </p>
-                      <p className="text-sm opacity-80">
-                        {formatCurrency(data?.value || 0)}
-                      </p>
+                    <div className="sankey-tooltip">
+                      <p className="sankey-tooltip-title">{data?.name}</p>
+                      <p className="sankey-tooltip-value">{formatCurrency(data?.value || 0)}</p>
+                      {data?.description && (
+                        <p className="text-xs text-gray-500 mt-1">{data.description}</p>
+                      )}
                     </div>
                   );
                 }}
@@ -225,6 +230,41 @@ export function KeuanganStatistics({
             </Sankey>
           </ResponsiveContainer>
         </div>
+
+        {/* Detailed Node/Link Information */}
+        {(selectedNode || selectedLink) && (
+          <div 
+            className={cn(
+              "p-4 rounded-lg transition-all duration-300 mt-4",
+              isDarkMode 
+                ? "bg-gray-700 text-gray-100" 
+                : "bg-gray-100 text-gray-900"
+            )}
+          >
+            {selectedNode && (
+              <div>
+                <h3 className="text-lg font-bold mb-2">{selectedNode.name}</h3>
+                <p className="text-sm text-gray-600">{selectedNode.description}</p>
+              </div>
+            )}
+            {selectedLink && (
+              <div>
+                <h3 className="text-lg font-bold mb-2">Aliran Dana</h3>
+                <p className="text-sm">
+                  {sankeyData.nodes[selectedLink.source].name} → {sankeyData.nodes[selectedLink.target].name}
+                </p>
+                <p className="text-sm font-medium mt-1">
+                  Jumlah: {formatCurrency(selectedLink.value)}
+                </p>
+                {selectedLink.description && (
+                  <p className="text-xs text-gray-600 mt-2">
+                    {selectedLink.description}
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
+        )}
       </CardContent>
     </Card>
   );

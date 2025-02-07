@@ -1141,3 +1141,52 @@ html, body {
 .dark ::-webkit-scrollbar-thumb:hover {
   @apply bg-gray-500;
 }
+
+/* Sankey Diagram Enhancements */
+.sankey-diagram-container {
+  @apply relative w-full h-[700px] overflow-hidden rounded-lg shadow-md transition-all duration-300 ease-in-out;
+}
+
+.sankey-diagram-background {
+  @apply absolute inset-0 pointer-events-none opacity-50 transition-opacity duration-300;
+  background-image: 
+    linear-gradient(to right, rgba(0,0,0,0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0,0,0,0.03) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.sankey-diagram-background.dark {
+  background-image: 
+    linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px);
+}
+
+.sankey-node-label {
+  @apply text-xs font-semibold tracking-tight transition-all duration-300 ease-in-out;
+}
+
+.sankey-node-label:hover {
+  @apply text-primary opacity-80 scale-105;
+}
+
+.sankey-link {
+  @apply transition-all duration-300 ease-in-out;
+  transition-property: stroke-opacity, stroke-width;
+}
+
+.sankey-link:hover {
+  @apply opacity-80;
+  stroke-width: 6px !important;
+}
+
+.sankey-tooltip {
+  @apply p-3 rounded-lg shadow-lg border bg-background/90 backdrop-blur-sm transition-all duration-300 ease-in-out;
+}
+
+.sankey-tooltip-title {
+  @apply font-bold mb-1 text-foreground;
+}
+
+.sankey-tooltip-value {
+  @apply text-sm text-muted-foreground;
+}

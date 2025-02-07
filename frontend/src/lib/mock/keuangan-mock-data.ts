@@ -17,24 +17,38 @@ export interface KeuanganSummary {
 export const mockKeuanganStatisticsData: KeuanganData[] = [
   {
     category: 'Operasional',
-    income: 50000000,
-    expense: 35000000,
-    balance: 15000000,
-    description: 'Biaya operasional bulanan gereja'
+    income: 75000000,
+    expense: 55000000,
+    balance: 20000000,
+    description: 'Biaya operasional bulanan gereja termasuk utilitas, administrasi, dan kebutuhan rutin'
   },
   {
     category: 'Pembangunan',
-    income: 25000000,
-    expense: 10000000,
-    balance: 15000000,
-    description: 'Dana pembangunan gedung gereja'
+    income: 45000000,
+    expense: 25000000,
+    balance: 20000000,
+    description: 'Dana pembangunan dan renovasi fasilitas gereja'
   },
   {
     category: 'Sosial',
-    income: 15000000,
-    expense: 12000000,
-    balance: 3000000,
-    description: 'Kegiatan sosial dan bantuan masyarakat'
+    income: 30000000,
+    expense: 22000000,
+    balance: 8000000,
+    description: 'Kegiatan sosial, bantuan masyarakat, dan program kepedulian'
+  },
+  {
+    category: 'Misi',
+    income: 25000000,
+    expense: 18000000,
+    balance: 7000000,
+    description: 'Pendanaan kegiatan misi, penginjilan, dan pelayanan lintas wilayah'
+  },
+  {
+    category: 'Pendidikan',
+    income: 20000000,
+    expense: 15000000,
+    balance: 5000000,
+    description: 'Biaya pendidikan, pelatihan rohani, dan pengembangan SDM gereja'
   }
 ];
 
@@ -82,19 +96,27 @@ export const mockKeuanganTransactions = [
 // Function to generate more dynamic mock data
 export function generateMockKeuanganData(months: number = 6): KeuanganData[] {
   const mockData: KeuanganData[] = [];
-  const categories = ['Operasional', 'Pembangunan', 'Sosial', 'Misi', 'Pendidikan'];
+  const categories = [
+    'Operasional', 
+    'Pembangunan', 
+    'Sosial', 
+    'Misi', 
+    'Pendidikan'
+  ];
   
   for (let i = 0; i < months; i++) {
     const category = categories[i % categories.length];
-    const baseIncome = 20000000 + Math.random() * 10000000;
-    const baseExpense = 15000000 + Math.random() * 8000000;
+    
+    // Ensure minimum income and expense values
+    const baseIncome = 30000000 + Math.random() * 15000000;
+    const baseExpense = 20000000 + Math.random() * 10000000;
     
     mockData.push({
       category: `${category} ${i + 1}`,
-      income: Math.round(baseIncome),
-      expense: Math.round(baseExpense),
+      income: Math.max(30000000, Math.round(baseIncome)),
+      expense: Math.max(20000000, Math.round(baseExpense)),
       balance: Math.round(baseIncome - baseExpense),
-      description: `Mock data for ${category} - Month ${i + 1}`
+      description: `Proyeksi keuangan untuk ${category} - Bulan ${i + 1}`
     });
   }
   
