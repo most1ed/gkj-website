@@ -4,7 +4,18 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-export function BackupSettings() {
+interface BackupSettingsProps {
+  data?: {
+    autoBackup?: boolean;
+    frequency?: 'daily' | 'weekly' | 'monthly';
+    backupTime?: string;
+    backupLocation?: string;
+    includeDatabase?: boolean;
+    includeFiles?: boolean;
+  };
+}
+
+export function BackupSettings({ data }: BackupSettingsProps) {
   return (
     <div className="space-y-6">
       <div>
@@ -22,13 +33,13 @@ export function BackupSettings() {
               Aktifkan backup otomatis berkala
             </p>
           </div>
-          <Switch />
+          <Switch defaultChecked={data?.autoBackup} />
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="backupFrequency">Frekuensi Backup</Label>
-          <Select>
-            <SelectTrigger>
+          <Select defaultValue={data?.frequency || 'daily'}>
+            <SelectTrigger id="backupFrequency">
               <SelectValue placeholder="Pilih frekuensi" />
             </SelectTrigger>
             <SelectContent>
@@ -44,23 +55,8 @@ export function BackupSettings() {
           <Input
             id="backupTime"
             type="time"
-            defaultValue="00:00"
+            defaultValue={data?.backupTime || "00:00"}
           />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="retentionPeriod">Periode Penyimpanan</Label>
-          <Select>
-            <SelectTrigger>
-              <SelectValue placeholder="Pilih periode" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="7">7 hari</SelectItem>
-              <SelectItem value="30">30 hari</SelectItem>
-              <SelectItem value="90">90 hari</SelectItem>
-              <SelectItem value="365">1 tahun</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
 
         <div className="space-y-2">
@@ -68,6 +64,7 @@ export function BackupSettings() {
           <Input
             id="backupLocation"
             placeholder="/path/to/backup"
+            defaultValue={data?.backupLocation}
           />
         </div>
 
@@ -78,23 +75,22 @@ export function BackupSettings() {
               Sertakan backup database
             </p>
           </div>
-          <Switch defaultChecked />
+          <Switch defaultChecked={data?.includeDatabase} />
         </div>
 
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
             <Label>Backup File</Label>
             <p className="text-sm text-muted-foreground">
-              Sertakan backup file upload
+              Sertakan backup file media
             </p>
           </div>
-          <Switch defaultChecked />
+          <Switch defaultChecked={data?.includeFiles} />
         </div>
       </div>
 
-      <div className="flex space-x-4">
+      <div className="flex justify-end">
         <Button>Simpan Perubahan</Button>
-        <Button variant="outline">Backup Manual</Button>
       </div>
     </div>
   );

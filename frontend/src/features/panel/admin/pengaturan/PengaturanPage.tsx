@@ -1,9 +1,11 @@
+import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { usePengaturanData } from "./hooks/usePengaturanData";
 import { GeneralSettings } from "./components/GeneralSettings";
 import { EmailSettings } from "./components/EmailSettings";
 import { SecuritySettings } from "./components/SecuritySettings";
 import { BackupSettings } from "./components/BackupSettings";
-import { usePengaturanData } from "./hooks/usePengaturanData";
+import LLMConfigurationSection from "./components/LLMConfigurationSection";
 
 export default function PengaturanPage() {
   const { data, isLoading } = usePengaturanData();
@@ -23,7 +25,7 @@ export default function PengaturanPage() {
             value="general" 
             className="flex-1 h-9 data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
           >
-            Umum
+            General
           </TabsTrigger>
           <TabsTrigger 
             value="email" 
@@ -35,7 +37,7 @@ export default function PengaturanPage() {
             value="security" 
             className="flex-1 h-9 data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
           >
-            Keamanan
+            Security
           </TabsTrigger>
           <TabsTrigger 
             value="backup" 
@@ -43,23 +45,48 @@ export default function PengaturanPage() {
           >
             Backup
           </TabsTrigger>
+          <TabsTrigger 
+            value="ai" 
+            className="flex-1 h-9 data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
+          >
+            AI
+          </TabsTrigger>
         </TabsList>
-        
+
         <div className="w-full bg-card rounded-lg border shadow-sm">
-          <TabsContent value="general" className="p-6 lg:p-8 mt-0 w-full focus-visible:outline-none">
-            <GeneralSettings data={data?.general} />
+          <TabsContent 
+            value="general" 
+            className="data-[state=active]:block data-[state=inactive]:hidden p-6 lg:p-8 w-full focus-visible:outline-none"
+          >
+            <GeneralSettings data={data} />
           </TabsContent>
-          
-          <TabsContent value="email" className="p-6 lg:p-8 mt-0 w-full focus-visible:outline-none">
-            <EmailSettings data={data?.email} />
+
+          <TabsContent 
+            value="email" 
+            className="data-[state=active]:block data-[state=inactive]:hidden p-6 lg:p-8 w-full focus-visible:outline-none"
+          >
+            <EmailSettings data={data} />
           </TabsContent>
-          
-          <TabsContent value="security" className="p-6 lg:p-8 mt-0 w-full focus-visible:outline-none">
-            <SecuritySettings data={data?.security} />
+
+          <TabsContent 
+            value="security" 
+            className="data-[state=active]:block data-[state=inactive]:hidden p-6 lg:p-8 w-full focus-visible:outline-none"
+          >
+            <SecuritySettings data={data} />
           </TabsContent>
-          
-          <TabsContent value="backup" className="p-6 lg:p-8 mt-0 w-full focus-visible:outline-none">
-            <BackupSettings data={data?.backup} />
+
+          <TabsContent 
+            value="backup" 
+            className="data-[state=active]:block data-[state=inactive]:hidden p-6 lg:p-8 w-full focus-visible:outline-none"
+          >
+            <BackupSettings data={data} />
+          </TabsContent>
+
+          <TabsContent 
+            value="ai" 
+            className="data-[state=active]:block data-[state=inactive]:hidden p-6 lg:p-8 w-full focus-visible:outline-none"
+          >
+            <LLMConfigurationSection />
           </TabsContent>
         </div>
       </Tabs>

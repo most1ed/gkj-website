@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { api } from '@/utils/api';
+import { apiMethods } from '@/lib/api';
 
 interface PengaturanData {
   general: {
@@ -40,8 +40,13 @@ export function usePengaturanData() {
   return useQuery({
     queryKey: ['pengaturan'],
     queryFn: async () => {
-      const response = await api.get('/pengaturan');
-      return response.data;
-    }
+      try {
+        return await apiMethods.getPengaturan();
+      } catch (error) {
+        console.error('Failed to fetch pengaturan data:', error);
+        throw error;
+      }
+    },
+    retry: 1
   });
 }

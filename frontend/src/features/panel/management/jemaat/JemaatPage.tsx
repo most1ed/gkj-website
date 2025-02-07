@@ -130,28 +130,62 @@ export default function JemaatPage() {
       </div>
 
       <Tabs defaultValue="statistik" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="statistik">Statistik</TabsTrigger>
-          <TabsTrigger value="all">Semua Jemaat</TabsTrigger>
-          <TabsTrigger value="kk">Kepala Keluarga</TabsTrigger>
-          <TabsTrigger value="wilayah">Wilayah Pelayanan</TabsTrigger>
+        <TabsList className="w-full h-11 p-1 bg-muted/50 rounded-lg mb-8">
+          <TabsTrigger 
+            value="statistik" 
+            className="flex-1 h-9 data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
+          >
+            Statistik
+          </TabsTrigger>
+          <TabsTrigger 
+            value="all" 
+            className="flex-1 h-9 data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
+          >
+            Semua Jemaat
+          </TabsTrigger>
+          <TabsTrigger 
+            value="kk" 
+            className="flex-1 h-9 data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
+          >
+            Kepala Keluarga
+          </TabsTrigger>
+          <TabsTrigger 
+            value="wilayah" 
+            className="flex-1 h-9 data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
+          >
+            Wilayah Pelayanan
+          </TabsTrigger>
         </TabsList>
-        
-        <TabsContent value="statistik" className="space-y-4">
-          <StatistikJemaat data={data?.statistik} />
-        </TabsContent>
 
-        <TabsContent value="all" className="space-y-4">
-          <JemaatList data={data?.jemaat} />
-        </TabsContent>
-        
-        <TabsContent value="kk" className="space-y-4">
-          <KepalaKeluarga data={data?.kepalaKeluarga} />
-        </TabsContent>
-        
-        <TabsContent value="wilayah" className="space-y-4">
-          <WilayahPelayanan data={data?.wilayah} />
-        </TabsContent>
+        <div className="w-full bg-card rounded-lg border shadow-sm">
+          <TabsContent 
+            value="statistik" 
+            className="data-[state=active]:block data-[state=inactive]:hidden p-6 lg:p-8 w-full focus-visible:outline-none"
+          >
+            <StatistikJemaat data={data?.statistik} />
+          </TabsContent>
+
+          <TabsContent 
+            value="all" 
+            className="data-[state=active]:block data-[state=inactive]:hidden p-6 lg:p-8 w-full focus-visible:outline-none"
+          >
+            <JemaatList data={data?.jemaat} />
+          </TabsContent>
+          
+          <TabsContent 
+            value="kk" 
+            className="data-[state=active]:block data-[state=inactive]:hidden p-6 lg:p-8 w-full focus-visible:outline-none"
+          >
+            <KepalaKeluarga data={data?.kepalaKeluarga} />
+          </TabsContent>
+          
+          <TabsContent 
+            value="wilayah" 
+            className="data-[state=active]:block data-[state=inactive]:hidden p-6 lg:p-8 w-full focus-visible:outline-none"
+          >
+            <WilayahPelayanan data={data?.wilayah} />
+          </TabsContent>
+        </div>
       </Tabs>
 
       <JemaatModal 

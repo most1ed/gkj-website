@@ -9,9 +9,17 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 interface SecuritySettingsProps {
-  data?: any;
+  data?: {
+    twoFactor?: boolean;
+    sessionTimeout?: number;
+    maxLoginAttempts?: number;
+    httpsOnly?: boolean;
+    allowedIPs?: string[];
+  };
 }
 
 export function SecuritySettings({ data }: SecuritySettingsProps) {
@@ -20,101 +28,68 @@ export function SecuritySettings({ data }: SecuritySettingsProps) {
       <div>
         <h3 className="text-lg font-medium">Pengaturan Keamanan</h3>
         <p className="text-sm text-muted-foreground">
-          Konfigurasi keamanan website
+          Konfigurasi keamanan dan autentikasi
         </p>
       </div>
-
-      <div className="space-y-8">
-        <Card>
-          <CardHeader>
-            <CardTitle>Two Factor Authentication</CardTitle>
-            <CardDescription>
-              Aktifkan autentikasi dua faktor untuk keamanan tambahan
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Switch />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Session Timeout</CardTitle>
-            <CardDescription>
-              Durasi waktu sebelum sesi login berakhir
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Select defaultValue="30">
-              <SelectTrigger className="w-full md:w-[240px]">
-                <SelectValue placeholder="Pilih durasi timeout" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="15">15 menit</SelectItem>
-                <SelectItem value="30">30 menit</SelectItem>
-                <SelectItem value="60">1 jam</SelectItem>
-                <SelectItem value="120">2 jam</SelectItem>
-              </SelectContent>
-            </Select>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Maksimal Percobaan Login</CardTitle>
-            <CardDescription>
-              Jumlah maksimal percobaan login yang diizinkan sebelum akun terkunci
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Select defaultValue="3">
-              <SelectTrigger className="w-full md:w-[240px]">
-                <SelectValue placeholder="Pilih jumlah maksimal" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="3">3 kali</SelectItem>
-                <SelectItem value="5">5 kali</SelectItem>
-                <SelectItem value="10">10 kali</SelectItem>
-              </SelectContent>
-            </Select>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>HTTPS Only</CardTitle>
-            <CardDescription>
-              Paksa semua koneksi menggunakan HTTPS
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Switch />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>IP yang Diizinkan</CardTitle>
-            <CardDescription>
-              Daftar alamat IP yang diizinkan untuk mengakses panel admin
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Textarea 
-              placeholder="Masukkan alamat IP (satu per baris)&#10;Contoh:&#10;192.168.1.1&#10;10.0.0.0/24" 
-              className="min-h-[120px] font-mono"
-            />
+      
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="space-y-0.5">
+            <Label>Two-Factor Authentication</Label>
             <p className="text-sm text-muted-foreground">
-              Format: IPv4 atau CIDR notation (contoh: 192.168.1.1 atau 10.0.0.0/24)
+              Aktifkan autentikasi dua faktor untuk keamanan tambahan
             </p>
-          </CardContent>
-        </Card>
-
-        <div className="flex justify-end">
-          <Button type="submit" size="lg">
-            Simpan Perubahan
-          </Button>
+          </div>
+          <Switch defaultChecked={data?.twoFactor} />
         </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="sessionTimeout">Session Timeout (menit)</Label>
+          <Input
+            id="sessionTimeout"
+            type="number"
+            min={5}
+            max={1440}
+            defaultValue={data?.sessionTimeout || 30}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="maxLoginAttempts">Maksimal Percobaan Login</Label>
+          <Input
+            id="maxLoginAttempts"
+            type="number"
+            min={3}
+            max={10}
+            defaultValue={data?.maxLoginAttempts || 5}
+          />
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div className="space-y-0.5">
+            <Label>HTTPS Only</Label>
+            <p className="text-sm text-muted-foreground">
+              Wajibkan penggunaan HTTPS untuk semua koneksi
+            </p>
+          </div>
+          <Switch defaultChecked={data?.httpsOnly} />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="allowedIPs">IP yang Diizinkan</Label>
+          <Input
+            id="allowedIPs"
+            placeholder="Contoh: 192.168.1.1, 10.0.0.0/24"
+            defaultValue={data?.allowedIPs?.join(', ')}
+          />
+          <p className="text-sm text-muted-foreground">
+            Kosongkan untuk mengizinkan semua IP
+          </p>
+        </div>
+      </div>
+
+      <div className="flex justify-end">
+        <Button>Simpan Perubahan</Button>
       </div>
     </div>
   );

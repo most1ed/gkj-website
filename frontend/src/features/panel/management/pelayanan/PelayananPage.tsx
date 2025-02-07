@@ -121,32 +121,64 @@ export default function PelayananPage() {
       </div>
 
       <Tabs defaultValue="laporan" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="laporan">
+        <TabsList className="w-full h-11 p-1 bg-muted/50 rounded-lg mb-8">
+          <TabsTrigger 
+            value="laporan" 
+            className="flex-1 h-9 data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
+          >
             <BarChart className="mr-2 h-4 w-4" />
             Laporan
           </TabsTrigger>
-          <TabsTrigger value="komisi">Komisi</TabsTrigger>
-          <TabsTrigger value="kegiatan">Kegiatan</TabsTrigger>
-          <TabsTrigger value="jadwal">Jadwal</TabsTrigger>
+          <TabsTrigger 
+            value="komisi" 
+            className="flex-1 h-9 data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
+          >
+            Komisi
+          </TabsTrigger>
+          <TabsTrigger 
+            value="kegiatan" 
+            className="flex-1 h-9 data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
+          >
+            Kegiatan
+          </TabsTrigger>
+          <TabsTrigger 
+            value="jadwal" 
+            className="flex-1 h-9 data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
+          >
+            Jadwal
+          </TabsTrigger>
         </TabsList>
-        
-        <TabsContent value="laporan" className="space-y-4">
-          <PelayananStatistics data={data} />
-          <LaporanPelayanan data={data?.laporan} />
-        </TabsContent>
-        
-        <TabsContent value="komisi" className="space-y-4">
-          <KomisiManager data={data?.komisi} />
-        </TabsContent>
-        
-        <TabsContent value="kegiatan" className="space-y-4">
-          <KegiatanPelayanan data={data?.kegiatan} />
-        </TabsContent>
-        
-        <TabsContent value="jadwal" className="space-y-4">
-          <JadwalPelayanan data={data?.jadwal} />
-        </TabsContent>
+
+        <div className="w-full bg-card rounded-lg border shadow-sm">
+          <TabsContent 
+            value="laporan" 
+            className="data-[state=active]:block data-[state=inactive]:hidden p-6 lg:p-8 w-full focus-visible:outline-none"
+          >
+            <PelayananStatistics data={data} />
+            <LaporanPelayanan data={data?.laporan} />
+          </TabsContent>
+
+          <TabsContent 
+            value="komisi" 
+            className="data-[state=active]:block data-[state=inactive]:hidden p-6 lg:p-8 w-full focus-visible:outline-none"
+          >
+            <KomisiManager data={data?.komisi} />
+          </TabsContent>
+
+          <TabsContent 
+            value="kegiatan" 
+            className="data-[state=active]:block data-[state=inactive]:hidden p-6 lg:p-8 w-full focus-visible:outline-none"
+          >
+            <KegiatanPelayanan data={data?.kegiatan} />
+          </TabsContent>
+
+          <TabsContent 
+            value="jadwal" 
+            className="data-[state=active]:block data-[state=inactive]:hidden p-6 lg:p-8 w-full focus-visible:outline-none"
+          >
+            <JadwalPelayanan data={data?.jadwal} />
+          </TabsContent>
+        </div>
       </Tabs>
 
       {/* Add Kegiatan Modal */}
