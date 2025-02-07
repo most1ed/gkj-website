@@ -253,6 +253,11 @@ export const sidebarConfig = {
           icon: Database
         }
       ]
+    },
+    {
+      title: 'Page Builder',
+      href: '/panel/page-builder',
+      icon: Network
     }
   ]
 };

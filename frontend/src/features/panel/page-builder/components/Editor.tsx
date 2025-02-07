@@ -12,12 +12,16 @@ import {
   Layers, 
   Settings,
   ChevronsLeft,
-  ChevronsRight
+  ChevronsRight,
+  Copy,
+  RotateCcw,
+  Save
 } from 'lucide-react';
 
 export const Editor: React.FC = () => {
   const { 
     currentPage, 
+    pages,
     addComponent, 
     updateComponent,
     deleteComponent,
@@ -26,12 +30,18 @@ export const Editor: React.FC = () => {
     editorState,
     togglePreviewMode,
     setActivePanel,
-    setSelectedComponent
+    setSelectedComponent,
+    createPage,
+    deletePage,
+    duplicatePage,
+    savePageVersion,
+    pageVersions
   } = usePageBuilderStore();
 
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [draggedComponent, setDraggedComponent] = useState<string | null>(null);
   const [newComponentType, setNewComponentType] = useState<ComponentType>('text');
+  const [showPageVersions, setShowPageVersions] = useState(false);
 
   const handleAddComponent = useCallback(() => {
     if (!currentPage) return;
@@ -80,6 +90,28 @@ export const Editor: React.FC = () => {
     setIsSidebarCollapsed(!isSidebarCollapsed);
   };
 
+  const handleCreateNewPage = () => {
+    createPage();
+  };
+
+  const handleDeleteCurrentPage = () => {
+    if (currentPage) {
+      deletePage(currentPage.id);
+    }
+  };
+
+  const handleDuplicateCurrentPage = () => {
+    if (currentPage) {
+      duplicatePage(currentPage.id);
+    }
+  };
+
+  const handleSavePageVersion = () => {
+    if (currentPage) {
+      savePageVersion(currentPage.id);
+    }
+  };
+
   const handleDragStart = (componentId: string) => {
     setDraggedComponent(componentId);
   };
@@ -99,10 +131,6 @@ export const Editor: React.FC = () => {
     }
   };
 
-  if (!currentPage) {
-    return <div>No page selected. Create a new page first.</div>;
-  }
-
   return (
     <div className="flex h-full">
       {/* Collapsible Sidebar */}
@@ -121,6 +149,92 @@ export const Editor: React.FC = () => {
 
         {!isSidebarCollapsed ? (
           <div className="p-4 space-y-4">
+            {/* Page Management Section */}
+            <div className="mb-4">
+              <h3 className="text-lg font-semibold mb-2">Pages</h3>
+              <div className="flex space-x-2 mb-2">
+                <button 
+                  onClick={handleCreateNewPage}
+                  className="bg-blue-500 text-white p-2 rounded flex items-center"
+                  title="Create New Page"
+                >
+                  <PlusCircle className="mr-2" size={16} /> New
+                </button>
+                {currentPage && (
+                  <>
+                    <button 
+                      onClick={handleDuplicateCurrentPage}
+                      className="bg-green-500 text-white p-2 rounded flex items-center"
+                      title="Duplicate Current Page"
+                    >
+                      <Copy className="mr-2" size={16} /> Duplicate
+                    </button>
+                    <button 
+                      onClick={handleDeleteCurrentPage}
+                      className="bg-red-500 text-white p-2 rounded flex items-center"
+                      title="Delete Current Page"
+                    >
+                      <Trash2 className="mr-2" size={16} /> Delete
+                    </button>
+                  </>
+                )}
+              </div>
+
+              {/* Page List */}
+              <div className="space-y-1">
+                {pages.map(page => (
+                  <div 
+                    key={page.id}
+                    className={`
+                      p-2 rounded cursor-pointer 
+                      ${currentPage?.id === page.id ? 'bg-blue-100' : 'hover:bg-gray-200'}
+                    `}
+                    onClick={() => {
+                      // TODO: Implement page selection
+                    }}
+                  >
+                    {page.name}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Page Version Control */}
+            {currentPage && (
+              <div className="mt-4">
+                <div className="flex justify-between items-center mb-2">
+                  <h3 className="text-lg font-semibold">Versions</h3>
+                  <button 
+                    onClick={handleSavePageVersion}
+                    className="text-blue-500 hover:text-blue-700"
+                    title="Save Current Version"
+                  >
+                    <Save size={16} />
+                  </button>
+                </div>
+                
+                {pageVersions[currentPage.id]?.slice(0, 5).map((version, index) => (
+                  <div 
+                    key={version.id} 
+                    className="bg-white p-2 rounded mb-1 flex justify-between items-center"
+                  >
+                    <span className="text-sm">
+                      Version {index + 1} 
+                      {version.author && ` - ${version.author}`}
+                    </span>
+                    <button 
+                      className="text-blue-500 hover:text-blue-700 flex items-center"
+                      onClick={() => {
+                        // TODO: Implement version restoration
+                      }}
+                    >
+                      <RotateCcw size={14} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-bold">Page Builder</h2>
               <button 
@@ -217,16 +331,22 @@ export const Editor: React.FC = () => {
             ${editorState.isPreviewMode ? 'pointer-events-none' : ''}
           `}
         >
-          <ComponentRenderer 
-            component={currentPage.content} 
-            isEditing={!editorState.isPreviewMode}
-            onContentChange={() => {
-              // Optional: Add any specific handling for content changes
-            }}
-            onDragStart={handleDragStart}
-            onDragEnd={handleDragEnd}
-            onDrop={handleDrop}
-          />
+          {currentPage ? (
+            <ComponentRenderer 
+              component={currentPage.content} 
+              isEditing={!editorState.isPreviewMode}
+              onContentChange={() => {
+                // Optional: Add any specific handling for content changes
+              }}
+              onDragStart={handleDragStart}
+              onDragEnd={handleDragEnd}
+              onDrop={handleDrop}
+            />
+          ) : (
+            <div className="text-center text-gray-500 p-4">
+              No page selected. Create a new page to get started.
+            </div>
+          )}
         </div>
       </div>
     </div>

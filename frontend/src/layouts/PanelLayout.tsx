@@ -29,7 +29,8 @@ import {
   KanbanIcon,
   KeyIcon,
   MoonIcon,
-  LogOutIcon
+  LogOutIcon,
+  NetworkIcon
 } from 'lucide-react';
 import { 
   Tooltip, 
@@ -419,10 +420,15 @@ const sidebarItems = [
     path: '/panel/admin/media',
   },
   {
+    label: 'Page Builder',
+    icon: NetworkIcon,
+    path: '/panel/page-builder',
+  },
+  {
     label: 'Pengaturan',
     icon: SettingsIcon,
     path: '/panel/admin/pengaturan',
-  }
+  },
 ];
 
 export const PanelLayout: React.FC = () => {

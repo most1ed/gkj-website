@@ -25,6 +25,7 @@ const MediaPage = lazy(() => import("@/features/panel/admin/media/MediaPage"));
 const PengaturanPage = lazy(() => import("@/features/panel/admin/pengaturan/PengaturanPage"));
 const FlexDashboardPage = lazy(() => import('@/features/panel/flexdash/pages/FlexDashboardPage'));
 import { OfferingTypeManagement } from '@/features/panel/base/offerings/components/OfferingTypeManagement';
+const PageBuilderPage = lazy(() => import('@/features/panel/page-builder/PageBuilderPage'));
 
 // Error fallback components (optional, can be customized)
 const DashboardErrorFallback = () => (
@@ -131,6 +132,16 @@ export const panelRoutes: RouteObject[] = [
           roles: [UserRole.ADMIN, UserRole.STAFF],
           icon: <BookOpen />,
         }
+      },
+      {
+        path: 'page-builder',
+        element: (
+          <ErrorBoundary>
+            <Suspense fallback={<div>Loading...</div>}>
+              <PageBuilderPage />
+            </Suspense>
+          </ErrorBoundary>
+        ),
       },
       {
         path: 'management',
