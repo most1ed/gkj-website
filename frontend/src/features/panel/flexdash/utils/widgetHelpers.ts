@@ -6,17 +6,11 @@ import {
   WidgetSize,
   WidgetTemplate,
   DashboardPreset,
-  WidgetLayout 
+  WidgetLayout,
+  CreateWidgetDTO
 } from '../types/widget.types';
 import { UserRole } from '@/routes/types';
 import { v4 as uuidv4 } from 'uuid';
-import { 
-  BaseWidget, 
-  WidgetTemplate, 
-  UserRole, 
-  WidgetCategory, 
-  CreateWidgetDTO 
-} from '../types/widget.types';
 import { widgetMock } from '@/lib/mock';
 
 export class WidgetManager {

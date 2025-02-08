@@ -1,0 +1,6 @@
+packages:
+  - '.'
+  - '../Repositories/easyblocks/packages/core'
+  - '../Repositories/easyblocks/packages/editor'
+  - '../Repositories/easyblocks/packages/design-system'
+  - '../Repositories/easyblocks/packages/utils'

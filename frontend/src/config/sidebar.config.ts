@@ -256,7 +256,7 @@ export const sidebarConfig = {
     },
     {
       title: 'Page Builder',
-      href: '/panel/page-builder',
+      href: '/panel/pagebuilder',
       icon: Network
     }
   ]

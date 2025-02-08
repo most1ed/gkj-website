@@ -6,6 +6,7 @@ import { protectedRoute } from './route-utils';
 import { UserRole } from './types';
 import { BookOpen } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
+import { LoadingSpinner } from '@/components/ui/loading-spinner'; // Import LoadingSpinner component
 
 const ProfilePage = lazy(() => import('@/features/panel/base/profile/ProfilePage'));
 const DocumentsPage = lazy(() => import("@/features/panel/base/documents/DocumentsPage"));
@@ -25,7 +26,8 @@ const MediaPage = lazy(() => import("@/features/panel/admin/media/MediaPage"));
 const PengaturanPage = lazy(() => import("@/features/panel/admin/pengaturan/PengaturanPage"));
 const FlexDashboardPage = lazy(() => import('@/features/panel/flexdash/pages/FlexDashboardPage'));
 import { OfferingTypeManagement } from '@/features/panel/base/offerings/components/OfferingTypeManagement';
-const PageBuilderPage = lazy(() => import('@/features/panel/page-builder/PageBuilderPage'));
+const PageBuilderPage = lazy(() => import('@/features/panel/pagebuilder/PageBuilderPage'));
+const PageList = lazy(() => import('@/features/panel/pagebuilder/PageList')); 
 
 // Error fallback components (optional, can be customized)
 const DashboardErrorFallback = () => (
@@ -134,16 +136,6 @@ export const panelRoutes: RouteObject[] = [
         }
       },
       {
-        path: 'page-builder',
-        element: (
-          <ErrorBoundary>
-            <Suspense fallback={<div>Loading...</div>}>
-              <PageBuilderPage />
-            </Suspense>
-          </ErrorBoundary>
-        ),
-      },
-      {
         path: 'management',
         children: [
           {
@@ -205,7 +197,7 @@ export const panelRoutes: RouteObject[] = [
                 </Suspense>
               </ErrorBoundary>
             ),
-          },
+          }
         ]
       },
       {
@@ -215,7 +207,7 @@ export const panelRoutes: RouteObject[] = [
             path: 'konten',
             element: (
               <ErrorBoundary fallback={<AdminErrorFallback />}>
-                <Suspense fallback={<div>Loading...</div>}>
+                <Suspense fallback={<LoadingSpinner />}>
                   <KontenPage />
                 </Suspense>
               </ErrorBoundary>
@@ -225,7 +217,7 @@ export const panelRoutes: RouteObject[] = [
             path: 'artikel',
             element: (
               <ErrorBoundary fallback={<AdminErrorFallback />}>
-                <Suspense fallback={<div>Loading...</div>}>
+                <Suspense fallback={<LoadingSpinner />}>
                   <ArtikelPage />
                 </Suspense>
               </ErrorBoundary>
@@ -235,7 +227,7 @@ export const panelRoutes: RouteObject[] = [
             path: 'master',
             element: (
               <ErrorBoundary fallback={<AdminErrorFallback />}>
-                <Suspense fallback={<div>Loading...</div>}>
+                <Suspense fallback={<LoadingSpinner />}>
                   <MasterPage />
                 </Suspense>
               </ErrorBoundary>
@@ -245,7 +237,7 @@ export const panelRoutes: RouteObject[] = [
             path: 'alkitab',
             element: (
               <ErrorBoundary fallback={<AdminErrorFallback />}>
-                <Suspense fallback={<div>Loading...</div>}>
+                <Suspense fallback={<LoadingSpinner />}>
                   <AlkitabPage />
                 </Suspense>
               </ErrorBoundary>
@@ -255,7 +247,7 @@ export const panelRoutes: RouteObject[] = [
             path: 'media',
             element: (
               <ErrorBoundary fallback={<AdminErrorFallback />}>
-                <Suspense fallback={<div>Loading...</div>}>
+                <Suspense fallback={<LoadingSpinner />}>
                   <MediaPage />
                 </Suspense>
               </ErrorBoundary>
@@ -265,7 +257,7 @@ export const panelRoutes: RouteObject[] = [
             path: 'pengaturan',
             element: (
               <ErrorBoundary fallback={<AdminErrorFallback />}>
-                <Suspense fallback={<div>Loading...</div>}>
+                <Suspense fallback={<LoadingSpinner />}>
                   <PengaturanPage />
                 </Suspense>
               </ErrorBoundary>
@@ -273,6 +265,45 @@ export const panelRoutes: RouteObject[] = [
           }
         ]
       },
+      {
+        path: 'pagebuilder',
+        children: [
+          {
+            index: true,
+            element: (
+              <ErrorBoundary fallback={<AdminErrorFallback />}>
+                <Suspense fallback={<LoadingSpinner size="lg" />}>
+                  <PageList />
+                </Suspense>
+              </ErrorBoundary>
+            )
+          },
+          {
+            path: 'create',
+            element: (
+              <ErrorBoundary fallback={<AdminErrorFallback />}>
+                <Suspense fallback={<LoadingSpinner size="lg" />}>
+                  <PageBuilderPage />
+                </Suspense>
+              </ErrorBoundary>
+            )
+          },
+          {
+            path: 'edit/:pageId',
+            element: (
+              <ErrorBoundary fallback={<AdminErrorFallback />}>
+                <Suspense fallback={<LoadingSpinner size="lg" />}>
+                  <PageBuilderPage />
+                </Suspense>
+              </ErrorBoundary>
+            )
+          }
+        ]
+      },
+      {
+        path: '*',
+        element: <Navigate to="/panel" replace />
+      }
     ]
   }
 ];

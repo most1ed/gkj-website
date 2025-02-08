@@ -422,7 +422,7 @@ const sidebarItems = [
   {
     label: 'Page Builder',
     icon: NetworkIcon,
-    path: '/panel/page-builder',
+    path: '/panel/pagebuilder',
   },
   {
     label: 'Pengaturan',
